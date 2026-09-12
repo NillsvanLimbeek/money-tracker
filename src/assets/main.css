@@ -1,0 +1,96 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/*
+ * Custom "brand" color scale (indigo-violet), anchored at shade 500 =
+ * the exact accent hex from the design tokens. `static` keeps Tailwind
+ * from tree-shaking these — they're only ever reached indirectly via
+ * Nuxt UI's `var(--color-brand-500, ...)` lookups, never as literal
+ * `bg-brand-500` classes, so static analysis can't see them in use.
+ * Generated with a Tailwind-style OKLCH tint/shade scale; only 500 is
+ * the exact designer value, the rest are interpolated.
+ */
+@theme static {
+  --color-brand-50: #f7f8ff;
+  --color-brand-100: #ebedff;
+  --color-brand-200: #d7dbff;
+  --color-brand-300: #b8beff;
+  --color-brand-400: #8184f1;
+  --color-brand-500: #4f45c4;
+  --color-brand-600: #3a2c9e;
+  --color-brand-700: #26117a;
+  --color-brand-800: #140050;
+  --color-brand-900: #07002b;
+  --color-brand-950: #01000f;
+}
+
+/*
+ * Exact neutral tokens from the design. These override Nuxt UI's
+ * default semantic vars (normally derived from the `neutral` Tailwind
+ * palette) with the designer's literal values. Written unlayered, so
+ * they win over Nuxt UI's `@layer theme` defaults regardless of import
+ * order. Light mode only — the design tokens don't specify a dark
+ * palette yet.
+ */
+:root,
+.light {
+  --ui-bg: #ffffff; /* cards / rows / inputs */
+  --ui-bg-muted: #f1f0ed; /* page canvas */
+  --ui-bg-elevated: #fbfbfa; /* phone surface / inline picker background */
+  --ui-bg-accented: #f8f8f6; /* net cell fill */
+  --ui-bg-inverted: #1a1a20; /* dark chip */
+
+  --ui-text-highlighted: #17171a; /* headings, sheet CTA */
+  --ui-text: #17171a; /* expense amounts */
+  --ui-text-toned: #4a4a55; /* filter bar icon strokes */
+  --ui-text-muted: #75757f; /* labels, dates, meta */
+  --ui-text-dimmed: #9a9aa4; /* search icon stroke */
+  --ui-text-inverted: #ffffff;
+
+  --ui-border: rgba(20, 20, 30, 0.07); /* hairline */
+  --ui-border-muted: rgba(20, 20, 30, 0.07);
+  --ui-border-accented: rgba(20, 20, 30, 0.07);
+}
+
+/*
+ * App-specific tokens that don't fit Nuxt UI's semantic color system:
+ * each category badge needs 3 independent hex values (bg/text/border)
+ * that aren't derivable from one base color via opacity, unlike Nuxt
+ * UI's built-in color aliases. Reference these directly, e.g.
+ * `bg-(--category-food-bg) text-(--category-food-text)`, until a
+ * dedicated CategoryBadge component wraps them.
+ *
+ * Selected state (per design): invert — the badge fill becomes the
+ * category's text color, and the label becomes white.
+ */
+:root {
+  --category-food-bg: #fdf0e3;
+  --category-food-text: #8a4f14;
+  --category-food-border: #f2ddc6;
+
+  --category-entertainment-bg: #fdeaf2;
+  --category-entertainment-text: #9b2d63;
+  --category-entertainment-border: #f5d6e4;
+
+  --category-income-bg: #eae7fb;
+  --category-income-text: #4f45c4;
+  --category-income-border: #dcd7f7;
+
+  --category-transport-bg: #e6f0f7;
+  --category-transport-text: #1f5b80;
+  --category-transport-border: #d2e3ee;
+
+  --category-housing-bg: #eef1e7;
+  --category-housing-text: #4d6033;
+  --category-housing-border: #dee4d2;
+
+  --category-shopping-bg: #f4ecf7;
+  --category-shopping-text: #71397e;
+  --category-shopping-border: #e6d9ec;
+
+  /* Dark chip hover (e.g. sheet CTA), not derivable from --ui-bg-inverted via opacity */
+  --ui-bg-inverted-hover: #2a2a33;
+
+  /* Link hover, not derivable from --ui-primary via opacity */
+  --ui-primary-link-hover: #332aa8;
+}

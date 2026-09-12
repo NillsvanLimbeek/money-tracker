@@ -1,0 +1,14 @@
+minimumReleaseAgeExcludePrune: true
+
+trustPolicy: no-downgrade
+# semver@6.3.1 is the only version satisfying @babel/core's `semver: ^6.3.1`
+# dependency (no 6.3.2+ has ever been published), so every project using
+# @babel/core pulls it in transitively via vite-plugin-vue-devtools here.
+trustPolicyExclude:
+  - semver@6.3.1
+
+shellEmulator: true
+
+allowBuilds:
+  esbuild: true
+  vue-demi: true
