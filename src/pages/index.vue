@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import CategoryDrawer from '@/components/CategoryDrawer.vue';
+import MonthPicker from '@/components/MonthPicker.vue';
 import { CATEGORIES } from '@/lib/constants';
 import { categoryIsSelected } from '@/lib/utils';
+
+const now = new Date();
+const selectedMonth = ref(new Date(now.getFullYear(), now.getMonth(), 1));
 
 const search = ref('');
 const isFilterOpen = ref(false);
@@ -43,4 +47,6 @@ function resetCategories() {
       @reset-categories="resetCategories"
     />
   </div>
+
+  <MonthPicker v-model="selectedMonth" />
 </template>

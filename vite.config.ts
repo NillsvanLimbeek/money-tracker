@@ -20,16 +20,17 @@ export default defineConfig({
           primary: 'brand',
           neutral: 'zinc',
         },
-        // Per the design, outlined inputs/buttons get a dark border
-        // (--ui-bg-inverted) instead of Nuxt UI's default hairline ring.
+        // Per the design, outlined inputs/buttons get the exact #ededef
+        // hairline border (--ui-border-accented) rather than Nuxt UI's
+        // default neutral ring.
         input: {
           compoundVariants: [
-            { variant: 'outline', class: 'ring-(--ui-text-dimmed)' },
+            { variant: 'outline', class: 'ring-(--ui-border-accented)' },
           ],
         },
         button: {
           compoundVariants: [
-            { color: 'neutral', variant: 'outline', class: 'ring-(--ui-text-dimmed)' },
+            { color: 'neutral', variant: 'outline', class: 'ring-(--ui-border-accented)' },
           ],
         },
       },

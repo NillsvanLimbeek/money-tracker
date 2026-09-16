@@ -8,7 +8,7 @@ const isMobile = breakpoints.smaller('md');
 <template>
   <UApp>
     <template v-if="isMobile">
-      <div class="h-screen bg-muted">
+      <div class="h-screen bg-olive-50">
         <RouterView />
       </div>
     </template>
