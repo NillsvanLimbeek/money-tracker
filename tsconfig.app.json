@@ -13,6 +13,6 @@
     // Extra safety for array and object lookups, but may have false positives.
     "noUncheckedIndexedAccess": true
   },
-  "include": ["env.d.ts", "components.d.ts", "auto-imports.d.ts", "src/**/*", "src/**/*.vue"],
+  "include": ["env.d.ts", "components.d.ts", "auto-imports.d.ts", "typed-router.d.ts", "src/**/*", "src/**/*.vue"],
   "exclude": ["src/**/__tests__/*"]
 }

@@ -44,3 +44,6 @@ playwright-report/
 # Nuxt UI / auto-import generated types
 components.d.ts
 auto-imports.d.ts
+
+# vue-router file-based routing generated types
+typed-router.d.ts

@@ -2,6 +2,65 @@
 @import "@nuxt/ui";
 
 /*
+ * Self-hosted fonts (Google Fonts, files in public/fonts). Only the
+ * weights actually used by the UI are included:
+ * Manrope 400/500/600/700 for all UI text, IBM Plex Mono 400/500 for
+ * numeric and label accents (uppercase micro-labels, dates, totals).
+ */
+@font-face {
+  font-family: "Manrope";
+  src: url("/fonts/manrope/Manrope-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Manrope";
+  src: url("/fonts/manrope/Manrope-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Manrope";
+  src: url("/fonts/manrope/Manrope-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Manrope";
+  src: url("/fonts/manrope/Manrope-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono/IBMPlexMono-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-sans: "Manrope", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", system-ui, sans-serif;
+}
+
+/*
  * Custom "brand" color scale (indigo-violet), anchored at shade 500 =
  * the exact accent hex from the design tokens. `static` keeps Tailwind
  * from tree-shaking these — they're only ever reached indirectly via
@@ -22,6 +81,41 @@
   --color-brand-800: #140050;
   --color-brand-900: #07002b;
   --color-brand-950: #01000f;
+}
+
+/*
+ * Wire the `primary` semantic role (vite.config.ts: colors.primary =
+ * 'brand') onto that scale. Nuxt UI's Nuxt module does this at runtime
+ * from app.config (see @nuxt/ui/dist/runtime/plugins/colors.js), but
+ * that plugin never runs in this plain-Vite setup — without it,
+ * `--ui-primary` and `--ui-color-primary-*` are never defined, so
+ * `bg-primary`/`text-primary-600`/etc. resolve to nothing. Secondary/
+ * success/info/warning/error keep Nuxt UI's stock palettes (the design
+ * hasn't touched them) and only need the flat semantic var, not the
+ * full scale.
+ */
+:root {
+  --ui-color-primary-50: var(--color-brand-50);
+  --ui-color-primary-100: var(--color-brand-100);
+  --ui-color-primary-200: var(--color-brand-200);
+  --ui-color-primary-300: var(--color-brand-300);
+  --ui-color-primary-400: var(--color-brand-400);
+  --ui-color-primary-500: var(--color-brand-500);
+  --ui-color-primary-600: var(--color-brand-600);
+  --ui-color-primary-700: var(--color-brand-700);
+  --ui-color-primary-800: var(--color-brand-800);
+  --ui-color-primary-900: var(--color-brand-900);
+  --ui-color-primary-950: var(--color-brand-950);
+}
+
+:root,
+.light {
+  --ui-primary: var(--ui-color-primary-500);
+  --ui-secondary: var(--color-blue-500);
+  --ui-success: var(--color-green-500);
+  --ui-info: var(--color-blue-500);
+  --ui-warning: var(--color-yellow-500);
+  --ui-error: var(--color-red-500);
 }
 
 /*

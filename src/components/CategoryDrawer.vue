@@ -1,0 +1,91 @@
+<script setup lang="ts">
+import type { Category } from '@/lib/types';
+import { categoryIsSelected } from '@/lib/utils';
+
+interface Props {
+  categories: Category[];
+  selectedCategories: string[];
+}
+
+const { selectedCategories } = defineProps<Props>();
+const emit = defineEmits<{
+  (e: 'resetCategories'): void;
+  (e: 'toggleCategory', payload: string): void;
+}>();
+
+const isFilterOpen = defineModel<boolean>('open', { required: true });
+
+function categoryStyle(key: string) {
+  if (categoryIsSelected(selectedCategories, key)) {
+    return {
+      backgroundColor: `var(--category-${key}-text)`,
+      borderColor: `var(--category-${key}-text)`,
+      color: 'var(--ui-text-inverted)',
+    };
+  }
+
+  return {
+    backgroundColor: 'var(--ui-bg)',
+    borderColor: `var(--category-${key}-border)`,
+    color: `var(--category-${key}-text)`,
+  };
+}
+</script>
+
+<template>
+  <UDrawer
+    v-model:open="isFilterOpen"
+    :ui="{ overlay: 'bg-black/50' }"
+  >
+    <UButton
+      color="neutral"
+      variant="outline"
+      icon="i-lucide-list-sort-descending"
+      size="lg"
+    >
+      Filter
+    </UButton>
+
+    <template #header>
+      <h2 class="flex-1 text-lg font-semibold text-highlighted">
+        Filter by category
+      </h2>
+
+      <UButton
+        variant="link"
+        color="primary"
+        class="p-0"
+        @click="emit('resetCategories')"
+      >
+        Reset
+      </UButton>
+    </template>
+
+    <template #body>
+      <div class="grid grid-cols-3 gap-2">
+        <button
+          v-for="category in categories"
+          :key="category.key"
+          type="button"
+          class="rounded-full border px-3 py-2 text-sm font-medium transition-colors"
+          :style="categoryStyle(category.key)"
+          @click="() => emit('toggleCategory', category.key)"
+        >
+          {{ category.label }}
+        </button>
+      </div>
+    </template>
+
+    <template #footer>
+      <UButton
+        block
+        color="neutral"
+        variant="solid"
+        size="lg"
+        @click="isFilterOpen = false"
+      >
+        Show items
+      </UButton>
+    </template>
+  </UDrawer>
+</template>

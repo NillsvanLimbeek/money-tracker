@@ -4,10 +4,12 @@ import ui from '@nuxt/ui/vite';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
+import VueRouter from 'vue-router/vite';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    VueRouter(),
     vue(),
     vueDevTools(),
     ui({
@@ -17,6 +19,18 @@ export default defineConfig({
         colors: {
           primary: 'brand',
           neutral: 'zinc',
+        },
+        // Per the design, outlined inputs/buttons get a dark border
+        // (--ui-bg-inverted) instead of Nuxt UI's default hairline ring.
+        input: {
+          compoundVariants: [
+            { variant: 'outline', class: 'ring-(--ui-text-dimmed)' },
+          ],
+        },
+        button: {
+          compoundVariants: [
+            { color: 'neutral', variant: 'outline', class: 'ring-(--ui-text-dimmed)' },
+          ],
         },
       },
     }),
