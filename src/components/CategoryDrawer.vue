@@ -47,7 +47,7 @@ function categoryStyle(key: string) {
     </UButton>
 
     <template #header>
-      <h2 class="flex-1 text-lg font-semibold text-highlighted">
+      <h2 class="text-highlighted flex-1 text-lg font-semibold">
         Filter by category
       </h2>
 

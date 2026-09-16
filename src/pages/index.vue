@@ -25,12 +25,12 @@ function resetCategories() {
 
 <template>
   <div class="flex items-center justify-between p-4">
-    <h1 class="text-xl font-bold text-highlighted">
+    <h1 class="text-highlighted text-xl font-bold">
       Transactions
     </h1>
   </div>
 
-  <div class="w-full flex gap-4 border-b border-accented pb-4 px-4">
+  <div class="border-accented flex w-full gap-4 border-b px-4 pb-4">
     <UInput
       v-model="search"
       class="w-full"

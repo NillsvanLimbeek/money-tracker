@@ -37,8 +37,8 @@ function shiftMonth(delta: number) {
     />
 
     <div class="flex flex-col items-center gap-1">
-      <span class="text-lg font-bold text-highlighted">{{ monthLabel }}</span>
-      <span class="font-mono text-xs uppercase tracking-wide text-muted">{{ relativeLabel }}</span>
+      <span class="text-highlighted text-lg font-bold">{{ monthLabel }}</span>
+      <span class="text-muted font-mono text-xs tracking-wide uppercase">{{ relativeLabel }}</span>
     </div>
 
     <UButton
