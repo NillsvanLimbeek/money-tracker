@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import CategoryDrawer from '@/components/CategoryDrawer.vue';
-import MonthPicker from '@/components/MonthPicker.vue';
+import MonthSummary from '@/components/MonthSummary.vue';
 import { CATEGORIES } from '@/lib/constants';
 import { categoryIsSelected } from '@/lib/utils';
 
 const now = new Date();
 const selectedMonth = ref(new Date(now.getFullYear(), now.getMonth(), 1));
+
+// Placeholder totals until transactions are wired up to a real data source.
+const income = ref(3400);
+const expense = ref(1145.04);
 
 const search = ref('');
 const isFilterOpen = ref(false);
@@ -48,5 +52,9 @@ function resetCategories() {
     />
   </div>
 
-  <MonthPicker v-model="selectedMonth" />
+  <MonthSummary
+    v-model="selectedMonth"
+    :income="income"
+    :expense="expense"
+  />
 </template>
