@@ -40,28 +40,30 @@ function resetCategories() {
 </script>
 
 <template>
-  <div class="flex items-center justify-between p-4">
-    <h1 class="text-highlighted text-xl font-bold">
-      Transactions
-    </h1>
-  </div>
+  <div class="bg-muted bg-olive-50 sticky top-0 z-10">
+    <div class="flex items-center justify-between p-4">
+      <h1 class="text-highlighted text-xl font-bold">
+        Transactions
+      </h1>
+    </div>
 
-  <div class="bg-muted border-accented sticky top-0 z-10 flex w-full gap-4 border-b px-4 pb-4">
-    <UInput
-      v-model="search"
-      class="w-full"
-      size="lg"
-      icon="i-lucide-search"
-      placeholder="Search Transactions"
-    />
+    <div class="border-accented flex w-full gap-4 border-b px-4 pb-4">
+      <UInput
+        v-model="search"
+        class="w-full"
+        size="lg"
+        icon="i-lucide-search"
+        placeholder="Search Transactions"
+      />
 
-    <CategoryDrawer
-      v-model:open="isFilterOpen"
-      :categories="CATEGORIES"
-      :selected-categories
-      @toggle-category="toggleCategory"
-      @reset-categories="resetCategories"
-    />
+      <CategoryDrawer
+        v-model:open="isFilterOpen"
+        :categories="CATEGORIES"
+        :selected-categories
+        @toggle-category="toggleCategory"
+        @reset-categories="resetCategories"
+      />
+    </div>
   </div>
 
   <MonthSummary
