@@ -46,7 +46,7 @@ function resetCategories() {
     </h1>
   </div>
 
-  <div class="border-accented flex w-full gap-4 border-b px-4 pb-4">
+  <div class="bg-muted border-accented sticky top-0 z-10 flex w-full gap-4 border-b px-4 pb-4">
     <UInput
       v-model="search"
       class="w-full"
