@@ -1,16 +1,28 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import CategoryDrawer from '@/components/CategoryDrawer.vue';
 import MonthSummary from '@/components/MonthSummary.vue';
-import { CATEGORIES } from '@/lib/constants';
+import TransactionList from '@/components/TransactionList.vue';
+import { CATEGORIES, MOCK_TRANSACTIONS } from '@/lib/constants';
 import { categoryIsSelected } from '@/lib/utils';
 
 const now = new Date();
 const selectedMonth = ref(new Date(now.getFullYear(), now.getMonth(), 1));
 
-// Placeholder totals until transactions are wired up to a real data source.
-const income = ref(3400);
-const expense = ref(1145.04);
+const transactions = ref(MOCK_TRANSACTIONS);
+
+const income = computed(() => transactions.value
+  .filter(t => t.amount > 0)
+  .reduce((sum, t) => sum + t.amount, 0));
+const expense = computed(() => transactions.value
+  .filter(t => t.amount < 0)
+  .reduce((sum, t) => sum - t.amount, 0));
+
+function changeCategory({ id, categoryKey }: { id: string; categoryKey: string }) {
+  const transaction = transactions.value.find(t => t.id === id);
+  if (transaction)
+    transaction.categoryKey = categoryKey;
+}
 
 const search = ref('');
 const isFilterOpen = ref(false);
@@ -40,7 +52,7 @@ function resetCategories() {
       class="w-full"
       size="lg"
       icon="i-lucide-search"
-      placeholder="Search merchant"
+      placeholder="Search Transactions"
     />
 
     <CategoryDrawer
@@ -56,5 +68,11 @@ function resetCategories() {
     v-model="selectedMonth"
     :income="income"
     :expense="expense"
+  />
+
+  <TransactionList
+    :transactions="transactions"
+    :categories="CATEGORIES"
+    @change-category="changeCategory"
   />
 </template>

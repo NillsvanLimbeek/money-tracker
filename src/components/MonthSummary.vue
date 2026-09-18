@@ -28,20 +28,18 @@ function shiftMonth(delta: number) {
         variant="outline"
         icon="i-lucide-chevron-left"
         square
-        size="lg"
         class="bg-accented rounded-lg"
         aria-label="Previous month"
         @click="shiftMonth(-1)"
       />
 
-      <span class="text-highlighted text-lg font-bold">{{ monthLabel }}</span>
+      <span class="text-highlighted text-md font-bold">{{ monthLabel }}</span>
 
       <UButton
         color="neutral"
         variant="outline"
         icon="i-lucide-chevron-right"
         square
-        size="lg"
         class="bg-accented rounded-lg"
         aria-label="Next month"
         @click="shiftMonth(1)"
