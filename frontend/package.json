@@ -21,7 +21,6 @@
     "@nuxt/ui": "^4.11.1",
     "@tanstack/vue-query": "^5.102.8",
     "@vueuse/core": "^14.4.0",
-    "better-auth": "^1.7.5",
     "date-fns": "^4.4.0",
     "pinia": "^4.0.2",
     "tailwindcss": "^4.3.3",
