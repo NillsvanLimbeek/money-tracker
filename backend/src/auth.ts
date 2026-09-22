@@ -3,10 +3,6 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import * as schema from './db/schema';
 
-// Scaffolding only for now — the frontend still authenticates directly
-// against Neon Auth (frontend/src/lib/neon.ts, frontend/src/stores/auth.ts
-// are intentionally untouched). Nothing here is called by the frontend yet;
-// wiring the frontend over to this API is a follow-up.
 export function createAuth(db: Db, options: {
   secret: string;
   baseURL: string;

@@ -1,10 +1,8 @@
 import { boolean, integer, numeric, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 // --- better-auth core tables ---
-// First draft, following better-auth's documented Drizzle schema shape
-// (user/session/account/verification). Reconcile against the real output
-// of the better-auth CLI's schema generator once configured in src/auth.ts,
-// before writing migrations against this.
+// Follows better-auth's documented Drizzle schema shape for the
+// emailAndPassword-only config in src/auth.ts (user/session/account/verification).
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),

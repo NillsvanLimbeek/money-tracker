@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { neon } from '@/lib/neon';
+import { authClient } from '@/lib/auth-client';
 
 type Status = 'idle' | 'loading' | 'ready';
 
@@ -17,7 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
     restoring = (async () => {
       status.value = 'loading';
 
-      const { data } = await neon.auth.getSession();
+      const { data } = await authClient.getSession();
 
       user.value = data?.session && data?.user
         ? { id: data.user.id, email: data.user.email, name: data.user.name }
@@ -29,7 +29,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signUp(email: string, password: string, name: string) {
-    const result = await neon.auth.signUp.email({ email, password, name });
+    const result = await authClient.signUp.email({ email, password, name });
 
     if (!result.error)
       await restoreSessionForced();
@@ -38,7 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signIn(email: string, password: string, rememberMe = true) {
-    const result = await neon.auth.signIn.email({ email, password, rememberMe });
+    const result = await authClient.signIn.email({ email, password, rememberMe });
 
     if (!result.error)
       await restoreSessionForced();
@@ -47,7 +47,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signOut() {
-    const result = await neon.auth.signOut();
+    const result = await authClient.signOut();
 
     user.value = null;
 
