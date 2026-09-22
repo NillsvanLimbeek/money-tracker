@@ -37,8 +37,8 @@ export const useAuthStore = defineStore('auth', () => {
     return result;
   }
 
-  async function signIn(email: string, password: string) {
-    const result = await neon.auth.signIn.email({ email, password });
+  async function signIn(email: string, password: string, rememberMe = true) {
+    const result = await neon.auth.signIn.email({ email, password, rememberMe });
 
     if (!result.error)
       await restoreSessionForced();

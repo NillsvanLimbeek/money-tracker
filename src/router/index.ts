@@ -7,14 +7,16 @@ const router = createRouter({
   routes,
 });
 
+const AUTH_PATHS = ['/signin', '/signup'];
+
 router.beforeEach(async (to) => {
   const authStore = useAuthStore();
   await authStore.restoreSession();
 
-  if (!authStore.user && to.path !== '/signin')
+  if (!authStore.user && !AUTH_PATHS.includes(to.path))
     return '/signin';
 
-  if (authStore.user && to.path === '/signin')
+  if (authStore.user && AUTH_PATHS.includes(to.path))
     return '/';
 });
 
