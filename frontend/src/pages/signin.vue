@@ -63,7 +63,7 @@ async function onSubmit(event: FormSubmitEvent<SignIn>) {
       @submit="onSubmit"
     >
       <AuthFormField
-        v-for="field in SIGN_IN_FIELDS "
+        v-for="field in SIGN_IN_FIELDS"
         :key="field.name"
         v-model="state[field.name]"
         :field="field"

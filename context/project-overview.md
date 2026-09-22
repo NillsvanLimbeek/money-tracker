@@ -27,43 +27,52 @@
 | PWA | `vite-plugin-pwa` | Installable from the browser |
 | Charts | vue-chartjs | Chart.js wrapper for Vue |
 
-**Backend**
-
-No custom backend — the frontend talks to [Neon](https://neon.tech) directly.
+**Backend (`backend/`)**
 
 | Layer | Choice | Notes |
 |---|---|---|
-| API | Neon Data API | PostgREST-style REST over Postgres, generated from the schema, no server to write or host |
-| Auth | Neon Managed Better Auth | Hosted auth (built on Better Auth), issues JWTs the Data API validates natively |
-| Access control | Postgres Row-Level Security | Policies keyed on `auth.user_id()` (JWT `sub` claim) — each user only ever sees their own rows |
-| Database | PostgreSQL (Neon, `aws-eu-central-1`) | Serverless, autoscaling, branchable; project `money-tracker` |
+| Framework | Hono | Lightweight, fast, already familiar |
+| Auth | better-auth | Hono adapter, single user |
+| ORM | Drizzle ORM | Type-safe queries, migrations, already familiar |
+| Database | Neon | Serverless Postgres, switched from self-hosted during Claude Code session |
+| Deployment | Cloudflare Workers | Free tier, native Hono runtime fit, pairs well with Neon via Hyperdrive |
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                  Neon (aws-eu-central-1)            │
-│   Managed Better Auth  →  neon_auth schema (JWTs)   │
-│   Data API  →  REST over public schema              │
-│             →  Postgres RLS (auth.user_id())        │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│         backend/  —  Hono on Cloudflare Workers       │
+│   Hono API  →  better-auth                          │
+│             →  /api/transactions                    │
+│             →  Drizzle ORM → Hyperdrive → Neon      │
+└──────────────────────────────────────────────────────┘
           ↑                 ↑               ↑
     PWA (browser)   Desktop (Tauri)  Mobile (Tauri)
           ↑                 ↑               ↑
-┌─────────────────────────────────────────────────────┐
-│        Vite + Vue 3 + TypeScript                    │
-│        (static build, no SSR)                       │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│        frontend/  —  Vite + Vue 3 + TypeScript       │
+│        (static build — served separately or Tauri)   │
+└──────────────────────────────────────────────────────┘
+                                  ↕
+                    ┌─────────────────────────┐
+                    │  Neon (serverless Postgres) │
+                    └─────────────────────────┘
 ```
 
-There is no `backend/` package. The Vue app calls the Neon Data API directly from the browser (`@neondatabase/neon-js`), authenticated via Managed Better Auth. Postgres Row-Level Security enforces that a signed-in user can only read/write their own `transactions` and `category_rules` rows — there's no application-layer authorization code to write or audit.
+The monorepo has two packages with a clean separation:
+
+- **`frontend/`** — Vite + Vue 3 app. Compiled to static files for Tauri (desktop/mobile) and served as a PWA in the browser. Talks to the backend exclusively via REST API calls.
+- **`backend/`** — Hono app deployed as a Cloudflare Worker. Handles auth (better-auth), all API routes, and database access via Drizzle + Neon. Shared by all three clients.
 
 **Infrastructure:**
 
-- **Neon project `money-tracker`**, region `aws-eu-central-1` (Frankfurt, GDPR) — Postgres, Managed Better Auth, and the Data API all live on the same branch and scale/branch together
-- Static frontend build served the same way regardless of host (Tauri bundle or any static host/PWA) — no server-side deploy step
+- **Neon** — Serverless Postgres. Switched from self-hosted PostgreSQL on Hetzner during the Claude Code session. Backups are managed by Neon automatically.
+- **Cloudflare Workers** — Hosts the Hono backend. Hono was built for the Workers runtime natively (Fetch API-based, no Node-specific APIs), so this is a clean fit with no compatibility shims needed. Free tier is generous; paid tier is $5/month if usage grows beyond it.
+- **Hyperdrive** — Cloudflare's connection pooler for reaching Neon from a Worker. Configured once, then Drizzle connects through it like a normal Postgres connection string.
+
+Chosen over Fly.io, Railway, and Render because: Fly.io no longer offers a free tier for new accounts, Railway's free tier is now a small one-time trial credit rather than ongoing, and Render's free tier has cold starts on traditional Node servers. Cloudflare Workers avoids all three issues and is the runtime Hono is actually designed for.
 
 ---
 
@@ -98,33 +107,31 @@ There is no automated sync. ING has no personal API, and the PSD2 open banking r
 
 ## Data Model
 
-`user_id` on both tables defaults to `auth.user_id()` (the signed-in user's id, from the JWT) rather than being set by application code — RLS policies use it to scope every read/write to the current user.
-
 ### `transactions`
 
 ```ts
-interface Transaction {
-  id: string; // uuid PK
-  user_id: string; // FK to auth user
-  date: string; // ISO date, parsed from YYYYMMDD
-  description: string; // Naam / Omschrijving
-  amount: number; // Negative = expense, positive = income
-  category: string; // Auto-assigned or manually overridden
-  raw_counterparty: string; // Tegenrekening IBAN
-  mutation_type: string; // MutatieSoort
-  import_hash: string; // For deduplication
-  created_at: string; // Timestamptz
+type Transaction = {
+  id: string              // uuid PK
+  user_id: string         // FK to auth user
+  date: string            // ISO date, parsed from YYYYMMDD
+  description: string     // Naam / Omschrijving
+  amount: number          // Negative = expense, positive = income
+  category: string        // Auto-assigned or manually overridden
+  raw_counterparty: string // Tegenrekening IBAN
+  mutation_type: string   // MutatieSoort
+  import_hash: string     // For deduplication
+  created_at: string      // Timestamptz
 }
 ```
 
 ### `category_rules`
 
 ```ts
-interface CategoryRule {
-  id: string;
-  keyword: string; // Matched against description (case-insensitive)
-  category: string; // Category to assign on match
-  priority: number; // Higher = evaluated first
+type CategoryRule = {
+  id: string
+  keyword: string    // Matched against description (case-insensitive)
+  category: string   // Category to assign on match
+  priority: number   // Higher = evaluated first
 }
 ```
 
@@ -196,13 +203,13 @@ This approach requires no credentials, works with any AI tool, and has zero runn
 
 | Phase | Focus | Est. time |
 |---|---|---|
-| 1 | Project setup — Vite + Vue frontend | ~2h |
-| 2 | Neon setup (Data API + Managed Better Auth, schema + RLS) & signin/signup UI | ~2h |
+| 1 | Project setup — monorepo, Vite + Vue frontend, Hono backend | ~2h |
+| 2 | Auth & backend (better-auth + Hono + Drizzle + Postgres) | ~3h |
 | 3 | CSV import pipeline + deduplication | ~4h |
 | 4 | Dashboard views + charts | ~5h |
 | 5 | Categorisation management UI | ~2h |
 | 6 | AI analysis export (copy button) | ~1h |
-| 7 | Deploy static frontend build + Tauri builds | ~2h |
+| 7 | Deploy backend to Cloudflare Workers + Tauri builds | ~2h |
 
 Full phase breakdown with individual tasks is in `finance-app-roadmap.docx`.
 
@@ -215,10 +222,11 @@ Full phase breakdown with individual tasks is in `finance-app-roadmap.docx`.
 | Data source | ING CSV (manual monthly) | No personal API available; manual step is ~30 seconds |
 | Cross-platform | Tauri 2.0 | Single Vue codebase, small binary, covers desktop + mobile + PWA |
 | Frontend framework | Vite + Vue 3 | Nuxt dropped — no SSR needed, cleaner Tauri fit, less complexity |
-| Backend | Neon Data API (no custom backend) | Single-user CRUD app — CSV parsing and categorisation already run client-side, so a REST layer generated from the schema is enough; nothing to deploy or maintain |
-| Auth | Neon Managed Better Auth | Hosted, branch-aware, JWTs work natively with the Data API and RLS; no auth server to run |
-| Database | PostgreSQL (Neon, `aws-eu-central-1`) | GDPR region matches the original Hetzner choice; traded self-hosting for zero ops — RLS keeps rows isolated per user even though Neon (not us) hosts the data |
-| Deployment | None (serverless) | Static frontend build only; Neon handles the backend, no VPS/PaaS to run |
+| Backend framework | Hono | Lightweight API layer, already familiar, great better-auth adapter |
+| Auth | better-auth | Already familiar; Hono adapter, single user |
+| Database | Neon (serverless Postgres) | Switched from self-hosted during Claude Code session; simpler ops, automatic backups |
+| ORM | Drizzle ORM | Already familiar; type-safe, lightweight, good migration story |
+| Backend deployment | Cloudflare Workers | Free tier, native fit for Hono's Fetch API design; Fly.io/Railway lost their free tiers, Render has cold starts |
 | AI integration | Copy-for-AI button | No API costs, no credentials, works with any AI tool |
 | Categorisation | Keyword rules + manual override | Simple, transparent, user-controlled |
 

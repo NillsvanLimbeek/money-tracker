@@ -47,3 +47,8 @@ auto-imports.d.ts
 
 # vue-router file-based routing generated types
 typed-router.d.ts
+
+# Cloudflare Workers local dev
+.wrangler/
+backend/.dev.vars
+backend/.env

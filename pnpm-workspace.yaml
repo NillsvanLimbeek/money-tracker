@@ -1,3 +1,7 @@
+packages:
+  - frontend
+  - backend
+
 minimumReleaseAgeExcludePrune: true
 
 trustPolicy: no-downgrade
@@ -13,3 +17,4 @@ allowBuilds:
   core-js: false
   esbuild: true
   vue-demi: true
+  workerd: true
