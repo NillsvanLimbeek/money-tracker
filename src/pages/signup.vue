@@ -3,7 +3,7 @@ import type { FormSubmitEvent } from '@nuxt/ui';
 import type { SignUp } from '@/lib/models/sign-up';
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { SignUpFields } from '@/lib/constants/sign-up-fields';
+import { SIGN_UP_FIELDS } from '@/lib/constants';
 import { SignUpSchema } from '@/lib/models/sign-up';
 import { useAuthStore } from '@/stores/auth';
 
@@ -64,7 +64,7 @@ async function onSubmit(event: FormSubmitEvent<SignUp>) {
       @submit="onSubmit"
     >
       <AuthFormField
-        v-for="field in SignUpFields"
+        v-for="field in SIGN_UP_FIELDS"
         :key="field.name"
         v-model="state[field.name]"
         :field="field"

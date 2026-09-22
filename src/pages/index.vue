@@ -40,7 +40,7 @@ function resetCategories() {
 </script>
 
 <template>
-  <div class="bg-muted bg-olive-50 sticky top-0 z-10">
+  <div class="bg-olive-50 sticky top-0 z-10">
     <div class="flex items-center justify-between p-4">
       <h1 class="text-highlighted text-xl font-bold">
         Transactions
@@ -77,4 +77,6 @@ function resetCategories() {
     :categories="CATEGORIES"
     @change-category="changeCategory"
   />
+
+  <div class="h-28" />
 </template>
