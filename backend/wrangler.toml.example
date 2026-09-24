@@ -3,14 +3,5 @@ main = "src/index.ts"
 compatibility_date = "2026-09-22"
 compatibility_flags = [ "nodejs_compat" ]
 
-[[hyperdrive]]
-binding = "HYPERDRIVE"
-id = "REPLACE_AFTER_WRANGLER_HYPERDRIVE_CREATE"
-# Local-dev only: no real Cloudflare Hyperdrive resource exists yet, so this
-# points wrangler dev straight at Neon to populate env.HYPERDRIVE.connectionString.
-# Hyperdrive's pooling/caching does not apply until a real `id` is created via
-# `wrangler hyperdrive create` and this file is updated.
-localConnectionString = "postgresql://user:password@ep-xxxx.neon.tech/neondb?sslmode=require"
-
 [vars]
 CORS_ORIGIN = "http://localhost:5173"
