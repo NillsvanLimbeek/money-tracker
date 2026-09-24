@@ -31,11 +31,11 @@
 
 | Layer | Choice | Notes |
 |---|---|---|
-| Framework | Hono | Lightweight, fast, already familiar |
-| Auth | better-auth | Hono adapter, single user |
-| ORM | Drizzle ORM | Type-safe queries, migrations, already familiar |
-| Database | Neon | Serverless Postgres, switched from self-hosted during Claude Code session |
-| Deployment | Cloudflare Workers | Free tier, native Hono runtime fit, pairs well with Neon via Hyperdrive |
+| Framework | Hono | Lightweight, fast, already familiar; built natively for the Workers runtime |
+| Auth | better-auth | Kysely adapter, D1-compatible, single user |
+| ORM | Drizzle ORM | SQLite dialect (`sqliteTable`) for D1 |
+| Database | Cloudflare D1 | Serverless SQLite, native Workers binding |
+| Deployment | Cloudflare Workers | Free tier, single-provider stack with D1 |
 
 ---
 
@@ -46,33 +46,48 @@
 │         backend/  —  Hono on Cloudflare Workers       │
 │   Hono API  →  better-auth                          │
 │             →  /api/transactions                    │
-│             →  Drizzle ORM → Hyperdrive → Neon      │
+│             →  Drizzle ORM (sqlite) → D1 binding    │
 └──────────────────────────────────────────────────────┘
           ↑                 ↑               ↑
     PWA (browser)   Desktop (Tauri)  Mobile (Tauri)
           ↑                 ↑               ↑
 ┌──────────────────────────────────────────────────────┐
 │        frontend/  —  Vite + Vue 3 + TypeScript       │
-│        (static build — served separately or Tauri)   │
+│        (static build — served via Cloudflare Pages   │
+│         or bundled into Tauri)                       │
 └──────────────────────────────────────────────────────┘
-                                  ↕
-                    ┌─────────────────────────┐
-                    │  Neon (serverless Postgres) │
-                    └─────────────────────────┘
 ```
 
 The monorepo has two packages with a clean separation:
 
-- **`frontend/`** — Vite + Vue 3 app. Compiled to static files for Tauri (desktop/mobile) and served as a PWA in the browser. Talks to the backend exclusively via REST API calls.
-- **`backend/`** — Hono app deployed as a Cloudflare Worker. Handles auth (better-auth), all API routes, and database access via Drizzle + Neon. Shared by all three clients.
+- **`frontend/`** — Vite + Vue 3 app. Compiled to static files for Tauri (desktop/mobile) and served as a PWA via Cloudflare Pages in the browser. Talks to the backend exclusively via REST API calls.
+- **`backend/`** — Hono app deployed as a Cloudflare Worker. Handles auth (better-auth), all API routes, and database access via Drizzle + D1. Shared by all three clients.
 
-**Infrastructure:**
+**Infrastructure — everything on Cloudflare:**
 
-- **Neon** — Serverless Postgres. Switched from self-hosted PostgreSQL on Hetzner during the Claude Code session. Backups are managed by Neon automatically.
 - **Cloudflare Workers** — Hosts the Hono backend. Hono was built for the Workers runtime natively (Fetch API-based, no Node-specific APIs), so this is a clean fit with no compatibility shims needed. Free tier is generous; paid tier is $5/month if usage grows beyond it.
-- **Hyperdrive** — Cloudflare's connection pooler for reaching Neon from a Worker. Configured once, then Drizzle connects through it like a normal Postgres connection string.
+- **Cloudflare D1** — Serverless SQLite, bound directly to the Worker (no external connection string or pooler needed). Free tier is generous and pairs naturally with the Workers free tier.
+- **Cloudflare Pages** — Serves the static frontend build for the PWA.
 
-Chosen over Fly.io, Railway, and Render because: Fly.io no longer offers a free tier for new accounts, Railway's free tier is now a small one-time trial credit rather than ongoing, and Render's free tier has cold starts on traditional Node servers. Cloudflare Workers avoids all three issues and is the runtime Hono is actually designed for.
+### Why Cloudflare Workers + D1 over the alternatives considered
+
+- **Fly.io** — no longer offers a free tier for new accounts
+- **Railway** — free tier is now a one-time trial credit, not ongoing
+- **Render** — free tier works but has cold starts on traditional Node servers
+- **Neon (considered earlier)** — a solid serverless Postgres option, but required Cloudflare Hyperdrive as a connection layer between the Worker and the database. Moving to D1 removes that extra moving part — D1 is a native Workers binding, no pooler required
+- **Cloudflare Workers + D1** — single provider for compute and database, generous free tier, no cold-start issue, and Hono is designed specifically for this runtime
+
+### D1 vs Postgres — what changed with this choice
+
+D1 is SQLite, not Postgres-compatible, which affects a few things:
+
+- Drizzle schema uses `sqliteTable` instead of `pgTable` — a straightforward rewrite for two tables
+- No native `numeric`/`decimal` type — store transaction amounts as integers in cents to avoid floating-point issues
+- No `timestamptz` type — store dates/timestamps as ISO text or unix integers
+- No database branching (a Neon feature) — not a concern for a single-user app
+- Local dev is a local SQLite file via Wrangler, which is lightweight and easy to reset
+
+For this app's two simple tables with no complex relational queries or JSON columns, D1 is a good fit and removes Hyperdrive from the architecture entirely.
 
 ---
 
@@ -102,37 +117,42 @@ There is no automated sync. ING has no personal API, and the PSD2 open banking r
 - `Bedrag` is always positive — check `Af Bij` for the sign
 - Decimal separator is a **comma** — replace before `parseFloat`
 - Deduplication uses a hash of `date + amount + description` to prevent double-importing the same rows
+- Since D1 has no native decimal type, convert the parsed amount to integer cents before storing (e.g. `12,50` → `1250`)
 
 ---
 
 ## Data Model
 
+D1 uses SQLite types via Drizzle's `sqliteTable`.
+
 ### `transactions`
 
 ```ts
-type Transaction = {
-  id: string              // uuid PK
-  user_id: string         // FK to auth user
-  date: string            // ISO date, parsed from YYYYMMDD
-  description: string     // Naam / Omschrijving
-  amount: number          // Negative = expense, positive = income
-  category: string        // Auto-assigned or manually overridden
-  raw_counterparty: string // Tegenrekening IBAN
-  mutation_type: string   // MutatieSoort
-  import_hash: string     // For deduplication
-  created_at: string      // Timestamptz
-}
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+
+export const transactions = sqliteTable("transactions", {
+  id: text("id").primaryKey(),                 // uuid
+  userId: text("user_id").notNull(),            // FK to auth user
+  date: text("date").notNull(),                  // ISO date string, parsed from YYYYMMDD
+  description: text("description").notNull(),    // Naam / Omschrijving
+  amountCents: integer("amount_cents").notNull(), // Negative = expense, positive = income
+  category: text("category").notNull(),           // Auto-assigned or manually overridden
+  rawCounterparty: text("raw_counterparty"),       // Tegenrekening IBAN
+  mutationType: text("mutation_type"),              // MutatieSoort
+  importHash: text("import_hash").notNull(),        // SHA hash for deduplication
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
 ```
 
 ### `category_rules`
 
 ```ts
-type CategoryRule = {
-  id: string
-  keyword: string    // Matched against description (case-insensitive)
-  category: string   // Category to assign on match
-  priority: number   // Higher = evaluated first
-}
+export const categoryRules = sqliteTable("category_rules", {
+  id: text("id").primaryKey(),
+  keyword: text("keyword").notNull(),     // Matched against description (case-insensitive)
+  category: text("category").notNull(),   // Category to assign on match
+  priority: integer("priority").notNull(), // Higher = evaluated first
+});
 ```
 
 ---
@@ -204,7 +224,7 @@ This approach requires no credentials, works with any AI tool, and has zero runn
 | Phase | Focus | Est. time |
 |---|---|---|
 | 1 | Project setup — monorepo, Vite + Vue frontend, Hono backend | ~2h |
-| 2 | Auth & backend (better-auth + Hono + Drizzle + Postgres) | ~3h |
+| 2 | Auth & backend (better-auth + Hono + Drizzle + D1) | ~3h |
 | 3 | CSV import pipeline + deduplication | ~4h |
 | 4 | Dashboard views + charts | ~5h |
 | 5 | Categorisation management UI | ~2h |
@@ -222,11 +242,11 @@ Full phase breakdown with individual tasks is in `finance-app-roadmap.docx`.
 | Data source | ING CSV (manual monthly) | No personal API available; manual step is ~30 seconds |
 | Cross-platform | Tauri 2.0 | Single Vue codebase, small binary, covers desktop + mobile + PWA |
 | Frontend framework | Vite + Vue 3 | Nuxt dropped — no SSR needed, cleaner Tauri fit, less complexity |
-| Backend framework | Hono | Lightweight API layer, already familiar, great better-auth adapter |
-| Auth | better-auth | Already familiar; Hono adapter, single user |
-| Database | Neon (serverless Postgres) | Switched from self-hosted during Claude Code session; simpler ops, automatic backups |
-| ORM | Drizzle ORM | Already familiar; type-safe, lightweight, good migration story |
-| Backend deployment | Cloudflare Workers | Free tier, native fit for Hono's Fetch API design; Fly.io/Railway lost their free tiers, Render has cold starts |
+| Backend framework | Hono | Lightweight API layer, already familiar, native Workers runtime fit |
+| Auth | better-auth | Already familiar; Kysely/D1-compatible adapter, single user |
+| Database | Cloudflare D1 | Switched from Neon — removes Hyperdrive, single-provider stack, native Workers binding |
+| ORM | Drizzle ORM | Already familiar; SQLite dialect for D1, type-safe, good migration story |
+| Backend deployment | Cloudflare Workers | Free tier, native fit for Hono; Fly.io/Railway lost free tiers, Render has cold starts |
 | AI integration | Copy-for-AI button | No API costs, no credentials, works with any AI tool |
 | Categorisation | Keyword rules + manual override | Simple, transparent, user-controlled |
 
