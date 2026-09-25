@@ -8,7 +8,7 @@ export interface TransactionGroup {
   transactions: Transaction[];
 }
 
-function dayLabel(date: Date) {
+function dayLabel(date: Date): string {
   if (isToday(date))
     return 'Today';
   if (isYesterday(date))

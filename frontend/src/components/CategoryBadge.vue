@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { CSSProperties } from 'vue';
+
 interface Props {
   categoryKey: string;
   label: string;
@@ -12,7 +14,7 @@ const emit = defineEmits<{
   (e: 'click'): void;
 }>();
 
-function style(key: string, selected: boolean) {
+function style(key: string, selected: boolean): CSSProperties {
   if (selected) {
     return {
       backgroundColor: `var(--category-${key}-text)`,

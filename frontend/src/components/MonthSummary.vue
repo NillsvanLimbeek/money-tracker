@@ -15,7 +15,7 @@ const modelValue = defineModel<Date>({ required: true });
 const monthLabel = computed(() => format(modelValue.value, 'MMMM yyyy'));
 const net = computed(() => income - expense);
 
-function shiftMonth(delta: number) {
+function shiftMonth(delta: number): void {
   modelValue.value = addMonths(modelValue.value, delta);
 }
 </script>

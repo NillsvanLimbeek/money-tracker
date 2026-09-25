@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CSSProperties } from 'vue';
 import type { Category } from '@/lib/types';
 import { categoryIsSelected } from '@/lib/utils';
 
@@ -15,7 +16,7 @@ const emit = defineEmits<{
 
 const isFilterOpen = defineModel<boolean>('open', { required: true });
 
-function categoryStyle(key: string) {
+function categoryStyle(key: string): CSSProperties {
   if (categoryIsSelected(selectedCategories, key)) {
     return {
       backgroundColor: `var(--category-${key}-text)`,

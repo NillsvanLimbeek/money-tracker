@@ -3,7 +3,7 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat('nl-NL', {
   maximumFractionDigits: 2,
 });
 
-export function formatCurrency(value: number) {
+export function formatCurrency(value: number): string {
   const sign = value < 0 ? '−' : '+';
   return `${sign}€${CURRENCY_FORMATTER.format(Math.abs(value))}`;
 }

@@ -9,5 +9,8 @@ export default antfu({
     semi: true,
   },
 }, {
-  rules: { 'vue/max-attributes-per-line': 'error' },
+  rules: {
+    'vue/max-attributes-per-line': 'error',
+    'ts/explicit-function-return-type': ['error', { allowExpressions: true }],
+  },
 });

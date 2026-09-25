@@ -1,7 +1,7 @@
 import type { Transaction } from '../types';
 import { subDays } from 'date-fns';
 
-function daysAgo(days: number) {
+function daysAgo(days: number): Date {
   const now = new Date();
   return subDays(new Date(now.getFullYear(), now.getMonth(), now.getDate()), days);
 }

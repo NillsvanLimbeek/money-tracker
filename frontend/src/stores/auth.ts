@@ -3,6 +3,9 @@ import { ref } from 'vue';
 import { authClient } from '@/lib/auth-client';
 
 type Status = 'idle' | 'loading' | 'ready';
+type SignUpResult = Awaited<ReturnType<typeof authClient.signUp.email>>;
+type SignInResult = Awaited<ReturnType<typeof authClient.signIn.email>>;
+type SignOutResult = Awaited<ReturnType<typeof authClient.signOut>>;
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<{ id: string; email: string; name: string } | null>(null);
@@ -10,7 +13,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   let restoring: Promise<void> | null = null;
 
-  async function restoreSession() {
+  async function restoreSession(): Promise<void> {
     if (restoring)
       return restoring;
 
@@ -28,7 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
     return restoring;
   }
 
-  async function signUp(email: string, password: string, name: string) {
+  async function signUp(email: string, password: string, name: string): Promise<SignUpResult> {
     const result = await authClient.signUp.email({ email, password, name });
 
     if (!result.error)
@@ -37,7 +40,7 @@ export const useAuthStore = defineStore('auth', () => {
     return result;
   }
 
-  async function signIn(email: string, password: string, rememberMe = true) {
+  async function signIn(email: string, password: string, rememberMe = true): Promise<SignInResult> {
     const result = await authClient.signIn.email({ email, password, rememberMe });
 
     if (!result.error)
@@ -46,7 +49,7 @@ export const useAuthStore = defineStore('auth', () => {
     return result;
   }
 
-  async function signOut() {
+  async function signOut(): Promise<SignOutResult> {
     const result = await authClient.signOut();
 
     user.value = null;
@@ -54,7 +57,7 @@ export const useAuthStore = defineStore('auth', () => {
     return result;
   }
 
-  async function restoreSessionForced() {
+  async function restoreSessionForced(): Promise<void> {
     restoring = null;
 
     return restoreSession();

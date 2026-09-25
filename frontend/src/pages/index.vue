@@ -18,7 +18,7 @@ const expense = computed(() => transactions.value
   .filter(t => t.amount < 0)
   .reduce((sum, t) => sum - t.amount, 0));
 
-function changeCategory({ id, categoryKey }: { id: string; categoryKey: string }) {
+function changeCategory({ id, categoryKey }: { id: string; categoryKey: string }): void {
   const transaction = transactions.value.find(t => t.id === id);
   if (transaction)
     transaction.categoryKey = categoryKey;
@@ -28,13 +28,13 @@ const search = ref('');
 const isFilterOpen = ref(false);
 const selectedCategories = ref<string[]>([]);
 
-function toggleCategory(key: string) {
+function toggleCategory(key: string): void {
   selectedCategories.value = categoryIsSelected(selectedCategories.value, key)
     ? selectedCategories.value.filter(k => k !== key)
     : [...selectedCategories.value, key];
 }
 
-function resetCategories() {
+function resetCategories(): void {
   selectedCategories.value = [];
 }
 </script>

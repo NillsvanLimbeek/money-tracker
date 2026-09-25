@@ -20,7 +20,7 @@ const state = reactive<SignUp>({
 const error = ref('');
 const isSubmitting = ref(false);
 
-async function onSubmit(event: FormSubmitEvent<SignUp>) {
+async function onSubmit(event: FormSubmitEvent<SignUp>): Promise<void> {
   error.value = '';
   isSubmitting.value = true;
 

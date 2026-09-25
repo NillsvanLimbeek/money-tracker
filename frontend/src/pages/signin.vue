@@ -19,7 +19,7 @@ const rememberMe = ref(true);
 const error = ref('');
 const isSubmitting = ref(false);
 
-async function onSubmit(event: FormSubmitEvent<SignIn>) {
+async function onSubmit(event: FormSubmitEvent<SignIn>): Promise<void> {
   error.value = '';
   isSubmitting.value = true;
 

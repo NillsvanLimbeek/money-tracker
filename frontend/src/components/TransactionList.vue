@@ -19,15 +19,15 @@ const emit = defineEmits<{
 const groups = computed(() => groupTransactionsByDay(transactions));
 const openRowId = ref<string | null>(null);
 
-function categoryLabel(key: string) {
+function categoryLabel(key: string): string {
   return categories.find(category => category.key === key)?.label ?? key;
 }
 
-function toggleRow(id: string) {
+function toggleRow(id: string): void {
   openRowId.value = openRowId.value === id ? null : id;
 }
 
-function selectCategory(id: string, categoryKey: string) {
+function selectCategory(id: string, categoryKey: string): void {
   emit('changeCategory', { id, categoryKey });
   openRowId.value = null;
 }
