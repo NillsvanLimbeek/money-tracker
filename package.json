@@ -7,6 +7,7 @@
     "node": "^22.18.0 || >=24.12.0"
   },
   "scripts": {
+    "dev": "concurrently -n FE,BE -c green,yellow \"pnpm dev:frontend\" \"pnpm dev:backend\"",
     "dev:frontend": "pnpm -C frontend dev",
     "dev:backend": "pnpm -C backend dev",
     "build": "pnpm -r build",
@@ -15,5 +16,8 @@
     "type-check": "pnpm -r type-check",
     "test:unit": "pnpm -C frontend test:unit",
     "test:e2e": "pnpm -C frontend test:e2e"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
   }
 }

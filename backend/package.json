@@ -10,17 +10,24 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types",
-    "type-check": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply money_tracker --local",
+    "type-check": "tsc -b",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@types/node": "^26.6.3",
+    "better-auth": "^1.7.6",
+    "drizzle-orm": "1.0.0-rc.4",
     "hono": "^4.13.8"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.5.1",
     "@cloudflare/workers-types": "^5.20260921.1",
+    "drizzle-kit": "1.0.0-rc.4",
     "eslint": "^10.10.0",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "wrangler": "^4.136.0"
   }
