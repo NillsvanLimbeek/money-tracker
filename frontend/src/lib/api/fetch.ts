@@ -5,7 +5,7 @@ interface ApiGetResponse {
 }
 
 const baseApi = ofetch.create({
-  baseURL: 'http://localhost:8788',
+  baseURL: 'http://localhost:8787',
 });
 
 async function get<T extends keyof ApiGetResponse>(route: T): Promise<ApiGetResponse[T]> {

@@ -38,21 +38,9 @@ async function onSubmit(event: FormSubmitEvent<SignIn>): Promise<void> {
 
 <template>
   <div class="bg-olive-50 flex min-h-screen flex-col gap-6 overflow-y-auto p-6">
-    <div class="flex items-center gap-3">
-      <div class="bg-primary text-inverted flex size-10 items-center justify-center rounded-xl text-lg font-bold">
-        K
-      </div>
-      <span class="text-highlighted text-lg font-bold">Kasboek</span>
-    </div>
-
-    <div>
-      <h1 class="text-highlighted text-2xl font-bold">
-        Welcome back
-      </h1>
-      <p class="text-muted mt-2 text-sm">
-        Sign in to pick up where you left off.
-      </p>
-    </div>
+    <h1 class="text-highlighted flex justify-center text-2xl font-bold">
+      Sign In
+    </h1>
 
     <AuthTabs active="signin" />
 

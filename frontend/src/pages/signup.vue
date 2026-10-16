@@ -39,20 +39,10 @@ async function onSubmit(event: FormSubmitEvent<SignUp>): Promise<void> {
 
 <template>
   <div class="bg-olive-50 flex min-h-screen flex-col gap-6 overflow-y-auto p-6">
-    <div class="flex items-center gap-3">
-      <div class="bg-primary text-inverted flex size-10 items-center justify-center rounded-xl text-lg font-bold">
-        K
-      </div>
-      <span class="text-highlighted text-lg font-bold">Kasboek</span>
-    </div>
-
     <div>
-      <h1 class="text-highlighted text-2xl font-bold">
-        Start your ledger
+      <h1 class="text-highlighted flex justify-center text-2xl font-bold">
+        Sign Up
       </h1>
-      <p class="text-muted mt-2 text-sm">
-        One private ledger for your own money. No accounts linked until you say so.
-      </p>
     </div>
 
     <AuthTabs active="signup" />
@@ -84,12 +74,12 @@ async function onSubmit(event: FormSubmitEvent<SignUp>): Promise<void> {
         color="neutral"
         :loading="isSubmitting"
       >
-        Create ledger
+        Sign Up
       </UButton>
     </UForm>
 
     <p class="text-muted mt-auto pb-2 text-center text-sm">
-      Already keeping a ledger?
+      Already a account?
       <RouterLink
         to="/signin"
         class="text-primary font-medium"
