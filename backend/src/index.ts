@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { requireAuth } from './middleware/require-auth';
 import authRoutes from './routes/auth';
+import transactionRoutes from './routes/transactions';
 
 const app = new Hono<AppEnv>();
 
@@ -15,5 +16,6 @@ app.get('/health', c => c.json({ status: 'ok' }));
 app.route('/api', authRoutes);
 
 app.use('/api/transactions/*', requireAuth);
+app.route('/api/transactions', transactionRoutes);
 
 export default app;
