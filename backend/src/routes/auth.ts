@@ -1,18 +1,6 @@
-import type { Context } from 'hono';
 import type { Bindings } from '../bindings';
 import { Hono } from 'hono';
-import { createAuth } from '../auth';
-import { createDb } from '../db';
-
-function getAuth(c: Context<{ Bindings: Bindings }>): ReturnType<typeof createAuth> {
-  const db = createDb(c.env.DB);
-
-  return createAuth(db, {
-    secret: c.env.BETTER_AUTH_SECRET,
-    baseURL: new URL(c.req.url).origin,
-    trustedOrigin: c.env.CORS_ORIGIN,
-  });
-}
+import { getAuth } from '../auth';
 
 const authRoutes = new Hono<{ Bindings: Bindings }>();
 

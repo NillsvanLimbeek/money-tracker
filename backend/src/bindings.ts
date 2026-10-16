@@ -3,3 +3,12 @@ export interface Bindings {
   BETTER_AUTH_SECRET: string;
   CORS_ORIGIN: string;
 }
+
+export interface Variables {
+  userId: string;
+}
+
+export interface AppEnv {
+  Bindings: Bindings;
+  Variables: Variables;
+}
