@@ -1,0 +1,15 @@
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { user } from './auth';
+
+export const transactions = sqliteTable('transactions', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  date: text('date').notNull(),
+  description: text('description').notNull(),
+  amountCents: integer('amount_cents').notNull(),
+  category: text('category').notNull(),
+  rawCounterparty: text('raw_counterparty'),
+  mutationType: text('mutation_type'),
+  importHash: text('import_hash').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});

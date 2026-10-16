@@ -2,7 +2,7 @@ import type { Auth, BetterAuthOptions } from 'better-auth';
 import type { Db } from './db';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import * as schema from './db/schema';
+import * as schema from './db/schema/auth';
 
 export function createAuth(db: Db, options: {
   secret: string;
