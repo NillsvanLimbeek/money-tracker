@@ -1,6 +1,35 @@
 # Personal Finance App — Project Overview
 
-> A personal finance tracker for importing, categorising, and analysing ING bank transactions. Not a SaaS — built for one user, runs on desktop, mobile, and in the browser from a single codebase.
+> A personal finance tracker for importing, categorising, and analysing ING bank transactions. Not a SaaS — built for one user, runs in the browser (installable as a PWA) from a single codebase.
+
+---
+
+## Status
+
+_Last updated: 2026-10-16_
+
+| Phase | State |
+|---|---|
+| 1. Project setup | Done |
+| 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
+| 3. CSV import pipeline | In progress — schema and migrations done; routes, parser and import screen still to do |
+| 4–7 | Not started |
+
+**Done in phase 3 so far**
+
+- Drizzle schema split into `backend/src/db/schema/` (`auth.ts`, `transactions.ts`, `category-rules.ts`) with an `index.ts` barrel
+- `transactions` and `category_rules` tables added, both scoped per user (see Data Model)
+- Migrations generated and applied locally (`drizzle/`)
+- `backend/src/db/relations.ts` added; `Db` type is `DrizzleD1Database<typeof relations>`
+
+**Next up**
+
+1. Auth middleware on `/api` routes (resolve session, set `userId` in Hono context)
+2. `GET /api/transactions` (month filter), `POST /api/transactions/import` (dedup, new/skipped counts), `PATCH /api/transactions/:id` (category override) — all filtered by `userId`
+3. Frontend CSV parser (Windows-1252, `YYYYMMDD`, comma decimals → cents, sign from `Af Bij`, dedup hash)
+4. Import screen (drop, preview, confirm)
+5. Keyword categorisation on import using `category_rules`
+6. Replace mock data in the transaction list and month summary with real queries
 
 ---
 
@@ -10,7 +39,7 @@
 - Categorise transactions automatically (keyword rules) with the option to override manually
 - View spending by category and month-over-month trends
 - Get occasional AI-assisted analysis by copying a formatted summary into any AI chat
-- Access the app on any device: browser, desktop, and phone
+- Access the app on any device via the browser / installed PWA
 
 ---
 
@@ -20,10 +49,9 @@
 
 | Layer | Choice | Notes |
 |---|---|---|
-| Framework | Vite + Vue 3 + TypeScript | Lightweight, native Tauri fit, no SSR overhead |
+| Framework | Vite + Vue 3 + TypeScript | Lightweight, no SSR overhead |
 | Routing | Vue Router | File-based routing via `unplugin-vue-router` |
 | State management | Pinia | Transactions, filters, UI state |
-| Desktop + mobile | Tauri 2.0 | Windows, macOS, Linux, iOS, Android |
 | PWA | `vite-plugin-pwa` | Installable from the browser |
 | Charts | vue-chartjs | Chart.js wrapper for Vue |
 
@@ -48,20 +76,19 @@
 │             →  /api/transactions                    │
 │             →  Drizzle ORM (sqlite) → D1 binding    │
 └──────────────────────────────────────────────────────┘
-          ↑                 ↑               ↑
-    PWA (browser)   Desktop (Tauri)  Mobile (Tauri)
-          ↑                 ↑               ↑
+                          ↑
+              PWA (browser, desktop, mobile)
+                          ↑
 ┌──────────────────────────────────────────────────────┐
 │        frontend/  —  Vite + Vue 3 + TypeScript       │
-│        (static build — served via Cloudflare Pages   │
-│         or bundled into Tauri)                       │
+│        (static build — served via Cloudflare Pages)  │
 └──────────────────────────────────────────────────────┘
 ```
 
 The monorepo has two packages with a clean separation:
 
-- **`frontend/`** — Vite + Vue 3 app. Compiled to static files for Tauri (desktop/mobile) and served as a PWA via Cloudflare Pages in the browser. Talks to the backend exclusively via REST API calls.
-- **`backend/`** — Hono app deployed as a Cloudflare Worker. Handles auth (better-auth), all API routes, and database access via Drizzle + D1. Shared by all three clients.
+- **`frontend/`** — Vite + Vue 3 app. Compiled to static files and served as a PWA via Cloudflare Pages. Talks to the backend exclusively via REST API calls.
+- **`backend/`** — Hono app deployed as a Cloudflare Worker. Handles auth (better-auth), all API routes, and database access via Drizzle + D1. Shared by all clients.
 
 **Infrastructure — everything on Cloudflare:**
 
@@ -123,37 +150,53 @@ There is no automated sync. ING has no personal API, and the PSD2 open banking r
 
 ## Data Model
 
-D1 uses SQLite types via Drizzle's `sqliteTable`.
+D1 uses SQLite types via Drizzle's `sqliteTable`. Schema lives in `backend/src/db/schema/`, one file per area, re-exported from `index.ts`. Both drizzle-kit configs point at `schema/index.ts` only (pointing at the folder makes drizzle-kit see every table twice and fail with "duplicate" errors).
+
+The project uses **drizzle-orm / drizzle-kit 1.0.0-rc**: the client takes `relations` (built with `defineRelations(schema)` in `db/relations.ts`), not the old `schema` option.
+
+Every user-owned table has a `userId` foreign key to `user.id` with `onDelete: 'cascade'`, and every query must filter by it so the app can support more than one user.
 
 ### `transactions`
 
 ```ts
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
-
-export const transactions = sqliteTable("transactions", {
-  id: text("id").primaryKey(),                 // uuid
-  userId: text("user_id").notNull(),            // FK to auth user
-  date: text("date").notNull(),                  // ISO date string, parsed from YYYYMMDD
-  description: text("description").notNull(),    // Naam / Omschrijving
-  amountCents: integer("amount_cents").notNull(), // Negative = expense, positive = income
-  category: text("category").notNull(),           // Auto-assigned or manually overridden
-  rawCounterparty: text("raw_counterparty"),       // Tegenrekening IBAN
-  mutationType: text("mutation_type"),              // MutatieSoort
-  importHash: text("import_hash").notNull(),        // SHA hash for deduplication
-  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-});
+export const transactions = sqliteTable('transactions', {
+  id: text('id').primaryKey(),                 // uuid
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  date: text('date').notNull(),                  // ISO date string, parsed from YYYYMMDD
+  description: text('description').notNull(),    // Naam / Omschrijving
+  amountCents: integer('amount_cents').notNull(), // Negative = expense, positive = income
+  category: text('category').notNull(),           // Auto-assigned or manually overridden
+  rawCounterparty: text('raw_counterparty'),       // Tegenrekening IBAN
+  mutationType: text('mutation_type'),              // MutatieSoort
+  importHash: text('import_hash').notNull(),        // SHA hash for deduplication
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+}, table => [
+  uniqueIndex('transactions_user_id_import_hash_unique').on(table.userId, table.importHash), // dedup per user
+  index('transactions_user_id_date_idx').on(table.userId, table.date),                       // month queries
+]);
 ```
 
 ### `category_rules`
 
 ```ts
-export const categoryRules = sqliteTable("category_rules", {
-  id: text("id").primaryKey(),
-  keyword: text("keyword").notNull(),     // Matched against description (case-insensitive)
-  category: text("category").notNull(),   // Category to assign on match
-  priority: integer("priority").notNull(), // Higher = evaluated first
-});
+export const categoryRules = sqliteTable('category_rules', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  keyword: text('keyword').notNull(),     // Matched against description (case-insensitive)
+  category: text('category').notNull(),   // Category to assign on match
+  priority: integer('priority').notNull(), // Higher = evaluated first
+}, table => [
+  index('category_rules_user_id_idx').on(table.userId),
+]);
 ```
+
+Auth tables (`user`, `session`, `account`, `verification`) are generated by better-auth and live in `schema/auth.ts`.
+
+### Multi-user notes
+
+- Deduplication is per user, so two users importing identical rows both succeed.
+- Default category rules need seeding per user (sign-up hook) or a built-in fallback set in code.
+- Sign-up is currently open; restrict it (`disableSignUp`) once the first account exists if the app stays single-user.
 
 ---
 
@@ -229,7 +272,7 @@ This approach requires no credentials, works with any AI tool, and has zero runn
 | 4 | Dashboard views + charts | ~5h |
 | 5 | Categorisation management UI | ~2h |
 | 6 | AI analysis export (copy button) | ~1h |
-| 7 | Deploy backend to Cloudflare Workers + Tauri builds | ~2h |
+| 7 | Deploy backend to Cloudflare Workers + frontend to Pages | ~2h |
 
 Full phase breakdown with individual tasks is in `finance-app-roadmap.docx`.
 
@@ -240,8 +283,8 @@ Full phase breakdown with individual tasks is in `finance-app-roadmap.docx`.
 | Decision | Choice | Why |
 |---|---|---|
 | Data source | ING CSV (manual monthly) | No personal API available; manual step is ~30 seconds |
-| Cross-platform | Tauri 2.0 | Single Vue codebase, small binary, covers desktop + mobile + PWA |
-| Frontend framework | Vite + Vue 3 | Nuxt dropped — no SSR needed, cleaner Tauri fit, less complexity |
+| Cross-platform | PWA | Single Vue codebase, installable from the browser on desktop and mobile |
+| Frontend framework | Vite + Vue 3 | Nuxt dropped — no SSR needed, less complexity |
 | Backend framework | Hono | Lightweight API layer, already familiar, native Workers runtime fit |
 | Auth | better-auth | Already familiar; Kysely/D1-compatible adapter, single user |
 | Database | Cloudflare D1 | Switched from Neon — removes Hyperdrive, single-provider stack, native Workers binding |
