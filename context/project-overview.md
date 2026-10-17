@@ -6,13 +6,13 @@
 
 ## Status
 
-_Last updated: 2026-10-16_
+_Last updated: 2026-10-17_
 
 | Phase | State |
 |---|---|
 | 1. Project setup | Done |
 | 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
-| 3. CSV import pipeline | In progress — schema and migrations done; routes, parser and import screen still to do |
+| 3. CSV import pipeline | In progress — schema, migrations, auth middleware and transactions routes done; frontend parser, import screen and categorisation still to do |
 | 4–7 | Not started |
 
 **Done in phase 3 so far**
@@ -21,15 +21,19 @@ _Last updated: 2026-10-16_
 - `transactions` and `category_rules` tables added, both scoped per user (see Data Model)
 - Migrations generated and applied locally (`drizzle/`)
 - `backend/src/db/relations.ts` added; `Db` type is `DrizzleD1Database<typeof relations>`
+- `requireAuth` middleware (`middleware/require-auth.ts`) resolves the session and sets `userId` in the Hono context; applied to `/api/transactions/*`
+- Transactions routes (`routes/transactions.ts`), all filtered by `userId` and validated with zod (`schemas/`, `middleware/validate.ts`):
+  - `GET /api/transactions` with optional `month` filter
+  - `POST /api/transactions/import` — chunked inserts, dedup via `(userId, importHash)` conflict, returns `{ imported, skipped }`
+  - `PATCH /api/transactions/:id` — category override, 404 if not found for the user
+- `packages/*` added to the workspace with a placeholder `packages/shared`
 
 **Next up**
 
-1. Auth middleware on `/api` routes (resolve session, set `userId` in Hono context)
-2. `GET /api/transactions` (month filter), `POST /api/transactions/import` (dedup, new/skipped counts), `PATCH /api/transactions/:id` (category override) — all filtered by `userId`
-3. Frontend CSV parser (Windows-1252, `YYYYMMDD`, comma decimals → cents, sign from `Af Bij`, dedup hash)
-4. Import screen (drop, preview, confirm)
-5. Keyword categorisation on import using `category_rules`
-6. Replace mock data in the transaction list and month summary with real queries
+1. Frontend CSV parser (Windows-1252, `YYYYMMDD`, comma decimals → cents, sign from `Af Bij`, dedup hash)
+2. Import screen (drop, preview, confirm)
+3. Keyword categorisation on import using `category_rules` (the import route currently assigns a placeholder: `Income` for positive amounts, otherwise `Other`)
+4. Replace mock data in the transaction list and month summary with real queries
 
 ---
 
