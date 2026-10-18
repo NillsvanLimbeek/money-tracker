@@ -53,3 +53,6 @@ typed-router.d.ts
 backend/.dev.vars
 backend/.env
 backend/wrangler.toml
+
+# Bank exports (contain IBANs and transaction history)
+*.csv

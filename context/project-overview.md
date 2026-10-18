@@ -6,7 +6,7 @@
 
 ## Status
 
-_Last updated: 2026-10-17_
+_Last updated: 17-10-2026_
 
 | Phase | State |
 |---|---|
@@ -142,12 +142,14 @@ There is no automated sync. ING has no personal API, and the PSD2 open banking r
 | `MutatieSoort` | Mutation type (`Betaalautomaat`, `Internetbankieren`, etc.) |
 | `Mededelingen` | Free-text description / memo |
 
+The columns above are the Dutch headers. Accounts set to English export `Date`, `Name / Description`, `Account`, `Counterparty`, `Code`, `Debit/credit` (`Debit`/`Credit`), `Amount (EUR)`, `Transaction type`, `Notifications`, `Resulting balance` and `Tag`, semicolon-delimited. The parser accepts both.
+
 **Parsing gotchas:**
 
 - Encoding is **Windows-1252**, not UTF-8 — use `TextDecoder('windows-1252')` in the browser
 - `Bedrag` is always positive — check `Af Bij` for the sign
 - Decimal separator is a **comma** — replace before `parseFloat`
-- Deduplication uses a hash of `date + amount + description` to prevent double-importing the same rows
+- Deduplication uses a hash of `date + amount + description` plus an occurrence number (so two identical purchases on one day both survive) to prevent double-importing the same rows
 - Since D1 has no native decimal type, convert the parsed amount to integer cents before storing (e.g. `12,50` → `1250`)
 
 ---
@@ -166,7 +168,7 @@ Every user-owned table has a `userId` foreign key to `user.id` with `onDelete: '
 export const transactions = sqliteTable('transactions', {
   id: text('id').primaryKey(),                 // uuid
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-  date: text('date').notNull(),                  // ISO date string, parsed from YYYYMMDD
+  date: text('date').notNull(),                  // ISO date string (YYYY-MM-DD) for sorting/range queries, parsed from YYYYMMDD; displayed as DD-MM-YYYY
   description: text('description').notNull(),    // Naam / Omschrijving
   amountCents: integer('amount_cents').notNull(), // Negative = expense, positive = income
   category: text('category').notNull(),           // Auto-assigned or manually overridden
@@ -257,8 +259,8 @@ vs. previous month:
   Transport   -8%
 
 Largest transactions:
-  2026-09-01  Huur           -€950
-  2026-09-08  Albert Heijn   -€187
+  01-09-2026  Huur           -€950
+  08-09-2026  Albert Heijn   -€187
   ...
 ```
 
