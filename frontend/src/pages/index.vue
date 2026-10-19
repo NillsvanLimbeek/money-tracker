@@ -45,6 +45,14 @@ function resetCategories(): void {
       <h1 class="text-highlighted text-xl font-bold">
         Transactions
       </h1>
+
+      <UButton
+        to="/import"
+        color="neutral"
+        variant="outline"
+        icon="i-lucide-upload"
+        aria-label="Import transactions"
+      />
     </div>
 
     <div class="border-accented flex w-full gap-4 border-b px-4 pb-4">
