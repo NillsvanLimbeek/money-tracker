@@ -1,25 +1,43 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { NAV_ITEMS } from '@/lib/constants/nav-items';
 
 const route = useRoute();
+const showImport = computed(() => route.path === '/');
 </script>
 
 <template>
-  <nav class="fixed inset-x-0 bottom-0 z-20 flex justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-    <div class="border-accented bg-default flex items-center gap-1 rounded-2xl border p-1.5 shadow-lg">
+  <nav class="border-accented bg-default fixed inset-x-0 bottom-0 z-20 border-t pb-[env(safe-area-inset-bottom)] shadow-lg">
+    <RouterLink
+      v-if="showImport"
+      to="/import"
+      aria-label="Import transactions"
+      class="bg-inverted text-inverted absolute top-0 left-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl border-4 shadow-md"
+    >
+      <UIcon
+        name="i-lucide-plus"
+        class="size-6"
+      />
+    </RouterLink>
+
+    <div class="flex items-center justify-around px-4 py-4">
       <RouterLink
         v-for="item in NAV_ITEMS"
         :key="item.to"
         :to="item.to"
-        class="flex min-w-16 flex-col items-center gap-1 rounded-xl px-4 py-2 transition-colors"
-        :class="route.path === item.to ? 'bg-brand-100 text-primary' : 'text-muted'"
+        :aria-label="item.label"
+        class="flex flex-col items-center gap-1.5 p-2 transition-colors"
+        :class="route.path === item.to ? 'text-primary' : 'text-muted'"
       >
         <UIcon
           :name="item.icon"
-          class="size-5"
+          class="size-6"
         />
-        <span class="text-xs font-medium">{{ item.label }}</span>
+        <span
+          class="size-1 rounded-full"
+          :class="route.path === item.to ? 'bg-primary' : 'bg-transparent'"
+        />
       </RouterLink>
     </div>
   </nav>
