@@ -9,7 +9,9 @@ const isMobile = breakpoints.smaller('md');
 
 const route = useRoute();
 const AUTH_PATHS = ['/signin', '/signup'];
-const showBottomNav = computed(() => !AUTH_PATHS.includes(route.path));
+// The import flow has its own footer actions.
+const HIDDEN_NAV_PATHS = [...AUTH_PATHS, '/import'];
+const showBottomNav = computed(() => !HIDDEN_NAV_PATHS.includes(route.path));
 </script>
 
 <template>

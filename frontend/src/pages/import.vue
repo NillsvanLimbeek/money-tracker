@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { ImportSummary } from '@/lib/api/transactions/transactions.api';
 import type { ParseResult } from '@/lib/utils';
-import { ref, watch } from 'vue';
-import ImportPreview from '@/components/ImportPreview.vue';
+import { computed, ref, watch } from 'vue';
 import { useImportTransactions } from '@/lib/api/transactions/transactions.queries';
+import { MAX_FILE_BYTES } from '@/lib/constants';
 import { decodeIngCsv, parseIngCsv } from '@/lib/utils';
 
 const MAX_IMPORT_ROWS = 5000;
+const STEP_COUNT = 3;
 
 const file = ref<File | null>(null);
 const parsed = ref<ParseResult | null>(null);
@@ -15,12 +16,33 @@ const error = ref('');
 
 const importMutation = useImportTransactions();
 
+const step = computed(() => summary.value ? 3 : parsed.value ? 2 : 1);
+
+const description = computed(() => {
+  if (summary.value)
+    return { title: 'Import complete', subtitle: 'Your transactions have been added to the ledger.' };
+
+  if (parsed.value)
+    return { title: 'Review transactions', subtitle: 'Check the rows below. Rows that could not be read are skipped.' };
+
+  return {
+    title: 'Import transactions',
+    subtitle: 'Upload a CSV export from your bank. You\'ll check the columns and review every row before anything is added.',
+  };
+});
+
 watch(file, async (selected) => {
   parsed.value = null;
   error.value = '';
 
   if (!selected)
     return;
+
+  if (selected.size > MAX_FILE_BYTES) {
+    error.value = 'This file is larger than 10 MB.';
+    file.value = null;
+    return;
+  }
 
   const result = await parseIngCsv(decodeIngCsv(await selected.arrayBuffer()));
 
@@ -36,6 +58,10 @@ watch(file, async (selected) => {
     parsed.value = result;
   }
 });
+
+function selectFile(selected: File): void {
+  file.value = selected;
+}
 
 function reset(): void {
   file.value = null;
@@ -61,80 +87,61 @@ async function confirm(): Promise<void> {
 </script>
 
 <template>
-  <div class="bg-olive-50 sticky top-0 z-10 flex items-center gap-2 p-4">
-    <UButton
-      to="/"
-      color="neutral"
-      variant="ghost"
-      icon="i-lucide-arrow-left"
-      aria-label="Back to ledger"
+  <div class="flex min-h-screen flex-col">
+    <PageHeader title="Import">
+      <template #left>
+        <UButton
+          to="/"
+          color="neutral"
+          variant="outline"
+          size="xl"
+          icon="i-lucide-x"
+          aria-label="Close import"
+        />
+      </template>
+
+      <template #right>
+        <span class="text-muted font-mono text-sm">{{ step }}/{{ STEP_COUNT }}</span>
+      </template>
+    </PageHeader>
+
+    <Stepper
+      :step-count="STEP_COUNT"
+      :step
     />
-    <h1 class="text-highlighted text-xl font-bold">
-      Import
-    </h1>
-  </div>
 
-  <div
-    v-if="summary"
-    class="flex flex-col items-center gap-4 p-4 pt-16 text-center"
-  >
-    <UIcon
-      name="i-lucide-circle-check"
-      class="text-primary size-10"
+    <UAlert
+      v-if="error"
+      class="m-4"
+      color="error"
+      variant="subtle"
+      icon="i-lucide-circle-alert"
+      :description="error"
     />
-    <div class="flex flex-col gap-1">
-      <p class="text-highlighted text-lg font-semibold">
-        {{ summary.imported }} imported
-      </p>
-      <p class="text-muted text-sm">
-        {{ summary.skipped }} skipped as duplicates
-      </p>
-    </div>
-    <div class="flex gap-3">
-      <UButton
-        color="neutral"
-        variant="outline"
-        @click="reset"
-      >
-        Import another
-      </UButton>
-      <UButton to="/">
-        View ledger
-      </UButton>
-    </div>
-  </div>
 
-  <ImportPreview
-    v-else-if="parsed"
-    :rows="parsed.rows"
-    :errors="parsed.errors"
-    :is-submitting="importMutation.isPending.value"
-    @confirm="confirm"
-    @cancel="reset"
-  />
+    <ImportDescription
+      :title="description.title"
+      :subtitle="description.subtitle"
+    />
 
-  <div
-    v-else
-    class="flex flex-col gap-4 p-4"
-  >
-    <UFileUpload
-      v-model="file"
-      accept=".csv,text/csv"
-      label="Drop your ING export here"
-      description="CSV from “Download transactions”"
-      icon="i-lucide-file-spreadsheet"
-      class="min-h-48"
+    <ImportSummary
+      v-if="summary"
+      :summary
+      @reset="reset"
+    />
+
+    <ImportPreview
+      v-else-if="parsed"
+      :rows="parsed.rows"
+      :errors="parsed.errors"
+      :is-submitting="importMutation.isPending.value"
+      @confirm="confirm"
+      @cancel="reset"
+    />
+
+    <ImportFilePicker
+      v-else
+      @select="selectFile"
     />
   </div>
-
-  <UAlert
-    v-if="error"
-    class="mx-4"
-    color="error"
-    variant="subtle"
-    icon="i-lucide-circle-alert"
-    :description="error"
-  />
-
-  <div class="h-28" />
 </template>

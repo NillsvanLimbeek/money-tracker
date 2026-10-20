@@ -56,3 +56,4 @@ backend/wrangler.toml
 
 # Bank exports (contain IBANs and transaction history)
 *.csv
+!frontend/public/sample-ing.csv

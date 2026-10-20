@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { decodeIngCsv, parseIngCsv } from './parse-ing-csv';
 
@@ -101,5 +102,16 @@ describe('decodeIngCsv', () => {
     const bytes = new Uint8Array([0x43, 0x61, 0x66, 0xE9]);
 
     expect(decodeIngCsv(bytes.buffer)).toBe('Café');
+  });
+});
+
+describe('sample file', () => {
+  it('parses cleanly, including the two identical purchases', async () => {
+    const buffer = readFileSync('public/sample-ing.csv');
+    const { rows, errors } = await parseIngCsv(decodeIngCsv(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer));
+
+    expect(errors).toEqual([]);
+    expect(rows).toHaveLength(12);
+    expect(new Set(rows.map(row => row.importHash)).size).toBe(12);
   });
 });
