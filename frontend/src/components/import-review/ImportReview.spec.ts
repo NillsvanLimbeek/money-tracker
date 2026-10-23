@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import ImportReview from './ImportReview.vue';
 
 function row(date: string, amountCents: number, description: string): ImportRow {
-  return { date, description, amountCents, rawCounterparty: null, mutationType: null, importHash: `${date}-${description}` };
+  return { date, description, amountCents, rawCounterparty: null, mutationType: null, notes: null, importHash: `${date}-${description}` };
 }
 
 const ROWS = [

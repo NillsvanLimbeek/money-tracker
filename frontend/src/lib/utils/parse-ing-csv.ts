@@ -19,6 +19,7 @@ const COLUMN_ALIASES = {
   direction: ['af bij', 'debit/credit'],
   amount: ['bedrag (eur)', 'amount (eur)'],
   mutationType: ['mutatiesoort', 'transaction type'],
+  notes: ['mededelingen', 'notifications'],
 } as const;
 
 const DEBIT = new Set(['af', 'debit']);
@@ -163,6 +164,7 @@ export async function parseIngCsv(text: string): Promise<ParseResult> {
         amountCents,
         rawCounterparty: column(record, 'counterparty') || null,
         mutationType: column(record, 'mutationType') || null,
+        notes: column(record, 'notes') || null,
         importHash: await sha256(`${key}|${occurrence}`),
       });
     }

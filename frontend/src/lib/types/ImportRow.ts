@@ -4,5 +4,6 @@ export interface ImportRow {
   amountCents: number;
   rawCounterparty: string | null;
   mutationType: string | null;
+  notes: string | null;
   importHash: string;
 }

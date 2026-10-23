@@ -60,6 +60,16 @@ describe('parseIngCsv', () => {
     expect(rows.map(row => row.amountCents)).toEqual([-901, 334126]);
     expect(rows[0]).toMatchObject({ date: '2026-09-30', rawCounterparty: null, mutationType: 'Payment terminal' });
     expect(rows[1]?.rawCounterparty).toBe('NL02ABNA0123456789');
+    expect(rows.map(row => row.notes)).toEqual(['Card no: 1234', 'Salary']);
+  });
+
+  it('reads the notes column and leaves it null when empty', async () => {
+    const { rows } = await parseIngCsv(csv(
+      '"20260908","A","","","BA","Af","1,00","","Pas 123"',
+      '"20260908","B","","","BA","Af","1,00","",""',
+    ));
+
+    expect(rows.map(row => row.notes)).toEqual(['Pas 123', null]);
   });
 
   it('keeps commas and newlines inside quoted fields', async () => {
