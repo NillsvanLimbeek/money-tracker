@@ -11,14 +11,20 @@ defineProps<Props>();
     <RouterLink
       to="/signin"
       class="rounded-lg px-4 py-2 text-center text-sm font-medium transition-colors"
-      :class="active === 'signin' ? 'bg-default text-highlighted shadow-sm' : 'text-muted'"
+      :class="{
+        'bg-default text-highlighted shadow-sm': active === 'signin',
+        'text-muted': active !== 'signin',
+      }"
     >
       Sign in
     </RouterLink>
     <RouterLink
       to="/signup"
       class="rounded-lg px-4 py-2 text-center text-sm font-medium transition-colors"
-      :class="active === 'signup' ? 'bg-default text-highlighted shadow-sm' : 'text-muted'"
+      :class="{
+        'bg-default text-highlighted shadow-sm': active === 'signup',
+        'text-muted': active !== 'signup',
+      }"
     >
       Sign up
     </RouterLink>

@@ -13,7 +13,7 @@ const { stepCount, step } = defineProps<Props>();
       v-for="n in stepCount"
       :key="n"
       class="h-1.5 flex-1 rounded-full"
-      :class="n <= step ? 'bg-primary' : 'bg-accented'"
+      :class="{ 'bg-primary': n <= step, 'bg-accented': n > step }"
     />
   </div>
 </template>

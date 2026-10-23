@@ -15,7 +15,7 @@ interface Props {
 <template>
   <div
     class="flex flex-col gap-1"
-    :class="align === 'end' ? 'items-end' : 'items-start'"
+    :class="{ 'items-end': align === 'end', 'items-start': align !== 'end' }"
   >
     <span class="text-muted font-mono text-xs tracking-wide uppercase">{{ label }}</span>
     <span

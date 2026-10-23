@@ -37,7 +37,10 @@ async function useSample(): Promise<void> {
         ref="dropZone"
         type="button"
         class="flex min-h-64 flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed px-4 transition-colors"
-        :class="isOverDropZone ? 'border-primary bg-primary/5' : 'border-accented bg-default'"
+        :class="{
+          'border-primary bg-primary/5': isOverDropZone,
+          'border-accented bg-default': !isOverDropZone,
+        }"
         @click="open()"
       >
         <span class="border-muted text-muted flex h-20 w-16 items-end justify-center rounded-xl border-2 pb-2 font-mono text-xs font-bold">

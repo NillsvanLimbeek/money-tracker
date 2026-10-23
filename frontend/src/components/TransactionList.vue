@@ -69,7 +69,7 @@ function selectCategory(id: string, categoryKey: string): void {
 
               <span
                 class="shrink-0 font-bold"
-                :class="transaction.amount > 0 ? 'text-primary' : 'text-highlighted'"
+                :class="{ 'text-primary': transaction.amount > 0, 'text-highlighted': transaction.amount <= 0 }"
               >{{ formatCurrency(transaction.amount) }}</span>
             </div>
 

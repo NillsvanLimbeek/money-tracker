@@ -5,6 +5,7 @@ import { NAV_ITEMS } from '@/lib/constants/nav-items';
 
 const route = useRoute();
 const showImport = computed(() => route.path === '/');
+const isActive = (to: string): boolean => route.path === to;
 </script>
 
 <template>
@@ -28,7 +29,7 @@ const showImport = computed(() => route.path === '/');
         :to="item.to"
         :aria-label="item.label"
         class="flex flex-col items-center gap-1.5 p-2 transition-colors"
-        :class="route.path === item.to ? 'text-primary' : 'text-muted'"
+        :class="{ 'text-primary': isActive(item.to), 'text-muted': !isActive(item.to) }"
       >
         <UIcon
           :name="item.icon"
@@ -36,7 +37,7 @@ const showImport = computed(() => route.path === '/');
         />
         <span
           class="size-1 rounded-full"
-          :class="route.path === item.to ? 'bg-primary' : 'bg-transparent'"
+          :class="{ 'bg-primary': isActive(item.to), 'bg-transparent': !isActive(item.to) }"
         />
       </RouterLink>
     </div>
