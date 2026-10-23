@@ -16,6 +16,15 @@ function dayLabel(date: Date): string {
   return format(date, 'dd MMM');
 }
 
+/**
+ * Groups transactions by calendar day, newest day first, and totals each day.
+ *
+ * @param transactions - Transactions in any order.
+ * @returns One group per day, keyed by `yyyy-MM-dd` and labelled `Today`, `Yesterday` or `dd MMM`.
+ * @example
+ * groupTransactionsByDay([{ id: 'a', date: new Date(2026, 9, 3), merchant: 'AH', amount: -10, categoryKey: 'food' }]);
+ * // [{ key: '2026-10-03', label: '03 Oct', total: -10, transactions: [...] }]
+ */
 export function groupTransactionsByDay(transactions: Transaction[]): TransactionGroup[] {
   const sorted = [...transactions].sort((a, b) => b.date.getTime() - a.date.getTime());
   const groups: TransactionGroup[] = [];

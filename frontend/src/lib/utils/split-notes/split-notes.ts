@@ -26,6 +26,16 @@ const NOTE_KEYS = [
 
 const NOTE_BREAK = new RegExp(`\\s+(?=(?:${NOTE_KEYS.join('|')}):|Recurrent SEPA direct debit)`);
 
+/**
+ * Splits the notes ING packs into one string into separate `Key: value` lines. Also breaks before the
+ * `Recurrent SEPA direct debit` marker.
+ *
+ * @param notes - The raw notes (`Mededelingen`) column.
+ * @returns The trimmed, non-empty lines.
+ * @example
+ * splitNotes('Name: Gym IBAN: NL01 Recurrent SEPA direct debit');
+ * // ['Name: Gym', 'IBAN: NL01', 'Recurrent SEPA direct debit']
+ */
 export function splitNotes(notes: string): string[] {
   return notes.split(NOTE_BREAK).map(line => line.trim()).filter(Boolean);
 }

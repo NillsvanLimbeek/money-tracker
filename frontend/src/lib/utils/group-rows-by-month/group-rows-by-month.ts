@@ -6,7 +6,15 @@ export interface MonthGroup<T> {
   rows: T[];
 }
 
-// Groups ISO-dated rows by calendar month, newest month first. Row order within a month is kept.
+/**
+ * Groups ISO-dated rows by calendar month, newest month first. Row order within a month is kept.
+ *
+ * @param rows - Rows with an ISO `date`.
+ * @returns One group per month, keyed by `yyyy-MM` and labelled like `October 2026`.
+ * @example
+ * groupRowsByMonth([{ date: '2026-09-30' }, { date: '2026-10-01' }]);
+ * // [{ key: '2026-10', label: 'October 2026', rows: [...] }, { key: '2026-09', label: 'September 2026', rows: [...] }]
+ */
 export function groupRowsByMonth<T extends { date: string }>(rows: T[]): MonthGroup<T>[] {
   const groups = new Map<string, MonthGroup<T>>();
 

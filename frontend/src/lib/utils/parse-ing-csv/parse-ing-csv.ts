@@ -1,4 +1,4 @@
-import type { ImportRow } from '../types';
+import type { ImportRow } from '../../types';
 import { format, isValid, parse } from 'date-fns';
 
 export interface ParseError {
@@ -29,6 +29,14 @@ type Column = keyof typeof COLUMN_ALIASES;
 
 const REQUIRED_COLUMNS: Column[] = ['date', 'description', 'direction', 'amount'];
 
+/**
+ * Decodes the bytes of an ING export, which is encoded as Windows-1252 rather than UTF-8.
+ *
+ * @param buffer - The raw file contents.
+ * @returns The CSV text, ready for `parseIngCsv`.
+ * @example
+ * const text = decodeIngCsv(await file.arrayBuffer());
+ */
 export function decodeIngCsv(buffer: ArrayBuffer): string {
   return new TextDecoder('windows-1252').decode(buffer);
 }
@@ -112,6 +120,17 @@ async function sha256(value: string): Promise<string> {
   return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
+/**
+ * Parses an ING CSV export (Dutch or English headers, `,` or `;` delimited) into import rows.
+ * Invalid lines are reported in `errors` and skipped, so one bad line doesn't fail the whole import.
+ * Amounts are in cents, negative for debits, and each row gets a stable `importHash` for dedup.
+ *
+ * @param text - The decoded CSV text, see `decodeIngCsv`.
+ * @returns The parsed rows and the errors, with 1-based line numbers where the header is line 1.
+ * @example
+ * const { rows, errors } = await parseIngCsv(text);
+ * // rows[0]: { date: '2026-09-08', description: 'Albert Heijn', amountCents: -1250, ... }
+ */
 export async function parseIngCsv(text: string): Promise<ParseResult> {
   const content = text.replace(/^\uFEFF/, '');
   const delimiter = detectDelimiter(content.split(/\r?\n/, 1)[0] ?? '');
