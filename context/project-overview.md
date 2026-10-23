@@ -6,13 +6,13 @@
 
 ## Status
 
-_Last updated: 22-10-2026_
+_Last updated: 23-10-2026_
 
 | Phase | State |
 |---|---|
 | 1. Project setup | Done |
 | 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
-| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done; column check step and keyword categorisation still to do |
+| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen; column check step and keyword categorisation still to do |
 | 4–7 | Not started |
 
 **Done in phase 3 so far**
@@ -28,17 +28,22 @@ _Last updated: 22-10-2026_
   - `GET /api/transactions/hashes?from&to` — import hashes already stored for the user in an ISO date range, so the review screen can flag duplicates
   - `PATCH /api/transactions/:id` — category override, 404 if not found for the user
 - `packages/*` added to the workspace with a placeholder `packages/shared`
-- Frontend ING CSV parser (`lib/utils/parse-ing-csv.ts`): Windows-1252 decoding, Dutch and English headers, cents, dedup hash with occurrence number
+- Frontend ING CSV parser (`lib/utils/parse-ing-csv.ts`): Windows-1252 decoding, Dutch and English headers, cents, dedup hash with occurrence number, optional notes column (`Mededelingen` / `Notifications`) kept on `ImportRow.notes`
+- `splitNotes` (`lib/utils/split-notes.ts`) breaks ING's single `Key: value Key: value` notes string onto separate lines using a list of known English and Dutch keys; text before the first key, or with none, stays one line
 - Import screen (`pages/import.vue`) with a 3-step `Stepper` and `PageHeader` slots:
   - `ImportFilePicker` — file selection, 10 MB and 5000-row limits
   - `ImportReview` / `ImportReviewRow` — rows grouped by month (`groupRowsByMonth`), per-row and per-month select all, duplicates shown as "Already imported" and disabled, Nuxt UI `UCheckbox`, income/expense totals, confirm button
-  - `ImportSummary` — imported/skipped result after confirming
+    - Only the checkbox toggles selection; clicking anywhere else on a row (or the chevron in the disclosure column on the far right) expands it to show the full name and a "Bank description" box with the split notes. Collapsed names are truncated
+    - Found / Selected / Duplicates strip uses the generic `StatStrip` component (`{ label, value, valueClass? }[]`)
+  - `ImportSummary` (`components/import-summary/`) — results screen after confirming: "N transactions imported", source file name and period (`formatPeriod`), In / Out / Skipped strip (`StatStrip`), an "Uncategorised" row linking to the ledger, "View transactions" and "Import another file". In/Out are computed from the rows that were sent; Skipped comes from the import response. The back chevron in the page header returns to file selection
+- Conditional classes in templates use object syntax or a computed instead of ternaries
 
 **Next up**
 
 1. Column check as step 2 of the import flow (the stepper currently jumps from file selection to review)
-2. Keyword categorisation on import using `category_rules` (the import route currently assigns a placeholder: `Income` for positive amounts, otherwise `Other`)
+2. Keyword categorisation on import using `category_rules` (the import route currently assigns a placeholder: `Income` for positive amounts, otherwise `Other`). Until then the summary's "Uncategorised" count is every imported debit, and it can't link to a filtered list because the ledger has no category filter
 3. Replace mock data in the transaction list and month summary with real queries
+4. Decide whether to persist `notes` (the import route's zod schema drops it and there is no column, so notes only show during review)
 
 ---
 
