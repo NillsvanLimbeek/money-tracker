@@ -15,6 +15,7 @@ const file = ref<File | null>(null);
 const parsed = ref<ParseResult | null>(null);
 const duplicateHashes = ref<string[]>([]);
 const summary = ref<ImportSummary | null>(null);
+const importedRows = ref<ImportRow[]>([]);
 const error = ref('');
 
 const importMutation = useImportTransactions();
@@ -23,9 +24,6 @@ const importMutation = useImportTransactions();
 const step = computed(() => summary.value || parsed.value ? 3 : 1);
 
 const description = computed(() => {
-  if (summary.value)
-    return { title: 'Import complete', subtitle: 'Your transactions have been added to the ledger.' };
-
   if (parsed.value)
     return { title: 'Review', subtitle: 'Untick anything you don\'t want. Categories can be changed later from the list.' };
 
@@ -85,6 +83,7 @@ function reset(): void {
   file.value = null;
   parsed.value = null;
   summary.value = null;
+  importedRows.value = [];
   error.value = '';
 }
 
@@ -93,6 +92,7 @@ async function confirm(rows: ImportRow[]): Promise<void> {
 
   try {
     summary.value = await importMutation.mutateAsync(rows);
+    importedRows.value = rows;
     parsed.value = null;
   }
   catch {
@@ -106,7 +106,7 @@ async function confirm(rows: ImportRow[]): Promise<void> {
     <PageHeader title="Import">
       <template #left>
         <UButton
-          v-if="parsed"
+          v-if="parsed || summary"
           color="neutral"
           variant="outline"
           size="xl"
@@ -146,6 +146,7 @@ async function confirm(rows: ImportRow[]): Promise<void> {
     />
 
     <ImportDescription
+      v-if="!summary"
       :title="description.title"
       :subtitle="description.subtitle"
     />
@@ -153,6 +154,8 @@ async function confirm(rows: ImportRow[]): Promise<void> {
     <ImportSummary
       v-if="summary"
       :summary
+      :rows="importedRows"
+      :file-name="file?.name ?? ''"
       @reset="reset"
     />
 
