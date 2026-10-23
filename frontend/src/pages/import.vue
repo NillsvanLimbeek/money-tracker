@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { ImportSummary } from '@/lib/api/transactions/transactions.api';
+import type { ImportRow } from '@/lib/types';
 import type { ParseResult } from '@/lib/utils';
 import { computed, ref, watch } from 'vue';
+import { getImportedHashes } from '@/lib/api/transactions/transactions.api';
 import { useImportTransactions } from '@/lib/api/transactions/transactions.queries';
 import { MAX_FILE_BYTES } from '@/lib/constants';
 import { decodeIngCsv, parseIngCsv } from '@/lib/utils';
@@ -11,19 +13,21 @@ const STEP_COUNT = 3;
 
 const file = ref<File | null>(null);
 const parsed = ref<ParseResult | null>(null);
+const duplicateHashes = ref<string[]>([]);
 const summary = ref<ImportSummary | null>(null);
 const error = ref('');
 
 const importMutation = useImportTransactions();
 
-const step = computed(() => summary.value ? 3 : parsed.value ? 2 : 1);
+// Review is step 3; the column check that will become step 2 isn't built yet.
+const step = computed(() => summary.value || parsed.value ? 3 : 1);
 
 const description = computed(() => {
   if (summary.value)
     return { title: 'Import complete', subtitle: 'Your transactions have been added to the ledger.' };
 
   if (parsed.value)
-    return { title: 'Review transactions', subtitle: 'Check the rows below. Rows that could not be read are skipped.' };
+    return { title: 'Review', subtitle: 'Untick anything you don\'t want. Categories can be changed later from the list.' };
 
   return {
     title: 'Import transactions',
@@ -55,9 +59,23 @@ watch(file, async (selected) => {
     file.value = null;
   }
   else {
+    duplicateHashes.value = await findDuplicateHashes(result.rows);
     parsed.value = result;
   }
 });
+
+// Flags rows that are already stored. If the lookup fails the review still works,
+// because the import route skips duplicates anyway.
+async function findDuplicateHashes(rows: ImportRow[]): Promise<string[]> {
+  const dates = rows.map(row => row.date).sort();
+
+  try {
+    return await getImportedHashes(dates[0]!, dates.at(-1)!);
+  }
+  catch {
+    return [];
+  }
+}
 
 function selectFile(selected: File): void {
   file.value = selected;
@@ -70,14 +88,11 @@ function reset(): void {
   error.value = '';
 }
 
-async function confirm(): Promise<void> {
-  if (!parsed.value)
-    return;
-
+async function confirm(rows: ImportRow[]): Promise<void> {
   error.value = '';
 
   try {
-    summary.value = await importMutation.mutateAsync(parsed.value.rows);
+    summary.value = await importMutation.mutateAsync(rows);
     parsed.value = null;
   }
   catch {
@@ -91,6 +106,17 @@ async function confirm(): Promise<void> {
     <PageHeader title="Import">
       <template #left>
         <UButton
+          v-if="parsed"
+          color="neutral"
+          variant="outline"
+          size="xl"
+          icon="i-lucide-chevron-left"
+          aria-label="Back to file selection"
+          @click="reset"
+        />
+
+        <UButton
+          v-else
           to="/"
           color="neutral"
           variant="outline"
@@ -130,13 +156,13 @@ async function confirm(): Promise<void> {
       @reset="reset"
     />
 
-    <ImportPreview
+    <ImportReview
       v-else-if="parsed"
       :rows="parsed.rows"
       :errors="parsed.errors"
+      :duplicate-hashes="duplicateHashes"
       :is-submitting="importMutation.isPending.value"
       @confirm="confirm"
-      @cancel="reset"
     />
 
     <ImportFilePicker

@@ -6,13 +6,13 @@
 
 ## Status
 
-_Last updated: 17-10-2026_
+_Last updated: 22-10-2026_
 
 | Phase | State |
 |---|---|
 | 1. Project setup | Done |
 | 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
-| 3. CSV import pipeline | In progress — schema, migrations, auth middleware and transactions routes done; frontend parser, import screen and categorisation still to do |
+| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done; column check step and keyword categorisation still to do |
 | 4–7 | Not started |
 
 **Done in phase 3 so far**
@@ -25,15 +25,20 @@ _Last updated: 17-10-2026_
 - Transactions routes (`routes/transactions.ts`), all filtered by `userId` and validated with zod (`schemas/`, `middleware/validate.ts`):
   - `GET /api/transactions` with optional `month` filter
   - `POST /api/transactions/import` — chunked inserts, dedup via `(userId, importHash)` conflict, returns `{ imported, skipped }`
+  - `GET /api/transactions/hashes?from&to` — import hashes already stored for the user in an ISO date range, so the review screen can flag duplicates
   - `PATCH /api/transactions/:id` — category override, 404 if not found for the user
 - `packages/*` added to the workspace with a placeholder `packages/shared`
+- Frontend ING CSV parser (`lib/utils/parse-ing-csv.ts`): Windows-1252 decoding, Dutch and English headers, cents, dedup hash with occurrence number
+- Import screen (`pages/import.vue`) with a 3-step `Stepper` and `PageHeader` slots:
+  - `ImportFilePicker` — file selection, 10 MB and 5000-row limits
+  - `ImportReview` / `ImportReviewRow` — rows grouped by month (`groupRowsByMonth`), per-row and per-month select all, duplicates shown as "Already imported" and disabled, Nuxt UI `UCheckbox`, income/expense totals, confirm button
+  - `ImportSummary` — imported/skipped result after confirming
 
 **Next up**
 
-1. Frontend CSV parser (Windows-1252, `YYYYMMDD`, comma decimals → cents, sign from `Af Bij`, dedup hash)
-2. Import screen (drop, preview, confirm)
-3. Keyword categorisation on import using `category_rules` (the import route currently assigns a placeholder: `Income` for positive amounts, otherwise `Other`)
-4. Replace mock data in the transaction list and month summary with real queries
+1. Column check as step 2 of the import flow (the stepper currently jumps from file selection to review)
+2. Keyword categorisation on import using `category_rules` (the import route currently assigns a placeholder: `Income` for positive amounts, otherwise `Other`)
+3. Replace mock data in the transaction list and month summary with real queries
 
 ---
 

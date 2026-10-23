@@ -1,24 +1,14 @@
-import type { ImportRow } from '../types';
+import type { ApiGetRoutes } from './types/api-get';
+import type { ApiPostRoutes } from './types/api-post';
 import { ofetch } from 'ofetch';
-
-interface ApiGetResponse {
-  '/health': string;
-}
-
-interface ApiPostRoutes {
-  '/api/transactions/import': {
-    body: ImportRow[];
-    response: { imported: number; skipped: number };
-  };
-}
 
 const baseApi = ofetch.create({
   baseURL: import.meta.env.VITE_API_URL,
   credentials: 'include',
 });
 
-async function get<T extends keyof ApiGetResponse>(route: T): Promise<ApiGetResponse[T]> {
-  const res = await baseApi(route, { method: 'GET' });
+async function get<T extends keyof ApiGetRoutes>(route: T, query?: ApiGetRoutes[T]['query']): Promise<ApiGetRoutes[T]['response']> {
+  const res = await baseApi(route, { method: 'GET', query });
 
   return res;
 }

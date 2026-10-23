@@ -6,9 +6,11 @@ interface Props {
   label: string;
   showIcon?: boolean;
   selected?: boolean;
+  // Render a plain span when the badge sits inside another interactive element.
+  interactive?: boolean;
 }
 
-const { categoryKey, label, showIcon = true, selected = false } = defineProps<Props>();
+const { categoryKey, label, showIcon = true, selected = false, interactive = true } = defineProps<Props>();
 
 const emit = defineEmits<{
   (e: 'click'): void;
@@ -32,8 +34,9 @@ function style(key: string, selected: boolean): CSSProperties {
 </script>
 
 <template>
-  <button
-    type="button"
+  <component
+    :is="interactive ? 'button' : 'span'"
+    :type="interactive ? 'button' : undefined"
     class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium transition-colors"
     :style="style(categoryKey, selected)"
     @click="emit('click')"
@@ -46,5 +49,5 @@ function style(key: string, selected: boolean): CSSProperties {
         class="size-3.5"
       />
     </div>
-  </button>
+  </component>
 </template>

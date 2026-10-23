@@ -1,11 +1,11 @@
 import type { AppEnv } from '../bindings';
-import { and, asc, desc, eq, gte, lt } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, lt, lte } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { IMPORT_CHUNK_SIZE } from '../constants';
 import { createDb } from '../db';
 import { transactions } from '../db/schema';
 import { validate } from '../middleware/validate';
-import { importBodySchema, listQuerySchema, updateCategoryBodySchema } from '../schemas';
+import { hashRangeQuerySchema, importBodySchema, listQuerySchema, updateCategoryBodySchema } from '../schemas';
 import { nextMonth } from '../utils';
 
 const transactionRoutes = new Hono<AppEnv>();
@@ -26,6 +26,25 @@ transactionRoutes.get('/', validate('query', listQuerySchema), async (c) => {
     .orderBy(desc(transactions.date), asc(transactions.id));
 
   return c.json(rows);
+});
+
+// Lets the import review screen flag rows that are already stored. A duplicate
+// shares its date with the incoming row, so the file's date range is enough.
+transactionRoutes.get('/hashes', validate('query', hashRangeQuerySchema), async (c) => {
+  const userId = c.get('userId');
+  const { from, to } = c.req.valid('query');
+  const db = createDb(c.env.DB);
+
+  const rows = await db
+    .select({ importHash: transactions.importHash })
+    .from(transactions)
+    .where(and(
+      eq(transactions.userId, userId),
+      gte(transactions.date, from),
+      lte(transactions.date, to),
+    ));
+
+  return c.json(rows.map(row => row.importHash));
 });
 
 transactionRoutes.post('/import', validate('json', importBodySchema), async (c) => {

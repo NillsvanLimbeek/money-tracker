@@ -182,6 +182,10 @@
   --category-shopping-text: #71397e;
   --category-shopping-border: #e6d9ec;
 
+  --category-other-bg: #f0efec;
+  --category-other-text: #5c5a52;
+  --category-other-border: #e1dfd8;
+
   /* Dark chip hover (e.g. sheet CTA), not derivable from --ui-bg-inverted via opacity */
   --ui-bg-inverted-hover: #2a2a33;
 

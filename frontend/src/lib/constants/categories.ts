@@ -7,4 +7,5 @@ export const CATEGORIES: Category[] = [
   { key: 'transport', label: 'Transport' },
   { key: 'housing', label: 'Housing' },
   { key: 'shopping', label: 'Shopping' },
+  { key: 'other', label: 'Other' },
 ];
