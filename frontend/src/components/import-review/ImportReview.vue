@@ -25,6 +25,12 @@ const groups = computed(() => groupRowsByMonth(rows));
 const selectedRows = computed(() => rows.filter(row => selected.value.has(row.importHash)));
 const duplicateCount = computed(() => rows.filter(isDuplicate).length);
 
+const stats = computed(() => [
+  { label: 'Found', value: rows.length },
+  { label: 'Selected', value: selectedRows.value.length, valueClass: 'text-primary' },
+  { label: 'Duplicates', value: duplicateCount.value },
+]);
+
 const income = computed(() => selectedRows.value
   .filter(row => row.amountCents > 0)
   .reduce((sum, row) => sum + row.amountCents, 0) / 100);
@@ -66,11 +72,7 @@ function toggleGroup(groupRows: ImportRow[]): void {
 <template>
   <div class="flex flex-1 flex-col">
     <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <ImportStats
-        :rows
-        :selected-rows
-        :duplicate-count
-      />
+      <StatStrip :stats />
 
       <UAlert
         v-if="errors.length > 0"
