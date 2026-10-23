@@ -2,7 +2,7 @@
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import BottomNav from '@/components/BottomNav.vue';
+import BottomNav from '@/components/bottom-nav/BottomNav.vue';
 
 const breakpoints = useBreakpoints(breakpointsTailwind);
 const isMobile = breakpoints.smaller('md');

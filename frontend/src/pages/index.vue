@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import CategoryDrawer from '@/components/CategoryDrawer.vue';
-import MonthSummary from '@/components/MonthSummary.vue';
-import TransactionList from '@/components/TransactionList.vue';
+import CategoryDrawer from '@/components/category-drawer/CategoryDrawer.vue';
+import MonthSummary from '@/components/month-summary/MonthSummary.vue';
+import TransactionList from '@/components/transaction-list/TransactionList.vue';
 import { CATEGORIES, MOCK_TRANSACTIONS } from '@/lib/constants';
 import { categoryIsSelected } from '@/lib/utils';
 

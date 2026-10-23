@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { addMonths, format } from 'date-fns';
 import { computed } from 'vue';
-import CurrencyAmount from '@/components/CurrencyAmount.vue';
+import CurrencyAmount from '@/components/currency-amount/CurrencyAmount.vue';
 
 interface Props {
   income: number;

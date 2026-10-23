@@ -2,8 +2,8 @@
 import type { Category, Transaction } from '@/lib/types';
 import { format } from 'date-fns';
 import { computed, ref } from 'vue';
-import CategoryBadge from '@/components/CategoryBadge.vue';
-import CategoryPicker from '@/components/CategoryPicker.vue';
+import CategoryBadge from '@/components/category-badge/CategoryBadge.vue';
+import CategoryPicker from '@/components/category-picker/CategoryPicker.vue';
 import { formatCurrency, groupTransactionsByDay } from '@/lib/utils';
 
 interface Props {

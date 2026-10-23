@@ -2,7 +2,7 @@
 import type { ImportRow } from '@/lib/types';
 import { format, parseISO } from 'date-fns';
 import { computed, ref } from 'vue';
-import CategoryBadge from '@/components/CategoryBadge.vue';
+import CategoryBadge from '@/components/category-badge/CategoryBadge.vue';
 import { CATEGORIES } from '@/lib/constants';
 import { formatCurrency, splitNotes } from '@/lib/utils';
 
