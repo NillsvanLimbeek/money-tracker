@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { ImportSummary } from '@/lib/api/transactions/transactions.api';
-import type { ImportRow } from '@/lib/types';
+import type { ImportRow, ImportSummary } from '@/lib/types';
 import type { ParseResult } from '@/lib/utils';
 import { computed, ref, watch } from 'vue';
 import { getImportedHashes } from '@/lib/api/transactions/transactions.api';
