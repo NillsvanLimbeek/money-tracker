@@ -8,7 +8,7 @@ import { MAX_FILE_BYTES } from '@/lib/constants';
 import { decodeIngCsv, parseIngCsv } from '@/lib/utils';
 
 const MAX_IMPORT_ROWS = 5000;
-const STEP_COUNT = 3;
+const STEP_COUNT = 2;
 
 const file = ref<File | null>(null);
 const parsed = ref<ParseResult | null>(null);
@@ -19,8 +19,7 @@ const error = ref('');
 
 const importMutation = useImportTransactions();
 
-// Review is step 3; the column check that will become step 2 isn't built yet.
-const step = computed(() => summary.value || parsed.value ? 3 : 1);
+const step = computed(() => parsed.value ? 2 : 1);
 
 const description = computed(() => {
   if (parsed.value)
@@ -28,7 +27,7 @@ const description = computed(() => {
 
   return {
     title: 'Import transactions',
-    subtitle: 'Upload a CSV export from your bank. You\'ll check the columns and review every row before anything is added.',
+    subtitle: 'Upload a CSV export from your bank. You\'ll review every row before anything is added.',
   };
 });
 
@@ -126,11 +125,15 @@ async function confirm(rows: ImportRow[]): Promise<void> {
       </template>
 
       <template #right>
-        <span class="text-muted font-mono text-sm">{{ step }}/{{ STEP_COUNT }}</span>
+        <span
+          v-if="!summary"
+          class="text-muted font-mono text-sm"
+        >{{ step }}/{{ STEP_COUNT }}</span>
       </template>
     </PageHeader>
 
     <Stepper
+      v-if="!summary"
       :step-count="STEP_COUNT"
       :step
     />
