@@ -32,18 +32,22 @@ _Last updated: 27-10-2026_
 - `splitNotes` (`lib/utils/split-notes.ts`) breaks ING's single `Key: value Key: value` notes string onto separate lines using a list of known English and Dutch keys; text before the first key, or with none, stays one line
 - Import screen (`pages/import.vue`) with a 2-step `Stepper` (file → review; hidden on the summary) and `PageHeader` slots:
   - `ImportFilePicker` — file selection, 10 MB and 5000-row limits
-  - `ImportReview` / `ImportReviewRow` — rows grouped by month (`groupRowsByMonth`), per-row and per-month select all, duplicates shown as "Already imported" and disabled, Nuxt UI `UCheckbox`, income/expense totals, confirm button
+  - `ImportReview` — one shared `TransactionRow` (`selectable`, `selected`, `duplicate` props; `importRowToTransaction` adapts parsed rows) per row, grouped by month (`groupRowsByMonth`), per-row and per-month select all, duplicates shown as "Already imported" and disabled, Nuxt UI `UCheckbox`, income/expense totals, confirm button
     - Only the checkbox toggles selection; clicking anywhere else on a row (or the chevron in the disclosure column on the far right) expands it to show the full name and a "Bank description" box with the split notes. Collapsed names are truncated
     - Found / Selected / Duplicates strip uses the generic `StatStrip` component (`{ label, value, valueClass? }[]`)
   - `ImportSummary` (`components/import-summary/`) — results screen after confirming: "N transactions imported", source file name and period (`formatPeriod`), In / Out / Skipped strip (`StatStrip`), an "Uncategorised" row linking to the ledger, "View transactions" and "Import another file". In/Out are computed from the rows that were sent; Skipped comes from the import response. The back chevron in the page header returns to file selection
 - Column check step dropped: the parser already accepts both ING header variants, so the import flow stays two steps (file → review) and the summary sits outside the stepper. Revisit if more banks are added
+- Transactions page (`pages/index.vue`) now uses real data: `useTransactions(month)` (`GET /api/transactions?month=YYYY-MM`, mapped to `Transaction` in `transactions.api.ts`) feeds the list and the month summary totals, wrapped in `QueryBoundary`. Changing a category calls `PATCH /api/transactions/:id` via `useUpdateTransactionCategory` and refetches. `MOCK_TRANSACTIONS` is gone. The search box and category filter are still not applied to the list
+- The import route's placeholder categories are now the lowercase keys `income` / `other` so they match `CATEGORIES`; rows imported earlier with `Income` / `Other` need re-importing or a manual fix
 - Conditional classes in templates use object syntax or a computed instead of ternaries
 
 **Next up**
 
-1. Keyword categorisation on import using `category_rules` (the import route currently assigns a placeholder: `Income` for positive amounts, otherwise `Other`). Until then the summary's "Uncategorised" count is every imported debit, and it can't link to a filtered list because the ledger has no category filter
-2. Replace mock data in the transaction list and month summary with real queries
-3. Decide whether to persist `notes` (the import route's zod schema drops it and there is no column, so notes only show during review)
+1. Rule-based categorisation on import using `category_rules` (the import route currently assigns a placeholder: `Income` for positive amounts, otherwise `Other`). Until then the summary's "Uncategorised" count is every imported debit, and it can't link to a filtered list because the ledger has no category filter. Design is in `docs/category-rules.md`; steps:
+   1. Shared matcher (`packages/shared`), migration, import route applies rules
+   2. Rules CRUD API plus apply / preview
+   3. Rules UI under Settings, and a "create rule" prompt after a manual category change
+2. Decide whether to persist `notes` (the import route's zod schema drops it and there is no column, so notes only show during review)
 
 ---
 
@@ -198,13 +202,16 @@ export const transactions = sqliteTable('transactions', {
 export const categoryRules = sqliteTable('category_rules', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-  keyword: text('keyword').notNull(),     // Matched against description (case-insensitive)
-  category: text('category').notNull(),   // Category to assign on match
-  priority: integer('priority').notNull(), // Higher = evaluated first
+  pattern: text('pattern').notNull(),       // Matched against description (case-insensitive)
+  operator: text('operator').notNull(),     // 'contains' | 'equals' | 'startsWith' | 'endsWith'
+  category: text('category').notNull(),     // Category key to assign on match (e.g. 'food')
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(), // Tie-break: oldest wins
 }, table => [
   index('category_rules_user_id_idx').on(table.userId),
 ]);
 ```
+
+The schema above is the planned shape (see `docs/category-rules.md`); the migrated table still has `keyword` and `priority`. `transactions` also gets a `categorySource` column (`rule` | `manual` | `default`) so applying rules never overwrites a manual override.
 
 Auth tables (`user`, `session`, `account`, `verification`) are generated by better-auth and live in `schema/auth.ts`.
 
@@ -231,15 +238,17 @@ All views share a global month/year filter.
 
 ## Categorisation
 
-Transactions are categorised on import using a simple keyword rule system:
+Transactions are categorised on import using a simple rule system. Full spec in `docs/category-rules.md`.
 
-1. The `description` field is matched against all rules (case-insensitive)
-2. The highest-priority matching rule wins
-3. If no rule matches, the transaction is marked as `Other` (or `Income` if `Af Bij` is `Bij`)
-4. The user can manually override any transaction's category inline in the transaction list
-5. A "re-categorise all" action re-runs the rules against existing transactions
+1. A rule is `description <operator> pattern → category`. Operators: `contains`, `equals`, `starts with`, `ends with`, all case-insensitive (no regex)
+2. The `description` field is matched against all of the user's rules
+3. If several rules match, the most specific wins: operator strength (`equals` > `starts with` / `ends with` > `contains`), then longer pattern, then oldest rule. There is no priority column or manual ordering
+4. If no rule matches, the transaction becomes `other` (or `income` for credits)
+5. The user can manually override any transaction's category inline in the transaction list. This sets `categorySource = manual`, and the app offers to create a rule from it
+6. Saving a rule shows how many existing transactions it matches and can apply it to them, skipping manual overrides. This replaces a global "re-categorise all" action
+7. The matcher lives in `packages/shared` so the backend (import) and frontend (review preview) share it
 
-**Default categories:** Housing, Food, Transport, Entertainment, Health, Shopping, Income, Other
+**Categories:** fixed list for now (Housing, Food, Transport, Entertainment, Health, Shopping, Income, Other), stored by key (`food`). User-defined categories are a later stage; rules reference keys, so the matcher won't change.
 
 ---
 
@@ -307,7 +316,7 @@ Full phase breakdown with individual tasks is in `finance-app-roadmap.docx`.
 | ORM | Drizzle ORM | Already familiar; SQLite dialect for D1, type-safe, good migration story |
 | Backend deployment | Cloudflare Workers | Free tier, native fit for Hono; Fly.io/Railway lost free tiers, Render has cold starts |
 | AI integration | Copy-for-AI button | No API costs, no credentials, works with any AI tool |
-| Categorisation | Keyword rules + manual override | Simple, transparent, user-controlled |
+| Categorisation | Operator rules (contains / equals / starts with / ends with) + manual override | Simple, transparent, user-controlled; most specific rule wins so there is no ordering to manage |
 
 ---
 

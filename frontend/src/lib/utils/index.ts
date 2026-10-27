@@ -3,6 +3,7 @@ export * from './format-date/format-date';
 export * from './format-period/format-period';
 export * from './group-rows-by-month/group-rows-by-month';
 export * from './group-transactions/group-transactions';
+export * from './import-row-to-transaction/import-row-to-transaction';
 export * from './is-selected/is-selected';
 export * from './parse-ing-csv/parse-ing-csv';
 export * from './split-notes/split-notes';

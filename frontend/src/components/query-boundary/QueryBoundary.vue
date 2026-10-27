@@ -10,8 +10,6 @@ defineSlots<{ default: (props: { data: NonNullable<T> }) => unknown }>();
 </script>
 
 <template>
-  <h1>Query Boundry</h1>
-
   <div v-if="query.isLoading.value">
     Loading...
   </div>

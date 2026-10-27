@@ -2,7 +2,8 @@
 import type { ImportRow } from '@/lib/types';
 import type { ParseError } from '@/lib/utils';
 import { computed, ref } from 'vue';
-import { formatCurrency, groupRowsByMonth } from '@/lib/utils';
+import { CATEGORIES } from '@/lib/constants';
+import { formatCurrency, groupRowsByMonth, importRowToTransaction } from '@/lib/utils';
 
 interface Props {
   rows: ImportRow[];
@@ -114,10 +115,12 @@ function toggleGroup(groupRows: ImportRow[]): void {
         </div>
 
         <div class="border-accented bg-default divide-accented divide-y overflow-hidden rounded-2xl border shadow-sm">
-          <ImportReviewRow
+          <TransactionRow
             v-for="row in group.rows"
             :key="row.importHash"
-            :row="row"
+            :transaction="importRowToTransaction(row)"
+            :categories="CATEGORIES"
+            selectable
             :selected="selected.has(row.importHash)"
             :duplicate="isDuplicate(row)"
             @toggle="toggle(row)"

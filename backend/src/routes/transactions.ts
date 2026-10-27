@@ -58,7 +58,7 @@ transactionRoutes.post('/import', validate('json', importBodySchema), async (c) 
     id: crypto.randomUUID(),
     userId,
     // Placeholder until keyword categorisation lands.
-    category: row.amountCents > 0 ? 'Income' : 'Other',
+    category: row.amountCents > 0 ? 'income' : 'other',
     createdAt,
   }));
 

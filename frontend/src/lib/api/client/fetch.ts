@@ -1,4 +1,5 @@
 import type { ApiGetRoutes } from './routes-get';
+import type { ApiPatchRoutes } from './routes-patch';
 import type { ApiPostRoutes } from './routes-post';
 import { ofetch } from 'ofetch';
 
@@ -37,4 +38,19 @@ async function post<T extends keyof ApiPostRoutes>(route: T, body: ApiPostRoutes
   return res;
 }
 
-export { get, post };
+/**
+ * Sends a typed PATCH request to the API.
+ *
+ * @param route - A route declared in `ApiPatchRoutes`.
+ * @param body - The JSON request body for that route.
+ * @returns The parsed response body for that route.
+ * @example
+ * await patch('/api/transactions/abc', { category: 'food' });
+ */
+async function patch<T extends keyof ApiPatchRoutes>(route: T, body: ApiPatchRoutes[T]['body']): Promise<ApiPatchRoutes[T]['response']> {
+  const res = await baseApi(route, { method: 'PATCH', body });
+
+  return res;
+}
+
+export { get, patch, post };

@@ -1,5 +1,39 @@
-import type { ImportRow, ImportSummary } from '../../types';
-import { get, post } from '../client/fetch';
+import type { ApiTransaction, ImportRow, ImportSummary, Transaction } from '../../types';
+import { parseISO } from 'date-fns';
+import { get, patch, post } from '../client/fetch';
+
+/**
+ * Fetches the user's transactions for one month.
+ *
+ * @param month - The month as `YYYY-MM`.
+ * @returns The month's transactions, newest first, with amounts in euros.
+ * @example
+ * const transactions = await getTransactions('2026-10');
+ */
+export async function getTransactions(month: string): Promise<Transaction[]> {
+  const rows = await get('/api/transactions', { month });
+
+  return rows.map(row => ({
+    id: row.id,
+    date: parseISO(row.date),
+    merchant: row.description,
+    amount: row.amountCents / 100,
+    categoryKey: row.category,
+  }));
+}
+
+/**
+ * Sets the category of one transaction.
+ *
+ * @param id - The transaction id.
+ * @param categoryKey - The category key to assign.
+ * @returns The updated transaction.
+ * @example
+ * await updateTransactionCategory('abc', 'food');
+ */
+export async function updateTransactionCategory(id: string, categoryKey: string): Promise<ApiTransaction> {
+  return await patch(`/api/transactions/${id}`, { category: categoryKey });
+}
 
 /**
  * Imports parsed bank rows into the user's transactions.
