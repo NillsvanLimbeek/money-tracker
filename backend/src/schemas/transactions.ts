@@ -8,6 +8,7 @@ export const importRowSchema = z.object({
   amountCents: z.int(),
   rawCounterparty: z.string().nullish().transform(value => value ?? null),
   mutationType: z.string().nullish().transform(value => value ?? null),
+  notes: z.string().nullish().transform(value => value ?? null),
   importHash: nonEmptyString,
 });
 

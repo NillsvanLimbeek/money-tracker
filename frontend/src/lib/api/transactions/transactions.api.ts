@@ -19,6 +19,7 @@ export async function getTransactions(month: string): Promise<Transaction[]> {
     merchant: row.description,
     amount: row.amountCents / 100,
     categoryKey: row.category,
+    notes: row.notes,
   }));
 }
 

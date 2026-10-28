@@ -10,6 +10,7 @@ export const transactions = sqliteTable('transactions', {
   category: text('category').notNull(),
   rawCounterparty: text('raw_counterparty'),
   mutationType: text('mutation_type'),
+  notes: text('notes'),
   importHash: text('import_hash').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 }, table => [

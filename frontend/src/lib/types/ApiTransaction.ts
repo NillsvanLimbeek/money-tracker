@@ -4,4 +4,5 @@ export interface ApiTransaction {
   description: string;
   amountCents: number;
   category: string;
+  notes: string | null;
 }
