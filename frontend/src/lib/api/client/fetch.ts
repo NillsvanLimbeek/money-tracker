@@ -1,3 +1,4 @@
+import type { ApiDeleteRoutes } from './routes-delete';
 import type { ApiGetRoutes } from './routes-get';
 import type { ApiPatchRoutes } from './routes-patch';
 import type { ApiPostRoutes } from './routes-post';
@@ -53,4 +54,18 @@ async function patch<T extends keyof ApiPatchRoutes>(route: T, body: ApiPatchRou
   return res;
 }
 
-export { get, patch, post };
+/**
+ * Sends a typed DELETE request to the API.
+ *
+ * @param route - A route declared in `ApiDeleteRoutes`.
+ * @returns The parsed response body for that route.
+ * @example
+ * await del('/api/category-rules/abc');
+ */
+async function del<T extends keyof ApiDeleteRoutes>(route: T): Promise<ApiDeleteRoutes[T]['response']> {
+  const res = await baseApi(route, { method: 'DELETE' });
+
+  return res;
+}
+
+export { del, get, patch, post };

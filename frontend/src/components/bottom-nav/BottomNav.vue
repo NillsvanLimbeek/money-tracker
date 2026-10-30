@@ -5,7 +5,7 @@ import { NAV_ITEMS } from '@/lib/constants/nav-items';
 
 const route = useRoute();
 const showImport = computed(() => route.path === '/');
-const isActive = (to: string): boolean => route.path === to;
+const isActive = (to: string): boolean => to === '/' ? route.path === '/' : route.path.startsWith(to);
 </script>
 
 <template>
