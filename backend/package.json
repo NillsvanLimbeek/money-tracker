@@ -12,6 +12,7 @@
     "cf-typegen": "wrangler types",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply money_tracker --local",
+    "test:unit": "vitest run",
     "type-check": "tsc -b",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -33,6 +34,7 @@
     "eslint": "^10.10.0",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
+    "vitest": "^4.1.11",
     "wrangler": "^4.136.0"
   }
 }
