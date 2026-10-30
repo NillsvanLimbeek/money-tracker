@@ -15,9 +15,11 @@ interface Props {
   selected?: boolean;
   // Already stored: dimmed, labelled "Already imported" and not selectable.
   duplicate?: boolean;
+  // Sits under a day header: the date leaves the row, a category dot leads it and the badge only shows when expanded.
+  grouped?: boolean;
 }
 
-const { transaction, categories, pickerOpen = false, selectable = false, selected = false, duplicate = false } = defineProps<Props>();
+const { transaction, categories, pickerOpen = false, selectable = false, selected = false, duplicate = false, grouped = false } = defineProps<Props>();
 const emit = defineEmits<{
   (e: 'togglePicker'): void;
   (e: 'closePicker'): void;
@@ -56,7 +58,17 @@ const amountClass = computed(() => {
           @update:model-value="emit('toggle')"
         />
 
-        <div class="text-muted flex w-9 shrink-0 flex-col items-start pt-0.5 font-mono text-xs leading-tight uppercase">
+        <span
+          v-if="grouped"
+          class="mt-2 size-2.5 shrink-0 rounded-full"
+          :style="{ backgroundColor: `var(--category-${transaction.categoryKey}-text)` }"
+          aria-hidden="true"
+        />
+
+        <div
+          v-else
+          class="text-muted flex w-9 shrink-0 flex-col items-start pt-0.5 font-mono text-xs leading-tight uppercase"
+        >
           <p>{{ format(transaction.date, 'dd') }}</p>
           <p>{{ format(transaction.date, 'MMM') }}</p>
         </div>
@@ -75,31 +87,7 @@ const amountClass = computed(() => {
           </p>
 
           <div
-            v-if="expanded && noteLines.length"
-            class="border-accented bg-elevated w-full rounded-xl border px-3 py-2"
-          >
-            <p class="text-muted font-mono text-xs tracking-wide uppercase">
-              Bank description
-            </p>
-
-            <p
-              v-for="line in noteLines"
-              :key="line"
-              class="text-toned font-mono text-sm wrap-break-word"
-            >
-              {{ line }}
-            </p>
-          </div>
-
-          <p
-            v-if="duplicate"
-            class="border-accented text-muted rounded-full border border-dashed px-3 py-1 text-xs"
-          >
-            Already imported
-          </p>
-
-          <div
-            v-else
+            v-if="!duplicate && (!grouped || expanded || pickerOpen)"
             @click.stop
           >
             <CategoryBadge
@@ -110,6 +98,13 @@ const amountClass = computed(() => {
               @click="emit('togglePicker')"
             />
           </div>
+
+          <p
+            v-if="duplicate"
+            class="border-accented text-muted rounded-full border border-dashed px-3 py-1 text-xs"
+          >
+            Already imported
+          </p>
         </div>
 
         <p
@@ -118,6 +113,13 @@ const amountClass = computed(() => {
         >
           {{ formatCurrency(transaction.amount) }}
         </p>
+      </div>
+
+      <div
+        v-if="expanded && noteLines.length"
+        class="mt-4 ml-5"
+      >
+        <TransactionDescription :note-lines />
       </div>
 
       <CategoryPicker

@@ -42,6 +42,17 @@ describe('transactionRow', () => {
     expect(text).toContain('Food');
   });
 
+  it('drops the date and hides the badge until expanded when grouped', async () => {
+    const wrapper = mountRow({ grouped: true });
+
+    expect(wrapper.text()).not.toContain('Oct');
+    expect(wrapper.findComponent(CategoryBadge).exists()).toBe(false);
+
+    await wrapper.find('button[aria-label="Toggle details"]').trigger('click');
+
+    expect(wrapper.findComponent(CategoryBadge).exists()).toBe(true);
+  });
+
   it('falls back to the category key when the category is unknown', () => {
     const wrapper = mountRow({ transaction: { ...TRANSACTION, categoryKey: 'income' } });
 

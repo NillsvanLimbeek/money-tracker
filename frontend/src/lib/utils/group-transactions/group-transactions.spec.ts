@@ -1,4 +1,5 @@
 import type { Transaction } from '@/lib/types';
+import { format } from 'date-fns';
 import { describe, expect, it } from 'vitest';
 import { groupTransactionsByDay } from './group-transactions';
 
@@ -23,19 +24,17 @@ describe('groupTransactionsByDay', () => {
     expect(groups[1]!.transactions.map(t => t.id)).toEqual(['c', 'a']);
   });
 
-  it('labels older days as dd MMM', () => {
+  it('labels days as EEE d MMM', () => {
     const [group] = groupTransactionsByDay([transaction('a', new Date(2020, 0, 5), -1)]);
 
-    expect(group!.label).toBe('05 Jan');
+    expect(group!.label).toBe('Sun 5 Jan');
   });
 
-  it('labels today and yesterday', () => {
+  it('prefixes today', () => {
     const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
 
-    const groups = groupTransactionsByDay([transaction('a', yesterday, -1), transaction('b', today, -1)]);
+    const [group] = groupTransactionsByDay([transaction('a', today, -1)]);
 
-    expect(groups.map(group => group.label)).toEqual(['Today', 'Yesterday']);
+    expect(group!.label).toBe(`Today · ${format(today, 'EEE d MMM')}`);
   });
 });

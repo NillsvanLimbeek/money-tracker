@@ -28,30 +28,31 @@ function selectCategory(id: string, categoryKey: string): void {
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 p-4">
-    <div
-      v-for="group in groups"
-      :key="group.key"
-    >
-      <div class="mb-2 flex items-center justify-between px-1">
-        <span class="text-highlighted text-sm font-semibold">{{ group.label }}</span>
-        <span class="text-muted font-mono text-xs">{{ formatCurrency(group.total) }}</span>
-      </div>
+  <div class="p-4">
+    <div class="border-accented bg-default overflow-hidden rounded-2xl border shadow-sm">
+      <section
+        v-for="group in groups"
+        :key="group.key"
+      >
+        <div class="border-accented bg-elevated text-muted flex items-center justify-between border-b px-4 py-2 font-mono text-xs tracking-wide uppercase not-first:border-t">
+          <h3>{{ group.label }}</h3>
+          <span>{{ formatCurrency(group.total) }}</span>
+        </div>
 
-      <div class="border-accented bg-default rounded-2xl border shadow-sm">
         <div class="divide-accented divide-y">
           <TransactionRow
             v-for="transaction in group.transactions"
             :key="transaction.id"
             :transaction
             :categories
+            grouped
             :picker-open="openRowId === transaction.id"
             @toggle-picker="toggleRow(transaction.id)"
             @close-picker="openRowId = null"
             @select-category="key => selectCategory(transaction.id, key)"
           />
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>

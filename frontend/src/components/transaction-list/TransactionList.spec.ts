@@ -31,9 +31,9 @@ describe('transactionList', () => {
   it('groups transactions by day with a total', () => {
     const text = mountList().text();
 
-    expect(text).toContain('Today');
+    expect(text).toContain('Today · ');
     expect(text).toContain('+€2.956,80');
-    expect(text).toContain('05 Jan');
+    expect(text).toContain('Mon 5 Jan');
   });
 
   it('shows the merchant, amount and category label', () => {
@@ -41,15 +41,32 @@ describe('transactionList', () => {
 
     expect(text).toContain('Albert Heijn');
     expect(text).toContain('−€43,20');
-    expect(text).toContain('Food');
   });
 
-  it('falls back to the category key when the category is unknown', () => {
-    expect(mountList().text()).toContain('income');
+  it('shows the category badge only once a row is expanded', async () => {
+    const wrapper = mountList();
+
+    expect(wrapper.findComponent(CategoryBadge).exists()).toBe(false);
+
+    await wrapper.find('button[aria-label="Toggle details"]').trigger('click');
+
+    expect(wrapper.findComponent(CategoryBadge).text()).toBe('Food');
+  });
+
+  it('falls back to the category key when the category is unknown', async () => {
+    const wrapper = mountList();
+
+    await wrapper.findAll('button[aria-label="Toggle details"]')[1]!.trigger('click');
+
+    expect(wrapper.text()).toContain('income');
   });
 
   it('opens the picker for one row at a time', async () => {
     const wrapper = mountList();
+
+    for (const toggle of wrapper.findAll('button[aria-label="Toggle details"]'))
+      await toggle.trigger('click');
+
     const badges = wrapper.findAllComponents(CategoryBadge);
 
     await badges[0]!.trigger('click');
@@ -65,7 +82,8 @@ describe('transactionList', () => {
   it('emits changeCategory and closes the picker on select', async () => {
     const wrapper = mountList();
 
-    await wrapper.findAllComponents(CategoryBadge)[0]!.trigger('click');
+    await wrapper.find('button[aria-label="Toggle details"]').trigger('click');
+    await wrapper.findComponent(CategoryBadge).trigger('click');
     await wrapper.findComponent(CategoryPicker).vm.$emit('select', 'transport');
 
     expect(wrapper.emitted('changeCategory')).toEqual([[{ id: '1', categoryKey: 'transport' }]]);
