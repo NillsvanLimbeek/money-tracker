@@ -1,4 +1,4 @@
-import type { CategoryRuleRow } from './category-rule-row';
+import type { CategoryRuleRow } from '../category-rule-row/category-rule-row';
 import { normalise } from '@money-tracker/shared';
 
 export function isDuplicate(rules: CategoryRuleRow[], pattern: string, operator: string, exceptId?: string): boolean {

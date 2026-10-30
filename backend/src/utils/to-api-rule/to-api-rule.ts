@@ -1,5 +1,5 @@
 import type { MatchableRule } from '@money-tracker/shared';
-import type { CategoryRuleRow } from './category-rule-row';
+import type { CategoryRuleRow } from '../category-rule-row/category-rule-row';
 import { ruleMatches } from '@money-tracker/shared';
 
 /**
