@@ -4,6 +4,12 @@ import { getAuth } from '../auth';
 
 const authRoutes = new Hono<{ Bindings: Bindings }>();
 
+/**
+ * Registers a new account with email and password.
+ *
+ * Forwards the JSON body to Better Auth and returns its response as-is,
+ * including any session cookie it sets.
+ */
 authRoutes.post('/sign-up', async (c) => {
   const body = await c.req.json();
 
@@ -14,6 +20,12 @@ authRoutes.post('/sign-up', async (c) => {
   });
 });
 
+/**
+ * Signs in with email and password.
+ *
+ * Forwards the JSON body to Better Auth and returns its response as-is,
+ * including any session cookie it sets.
+ */
 authRoutes.post('/sign-in', async (c) => {
   const body = await c.req.json();
 
@@ -24,6 +36,11 @@ authRoutes.post('/sign-in', async (c) => {
   });
 });
 
+/**
+ * Ends the current session.
+ *
+ * Passes the request headers to Better Auth, which clears the session cookie.
+ */
 authRoutes.post('/sign-out', async (c) => {
   return getAuth(c).api.signOut({
     headers: c.req.raw.headers,
@@ -31,6 +48,9 @@ authRoutes.post('/sign-out', async (c) => {
   });
 });
 
+/**
+ * Returns the current session, resolved from the request headers.
+ */
 authRoutes.get('/session', async (c) => {
   return getAuth(c).api.getSession({
     headers: c.req.raw.headers,

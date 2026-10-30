@@ -11,6 +11,11 @@ import { nextMonth } from '../utils';
 
 const transactionRoutes = new Hono<AppEnv>();
 
+/**
+ * Lists the user's transactions, newest first.
+ *
+ * With the optional `month` query (`YYYY-MM`) only that month is returned.
+ */
 transactionRoutes.get('/', validate('query', listQuerySchema), async (c) => {
   const userId = c.get('userId');
   const { month } = c.req.valid('query');
@@ -29,8 +34,13 @@ transactionRoutes.get('/', validate('query', listQuerySchema), async (c) => {
   return c.json(rows);
 });
 
-// Lets the import review screen flag rows that are already stored. A duplicate
-// shares its date with the incoming row, so the file's date range is enough.
+/**
+ * Lists the import hashes of stored transactions between `from` and `to`
+ * (inclusive).
+ *
+ * Lets the import review screen flag rows that are already stored. A duplicate
+ * shares its date with the incoming row, so the file's date range is enough.
+ */
 transactionRoutes.get('/hashes', validate('query', hashRangeQuerySchema), async (c) => {
   const userId = c.get('userId');
   const { from, to } = c.req.valid('query');
@@ -48,6 +58,14 @@ transactionRoutes.get('/hashes', validate('query', hashRangeQuerySchema), async 
   return c.json(rows.map(row => row.importHash));
 });
 
+/**
+ * Imports transactions, categorising each with the user's rules.
+ *
+ * A row without a matching rule falls back to `income` for a positive amount
+ * and `other` otherwise. Rows already stored (same user and import hash) are
+ * skipped. Inserts run in chunks of `IMPORT_CHUNK_SIZE` rows. Responds with
+ * `{ imported, skipped }`.
+ */
 transactionRoutes.post('/import', validate('json', importBodySchema), async (c) => {
   const userId = c.get('userId');
   const rows = c.req.valid('json');
@@ -87,6 +105,12 @@ transactionRoutes.post('/import', validate('json', importBodySchema), async (c) 
   return c.json({ imported, skipped: rows.length - imported });
 });
 
+/**
+ * Sets a transaction's category by hand.
+ *
+ * Marks the category source as `manual`. Responds with the updated
+ * transaction, or 404 when it does not exist or belongs to another user.
+ */
 transactionRoutes.patch('/:id', validate('json', updateCategoryBodySchema), async (c) => {
   const userId = c.get('userId');
   const { category } = c.req.valid('json');

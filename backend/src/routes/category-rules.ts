@@ -10,6 +10,12 @@ import { findChangedIds, isDuplicate, loadDescriptions, loadRules, toApiRule } f
 
 const categoryRuleRoutes = new Hono<AppEnv>();
 
+/**
+ * Lists the user's category rules.
+ *
+ * Each rule is returned in its API shape, enriched from the user's
+ * transaction descriptions by `toApiRule`.
+ */
 categoryRuleRoutes.get('/', async (c) => {
   const userId = c.get('userId');
   const db = createDb(c.env.DB);
@@ -19,6 +25,12 @@ categoryRuleRoutes.get('/', async (c) => {
   return c.json(rules.map(rule => toApiRule(rule, descriptions)));
 });
 
+/**
+ * Creates a category rule.
+ *
+ * Responds with 201 and the created rule, or 409 when the user already has a
+ * rule with the same pattern and operator.
+ */
 categoryRuleRoutes.post('/', validate('json', createRuleBodySchema), async (c) => {
   const userId = c.get('userId');
   const body = c.req.valid('json');
@@ -35,6 +47,14 @@ categoryRuleRoutes.post('/', validate('json', createRuleBodySchema), async (c) =
   return c.json(toApiRule(created!, await loadDescriptions(db, userId)), 201);
 });
 
+/**
+ * Updates a category rule.
+ *
+ * Fields missing from the body keep their current value when checking for
+ * duplicates. Responds with the updated rule, 404 when the rule does not
+ * exist, or 409 when the change would duplicate another rule's pattern and
+ * operator.
+ */
 categoryRuleRoutes.patch('/:id', validate('json', updateRuleBodySchema), async (c) => {
   const userId = c.get('userId');
   const body = c.req.valid('json');
@@ -58,7 +78,12 @@ categoryRuleRoutes.patch('/:id', validate('json', updateRuleBodySchema), async (
   return c.json(toApiRule(updated!, await loadDescriptions(db, userId)));
 });
 
-// Transactions it categorised keep their category.
+/**
+ * Deletes a category rule.
+ *
+ * Transactions it categorised keep their category. Responds with 204, or 404
+ * when the rule does not exist.
+ */
 categoryRuleRoutes.delete('/:id', async (c) => {
   const userId = c.get('userId');
   const db = createDb(c.env.DB);
@@ -74,6 +99,13 @@ categoryRuleRoutes.delete('/:id', async (c) => {
   return c.body(null, 204);
 });
 
+/**
+ * Previews applying a rule.
+ *
+ * Responds with `{ count }`, the number of transactions whose category would
+ * change, without modifying anything. Responds with 404 when the rule does not
+ * exist.
+ */
 categoryRuleRoutes.get('/:id/preview', async (c) => {
   const userId = c.get('userId');
   const db = createDb(c.env.DB);
@@ -87,6 +119,13 @@ categoryRuleRoutes.get('/:id/preview', async (c) => {
   return c.json({ count: (await findChangedIds(db, userId, rule, rules)).length });
 });
 
+/**
+ * Applies a rule to the user's existing transactions.
+ *
+ * Sets the rule's category on every transaction it changes and marks their
+ * category source as `rule`. Updates run in batches of `MAX_UPDATE_IDS` ids.
+ * Responds with `{ updated }`, or 404 when the rule does not exist.
+ */
 categoryRuleRoutes.post('/:id/apply', async (c) => {
   const userId = c.get('userId');
   const db = createDb(c.env.DB);
