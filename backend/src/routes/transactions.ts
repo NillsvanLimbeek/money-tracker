@@ -1,9 +1,10 @@
 import type { AppEnv } from '../bindings';
+import { matchCategory } from '@money-tracker/shared';
 import { and, asc, desc, eq, gte, lt, lte } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { IMPORT_CHUNK_SIZE } from '../constants';
 import { createDb } from '../db';
-import { transactions } from '../db/schema';
+import { categoryRules, transactions } from '../db/schema';
 import { validate } from '../middleware/validate';
 import { hashRangeQuerySchema, importBodySchema, listQuerySchema, updateCategoryBodySchema } from '../schemas';
 import { nextMonth } from '../utils';
@@ -52,15 +53,21 @@ transactionRoutes.post('/import', validate('json', importBodySchema), async (c) 
   const rows = c.req.valid('json');
   const db = createDb(c.env.DB);
   const createdAt = new Date();
+  const rules = await db.select().from(categoryRules).where(eq(categoryRules.userId, userId));
 
-  const values = rows.map(row => ({
-    ...row,
-    id: crypto.randomUUID(),
-    userId,
-    // Placeholder until keyword categorisation lands.
-    category: row.amountCents > 0 ? 'income' : 'other',
-    createdAt,
-  }));
+  const values = rows.map((row) => {
+    const category = matchCategory(row.description, rules);
+
+    return {
+      ...row,
+      id: crypto.randomUUID(),
+      userId,
+      // No matching rule falls back to a placeholder.
+      category: category ?? (row.amountCents > 0 ? 'income' : 'other'),
+      categorySource: category ? 'rule' as const : 'default' as const,
+      createdAt,
+    };
+  });
 
   const statements = [];
 
@@ -87,7 +94,7 @@ transactionRoutes.patch('/:id', validate('json', updateCategoryBodySchema), asyn
 
   const [updated] = await db
     .update(transactions)
-    .set({ category })
+    .set({ category, categorySource: 'manual' })
     .where(and(
       eq(transactions.id, c.req.param('id')),
       eq(transactions.userId, userId),

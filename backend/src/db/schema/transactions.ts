@@ -8,6 +8,8 @@ export const transactions = sqliteTable('transactions', {
   description: text('description').notNull(),
   amountCents: integer('amount_cents').notNull(),
   category: text('category').notNull(),
+  // `manual` rows are never touched when rules are applied.
+  categorySource: text('category_source', { enum: ['rule', 'manual', 'default'] }).notNull().default('default'),
   rawCounterparty: text('raw_counterparty'),
   mutationType: text('mutation_type'),
   notes: text('notes'),

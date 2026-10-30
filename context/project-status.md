@@ -46,12 +46,20 @@ _Last updated: 27-10-2026_
 
 ---
 
+- Category rules backend (steps 1 and 2 of `docs/category-rules.md`):
+  - `packages/shared` is now the `@money-tracker/shared` workspace package (TS source exported directly, own vitest + eslint). It holds the matcher: `ruleMatches`, `findWinningRule` (equals > starts/ends > contains, then longer pattern, then older rule) and `matchCategory`; the backend depends on it
+  - Migration `20261029143319_sour_miss_america`: `category_rules` recreated with `pattern` / `operator` / `createdAt` (the old `keyword` / `priority` table was never written to), and `transactions.category_source` added
+  - Import applies the user's rules (`categorySource` `rule`, otherwise the `income` / `other` placeholder as `default`); `PATCH /api/transactions/:id` sets `manual`. `IMPORT_CHUNK_SIZE` dropped to 8 because a row now binds 12 parameters
+  - `routes/category-rules.ts` (behind `requireAuth`): `GET /` (each rule with a `matches` count, computed by running the matcher over the user's descriptions), `POST /`, `PATCH /:id`, `DELETE /:id` (204), `GET /:id/preview` (`{ count }`), `POST /:id/apply` (`{ updated }`). Apply and preview only touch non-manual rows that this rule wins and that aren't already in its category. A duplicate pattern + operator (normalised) is rejected with 409
+  - Not done: the import response has no `uncategorised` count yet, and the frontend still has its own `RuleOperator` type rather than importing from shared
+
+---
+
 ## Next up
 
 1. Rule-based categorisation on import using `category_rules` (the import route currently assigns a placeholder: `income` for positive amounts, otherwise `other`). Until then the summary's "Uncategorised" count is every imported debit, and it can't link to a filtered list because the ledger has no category filter. Design is in `docs/category-rules.md`; steps:
-   1. Shared matcher (`packages/shared`), migration, import route applies rules
-   2. Rules CRUD API plus apply / preview
-   3. Rules UI under Settings, and a "create rule" prompt after a manual category change
+   1. Rules UI: the list screen is built; still needs the add / edit form, the apply prompt after saving, and a "create rule" prompt after a manual category change
+   2. Return an `uncategorised` count from import and show category previews on the review screen
 2. Wire the transactions page's search box and category filter to the list
 
 ---
