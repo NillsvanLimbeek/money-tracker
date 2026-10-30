@@ -4,4 +4,5 @@ export * from './is-duplicate/is-duplicate';
 export * from './load-descriptions/load-descriptions';
 export * from './load-rules/load-rules';
 export * from './next-month/next-month';
+export * from './preview-rule-matches/preview-rule-matches';
 export * from './to-api-rule/to-api-rule';

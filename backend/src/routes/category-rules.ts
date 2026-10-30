@@ -5,8 +5,8 @@ import { MAX_UPDATE_IDS } from '../constants';
 import { createDb } from '../db';
 import { categoryRules, transactions } from '../db/schema';
 import { validate } from '../middleware/validate';
-import { createRuleBodySchema, updateRuleBodySchema } from '../schemas';
-import { findChangedIds, isDuplicate, loadDescriptions, loadRules, toApiRule } from '../utils';
+import { createRuleBodySchema, previewRuleQuerySchema, updateRuleBodySchema } from '../schemas';
+import { findChangedIds, isDuplicate, loadDescriptions, loadRules, previewRuleMatches, toApiRule } from '../utils';
 
 const categoryRuleRoutes = new Hono<AppEnv>();
 
@@ -23,6 +23,18 @@ categoryRuleRoutes.get('/', async (c) => {
   const [rules, descriptions] = await Promise.all([loadRules(db, userId), loadDescriptions(db, userId)]);
 
   return c.json(rules.map(rule => toApiRule(rule, descriptions)));
+});
+
+/**
+ * Previews a rule that is not saved yet.
+ *
+ * Responds with `{ count, descriptions }`: the number of matching transactions
+ * and one entry per distinct description, most frequent first.
+ */
+categoryRuleRoutes.get('/preview', validate('query', previewRuleQuerySchema), async (c) => {
+  const descriptions = await previewRuleMatches(createDb(c.env.DB), c.get('userId'), c.req.valid('query'));
+
+  return c.json({ count: descriptions.reduce((sum, group) => sum + group.count, 0), descriptions });
 });
 
 /**

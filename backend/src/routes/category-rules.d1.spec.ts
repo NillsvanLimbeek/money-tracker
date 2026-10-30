@@ -35,6 +35,28 @@ describe('category rule routes', () => {
     });
   });
 
+  describe('get /preview', () => {
+    it('counts and groups the user\'s matching transactions for an unsaved rule', async () => {
+      await seedTransaction({ id: 't1', userId: 'alice', description: 'Albert Heijn 1', date: '2026-10-01', amountCents: -100 });
+      await seedTransaction({ id: 't2', userId: 'alice', description: 'Albert Heijn 1', date: '2026-10-02', amountCents: -200 });
+      await seedTransaction({ id: 't3', userId: 'alice', description: 'Netflix' });
+      await seedTransaction({ id: 't4', userId: 'bob', description: 'Albert Heijn 2' });
+
+      const res = await asAlice('/preview?pattern=albert&operator=contains');
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        count: 2,
+        descriptions: [{ description: 'Albert Heijn 1', count: 2, date: '2026-10-02', amountCents: -200 }],
+      });
+    });
+
+    it('rejects a missing pattern or an unknown operator', async () => {
+      expect((await asAlice('/preview?operator=contains')).status).toBe(400);
+      expect((await asAlice('/preview?pattern=albert&operator=regex')).status).toBe(400);
+    });
+  });
+
   describe('post /', () => {
     const body = { pattern: 'albert', operator: 'contains', category: 'food' };
 

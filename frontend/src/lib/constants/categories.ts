@@ -9,3 +9,13 @@ export const CATEGORIES: Category[] = [
   { key: 'shopping', label: 'Shopping' },
   { key: 'other', label: 'Other' },
 ];
+
+export const CATEGORY_ICONS: Record<string, string> = {
+  food: 'i-lucide-utensils',
+  entertainment: 'i-lucide-circle-play',
+  income: 'i-lucide-arrow-down-to-line',
+  transport: 'i-lucide-train-front',
+  housing: 'i-lucide-house',
+  shopping: 'i-lucide-shopping-bag',
+  other: 'i-lucide-ellipsis',
+};

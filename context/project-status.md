@@ -2,13 +2,13 @@
 
 > What's done and what's next. For goals, stack, architecture and data model see `project-overview.md`.
 
-_Last updated: 27-10-2026_
+_Last updated: 30-10-2026_
 
 | Phase | State |
 |---|---|
 | 1. Project setup | Done |
 | 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
-| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; keyword categorisation still to do |
+| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend and the add-rule form done, rule-based categorisation shown on the review screen and the edit / manual-change prompts still to do |
 | 4–7 | Not started |
 
 ---
@@ -51,14 +51,24 @@ _Last updated: 27-10-2026_
   - Migration `20261029143319_sour_miss_america`: `category_rules` recreated with `pattern` / `operator` / `createdAt` (the old `keyword` / `priority` table was never written to), and `transactions.category_source` added
   - Import applies the user's rules (`categorySource` `rule`, otherwise the `income` / `other` placeholder as `default`); `PATCH /api/transactions/:id` sets `manual`. `IMPORT_CHUNK_SIZE` dropped to 8 because a row now binds 12 parameters
   - `routes/category-rules.ts` (behind `requireAuth`): `GET /` (each rule with a `matches` count, computed by running the matcher over the user's descriptions), `POST /`, `PATCH /:id`, `DELETE /:id` (204), `GET /:id/preview` (`{ count }`), `POST /:id/apply` (`{ updated }`). Apply and preview only touch non-manual rows that this rule wins and that aren't already in its category. A duplicate pattern + operator (normalised) is rejected with 409
+  - `GET /api/category-rules/preview?pattern&operator` previews an unsaved rule: `{ count, descriptions }`, one entry per distinct description (newest date and amount, `count` of repeats), most frequent first
   - Not done: the import response has no `uncategorised` count yet, and the frontend still has its own `RuleOperator` type rather than importing from shared
+
+- New rule form, opened from "Add rule" on `pages/settings/rules.vue` (the page owns the draft state, the preview query and the create / apply mutations, and shows a toast on success or failure):
+  - `RuleForm` (`components/rule-form/`) is a Nuxt UI `UForm` whose fields are generated from `RULE_FIELDS` (`lib/constants/rule-fields.ts`, typed by `RuleFieldConfig` / `RuleDraft`). Its `validate` function blocks an empty or duplicate pattern and a missing category; the short-pattern warning is a separate amber box and does not block saving. Save & apply is the form's submit button, Save validates silently and then emits
+  - `validateRule` (`lib/utils/`) holds the pattern checks; it warns under `MIN_PATTERN_LENGTH` (3) characters and uses `normalise` from `@money-tracker/shared` (now a frontend dependency) for the duplicate check
+  - `CategorySelect` (category grid with icons from `CATEGORY_ICONS`, `v-model` is the selected key) and `RulePreview` (match count plus one row per distinct description with date, `×N` and amount) are standalone components
+  - `AppDrawer` (`components/app-drawer/`) is the generic drawer: title, close button, default slot as body, optional `footer` slot. It is a fixed `92dvh` so the sheet doesn't shift as content appears, and only the body scrolls. `CategoryDrawer` (the filter drawer) still uses `UDrawer` directly because it needs a Reset button in the header
+  - Frontend API: `createCategoryRule`, `applyCategoryRule`, `previewCategoryRule` with `useCreateCategoryRule`, `useApplyCategoryRule`, `useRulePreview`
+  - Not done: the "Edit existing rule" link on the duplicate error, since there is no edit form yet
+  - Open issue: the confirmation toast sometimes doesn't auto-close. Reka UI pauses the timer while the pointer or focus is on the toast area or the window is blurred (for example with DevTools focused); not yet confirmed whether it also happens in a normal window
 
 ---
 
 ## Next up
 
 1. Rule-based categorisation on import using `category_rules` (the import route currently assigns a placeholder: `income` for positive amounts, otherwise `other`). Until then the summary's "Uncategorised" count is every imported debit, and it can't link to a filtered list because the ledger has no category filter. Design is in `docs/category-rules.md`; steps:
-   1. Rules UI: the list screen is built; still needs the add / edit form, the apply prompt after saving, and a "create rule" prompt after a manual category change
+   1. Rules UI: the list screen and the add form (with apply on save) are built; still needs an edit form and a "create rule" prompt after a manual category change
    2. Return an `uncategorised` count from import and show category previews on the review screen
 2. Wire the transactions page's search box and category filter to the list
 

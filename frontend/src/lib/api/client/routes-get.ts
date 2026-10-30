@@ -1,4 +1,4 @@
-import type { ApiTransaction, CategoryRule } from '@/lib/types';
+import type { ApiTransaction, CategoryRule, RuleOperator, RulePreview } from '@/lib/types';
 
 export interface ApiGetRoutes {
   '/health': {
@@ -12,6 +12,10 @@ export interface ApiGetRoutes {
   '/api/category-rules': {
     query?: undefined;
     response: CategoryRule[];
+  };
+  '/api/category-rules/preview': {
+    query: { pattern: string; operator: RuleOperator };
+    response: RulePreview;
   };
   '/api/transactions/hashes': {
     query: { from: string; to: string };
