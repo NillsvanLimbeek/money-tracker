@@ -49,9 +49,17 @@ describe('ruleGroup', () => {
   it('re-emits delete from a row with the rule id', async () => {
     const wrapper = mountGroup();
 
-    await wrapper.findAll('.menu-item')[1]!.trigger('click');
+    await wrapper.findAll('.menu-item').filter(item => item.text() === 'Delete')[1]!.trigger('click');
     await wrapper.findAll('button').find(button => button.text() === 'Delete rule')!.trigger('click');
 
     expect(wrapper.emitted('delete')).toEqual([['rule-2']]);
+  });
+
+  it('re-emits edit from a row with the rule', async () => {
+    const wrapper = mountGroup();
+
+    await wrapper.findAll('.menu-item').filter(item => item.text() === 'Edit')[1]!.trigger('click');
+
+    expect(wrapper.emitted('edit')).toEqual([[RULES[1]]]);
   });
 });

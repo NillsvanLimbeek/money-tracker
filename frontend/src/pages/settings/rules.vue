@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import type { RuleOperator } from '@/lib/types';
+import type { CategoryRule, RuleOperator } from '@/lib/types';
 import { computed, ref } from 'vue';
-import { useApplyCategoryRule, useCategoryRules, useCreateCategoryRule, useDeleteCategoryRule, useRulePreview } from '@/lib/api/category-rules/category-rules.queries';
+import { useApplyCategoryRule, useCategoryRules, useCreateCategoryRule, useDeleteCategoryRule, useRulePreview, useUpdateCategoryRule } from '@/lib/api/category-rules/category-rules.queries';
 import { CATEGORIES } from '@/lib/constants';
 import { groupRulesByCategory } from '@/lib/utils';
 
 const rulesQuery = useCategoryRules();
 const { mutate: deleteRule } = useDeleteCategoryRule();
 const { mutateAsync: createRule } = useCreateCategoryRule();
+const { mutateAsync: updateRule } = useUpdateCategoryRule();
 const { mutateAsync: applyRule } = useApplyCategoryRule();
 const toast = useToast();
 
 const isFormOpen = ref(false);
 const isSaving = ref(false);
+const editingId = ref<string | undefined>();
 const operator = ref<RuleOperator>('contains');
 const pattern = ref('');
 const categoryKey = ref<string | null>(null);
@@ -36,9 +38,18 @@ const groups = computed(() => {
 });
 
 function addRule(): void {
+  editingId.value = undefined;
   operator.value = 'contains';
   pattern.value = '';
   categoryKey.value = null;
+  isFormOpen.value = true;
+}
+
+function editRule(rule: CategoryRule): void {
+  editingId.value = rule.id;
+  operator.value = rule.operator;
+  pattern.value = rule.pattern;
+  categoryKey.value = rule.categoryKey;
   isFormOpen.value = true;
 }
 
@@ -49,8 +60,9 @@ async function saveRule(shouldApply: boolean): Promise<void> {
   isSaving.value = true;
 
   try {
-    const created = await createRule({ pattern: pattern.value.trim(), operator: operator.value, category: categoryKey.value });
-    const updated = shouldApply ? (await applyRule(created.id)).updated : null;
+    const draft = { pattern: pattern.value.trim(), operator: operator.value, category: categoryKey.value };
+    const saved = editingId.value ? await updateRule({ id: editingId.value, changes: draft }) : await createRule(draft);
+    const updated = shouldApply ? (await applyRule(saved.id)).updated : null;
 
     isFormOpen.value = false;
     toast.add({
@@ -118,16 +130,13 @@ async function saveRule(shouldApply: boolean): Promise<void> {
           All <span class="font-mono text-sm opacity-70">{{ rules.length }}</span>
         </button>
 
-        <button
+        <Chip
           v-for="chip in chips"
           :key="chip.key"
-          type="button"
-          class="border-accented flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 font-medium"
-          :class="{ 'border-primary bg-primary/10 text-primary': selectedKey === chip.key, 'bg-default text-highlighted': selectedKey !== chip.key }"
-          @click="selectedKey = chip.key"
-        >
-          {{ chip.label }} <span class="font-mono text-sm opacity-70">{{ chip.count }}</span>
-        </button>
+          :chip
+          :selected="selectedKey"
+          @select="(e) => selectedKey = e"
+        />
       </div>
 
       <p class="border-accented bg-default text-toned flex gap-3 rounded-2xl border p-4 text-sm shadow-sm">
@@ -145,6 +154,7 @@ async function saveRule(shouldApply: boolean): Promise<void> {
         v-for="group in groups"
         :key="group.category.key"
         :group
+        @edit="editRule"
         @delete="deleteRule"
       />
 
@@ -166,6 +176,7 @@ async function saveRule(shouldApply: boolean): Promise<void> {
     :rules
     :preview="preview.data.value"
     :pending="isSaving"
+    :editing-id
     @save="saveRule(false)"
     @save-and-apply="saveRule(true)"
   />

@@ -22,6 +22,10 @@ describe('validateRule', () => {
     });
   });
 
+  it('does not count the rule being edited as its own duplicate', () => {
+    expect(validateRule({ pattern: 'ziggo', operator: 'contains' }, RULES, CATEGORIES, undefined, 'r1').canSave).toBe(true);
+  });
+
   it('allows the same pattern with another operator', () => {
     expect(validateRule({ pattern: 'ziggo', operator: 'equals' }, RULES, CATEGORIES).canSave).toBe(true);
   });

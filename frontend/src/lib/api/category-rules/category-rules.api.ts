@@ -1,5 +1,5 @@
 import type { CategoryRule, NewCategoryRule, RuleOperator, RulePreview } from '../../types';
-import { del, get, post } from '../client/fetch';
+import { del, get, patch, post } from '../client/fetch';
 
 /**
  * Fetches the user's category rules.
@@ -33,6 +33,19 @@ export async function deleteCategoryRule(id: string): Promise<void> {
  */
 export async function createCategoryRule(rule: NewCategoryRule): Promise<CategoryRule> {
   return await post('/api/category-rules', rule);
+}
+
+/**
+ * Updates a category rule. Transactions it already categorised keep their category until it is applied again.
+ *
+ * @param id - The rule id.
+ * @param changes - The fields to change.
+ * @returns The updated rule. Rejects with a 409 when the new pattern and operator already exist.
+ * @example
+ * const rule = await updateCategoryRule('abc', { category: 'food' });
+ */
+export async function updateCategoryRule(id: string, changes: Partial<NewCategoryRule>): Promise<CategoryRule> {
+  return await patch(`/api/category-rules/${id}`, changes);
 }
 
 /**

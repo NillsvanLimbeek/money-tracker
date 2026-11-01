@@ -8,7 +8,7 @@ _Last updated: 30-10-2026_
 |---|---|
 | 1. Project setup | Done |
 | 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
-| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend and the add-rule form done, rule-based categorisation shown on the review screen and the edit / manual-change prompts still to do |
+| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend and the add / edit rule form done, rule-based categorisation shown on the review screen and the manual-change prompt still to do |
 | 4–7 | Not started |
 
 ---
@@ -60,7 +60,8 @@ _Last updated: 30-10-2026_
   - `CategorySelect` (category grid with icons from `CATEGORY_ICONS`, `v-model` is the selected key) and `RulePreview` (match count plus one row per distinct description with date, `×N` and amount) are standalone components
   - `AppDrawer` (`components/app-drawer/`) is the generic drawer: title, close button, default slot as body, optional `footer` slot. It is a fixed `92dvh` so the sheet doesn't shift as content appears, and only the body scrolls. `CategoryDrawer` (the filter drawer) still uses `UDrawer` directly because it needs a Reset button in the header
   - Frontend API: `createCategoryRule`, `applyCategoryRule`, `previewCategoryRule` with `useCreateCategoryRule`, `useApplyCategoryRule`, `useRulePreview`
-  - Not done: the "Edit existing rule" link on the duplicate error, since there is no edit form yet
+  - Editing: the "Edit" item in a rule's menu opens the same drawer ("Edit rule") prefilled; the page tracks `editingId` and saves through `useUpdateCategoryRule` (`PATCH /api/category-rules/:id`) instead of create. `validateRule` takes an `ignoreId` so a rule isn't its own duplicate. Save & apply re-applies the edited rule; plain Save leaves already-categorised transactions as they are
+  - Not done: the "Edit existing rule" link on the duplicate error (the edit form now exists, so it can be wired up)
   - Open issue: the confirmation toast sometimes doesn't auto-close. Reka UI pauses the timer while the pointer or focus is on the toast area or the window is blurred (for example with DevTools focused); not yet confirmed whether it also happens in a normal window
 
 ---
@@ -68,7 +69,7 @@ _Last updated: 30-10-2026_
 ## Next up
 
 1. Rule-based categorisation on import using `category_rules` (the import route currently assigns a placeholder: `income` for positive amounts, otherwise `other`). Until then the summary's "Uncategorised" count is every imported debit, and it can't link to a filtered list because the ledger has no category filter. Design is in `docs/category-rules.md`; steps:
-   1. Rules UI: the list screen and the add form (with apply on save) are built; still needs an edit form and a "create rule" prompt after a manual category change
+   1. Rules UI: the list screen and the add and edit forms (with apply on save) are built; still needs a "create rule" prompt after a manual category change
    2. Return an `uncategorised` count from import and show category previews on the review screen
 2. Wire the transactions page's search box and category filter to the list
 

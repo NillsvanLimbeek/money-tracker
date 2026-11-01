@@ -11,9 +11,11 @@ interface Props {
   // What the draft matches; undefined until the first lookup returns.
   preview?: RulePreview;
   pending?: boolean;
+  // Id of the rule being edited; undefined when creating.
+  editingId?: string;
 }
 
-const { categories, rules, preview, pending = false } = defineProps<Props>();
+const { categories, rules, preview, pending = false, editingId } = defineProps<Props>();
 const emit = defineEmits<{
   (e: 'save'): void;
   (e: 'saveAndApply'): void;
@@ -36,6 +38,7 @@ const validation = computed(() => validateRule(
   rules,
   categories,
   preview?.descriptions.length,
+  editingId,
 ));
 
 const warning = computed(() => validation.value.level === 'warning' ? validation.value.message : null);
@@ -61,7 +64,7 @@ async function save(): Promise<void> {
 <template>
   <AppDrawer
     v-model:open="isOpen"
-    title="New rule"
+    :title="editingId ? 'Edit rule' : 'New rule'"
   >
     <UForm
       :id="FORM_ID"

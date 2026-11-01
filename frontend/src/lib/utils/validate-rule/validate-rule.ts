@@ -10,7 +10,7 @@ export interface RuleValidation {
 }
 
 /**
- * Validates the pattern of a rule that is being created.
+ * Validates the pattern of a rule that is being created or edited.
  *
  * @param draft - The rule being entered.
  * @param draft.pattern - The pattern text.
@@ -18,6 +18,7 @@ export interface RuleValidation {
  * @param rules - The user's existing rules, to detect a duplicate.
  * @param categories - The known categories, to name the category of a duplicate.
  * @param distinctMatches - How many different descriptions the draft matches, or undefined while still loading.
+ * @param ignoreId - Id of the rule being edited, so it does not count as its own duplicate.
  * @returns The strongest problem found, and whether the rule can be saved.
  * @example
  * validateRule({ pattern: 'ah', operator: 'contains' }, rules, CATEGORIES, 4);
@@ -28,13 +29,14 @@ export function validateRule(
   rules: CategoryRule[],
   categories: Category[],
   distinctMatches?: number,
+  ignoreId?: string,
 ): RuleValidation {
   const pattern = normalise(draft.pattern);
 
   if (pattern === '')
     return { level: 'error', message: 'Enter a pattern to match.', canSave: false };
 
-  const duplicate = rules.find(rule => rule.operator === draft.operator && normalise(rule.pattern) === pattern);
+  const duplicate = rules.find(rule => rule.id !== ignoreId && rule.operator === draft.operator && normalise(rule.pattern) === pattern);
 
   if (duplicate) {
     const category = categories.find(item => item.key === duplicate.categoryKey)?.label ?? duplicate.categoryKey;

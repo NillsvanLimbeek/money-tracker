@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CategoryRule } from '@/lib/types';
 import type { RuleGroup } from '@/lib/utils';
 
 interface Props {
@@ -6,7 +7,10 @@ interface Props {
 }
 
 const { group } = defineProps<Props>();
-const emit = defineEmits<{ (e: 'delete', id: string): void }>();
+const emit = defineEmits<{
+  (e: 'edit', rule: CategoryRule): void;
+  (e: 'delete', id: string): void;
+}>();
 </script>
 
 <template>
@@ -30,6 +34,7 @@ const emit = defineEmits<{ (e: 'delete', id: string): void }>();
         :key="rule.id"
         :rule
         :category-label="group.category.label"
+        @edit="emit('edit', $event)"
         @delete="emit('delete', $event)"
       />
     </div>

@@ -18,8 +18,12 @@ function mountRow(rule: Partial<CategoryRule> = {}): VueWrapper {
   return mount(RuleRow, { props: { rule: { ...RULE, ...rule }, categoryLabel: 'Food' }, global: { stubs } });
 }
 
+async function chooseMenuItem(wrapper: VueWrapper, label: string): Promise<void> {
+  await wrapper.findAll('.menu-item').find(item => item.text() === label)!.trigger('click');
+}
+
 async function openConfirmation(wrapper: VueWrapper): Promise<void> {
-  await wrapper.find('.menu-item').trigger('click');
+  await chooseMenuItem(wrapper, 'Delete');
 }
 
 function textOf(wrapper: VueWrapper): string {
@@ -83,5 +87,14 @@ describe('ruleRow', () => {
     await findButton(wrapper, 'Delete rule').trigger('click');
 
     expect(wrapper.emitted('delete')).toEqual([['rule-1']]);
+  });
+
+  it('emits edit with the rule when Edit is chosen', async () => {
+    const wrapper = mountRow();
+
+    await chooseMenuItem(wrapper, 'Edit');
+
+    expect(wrapper.emitted('edit')).toEqual([[RULE]]);
+    expect(wrapper.text()).not.toContain('Delete this rule?');
   });
 });

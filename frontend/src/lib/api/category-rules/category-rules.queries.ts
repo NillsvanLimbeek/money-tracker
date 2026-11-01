@@ -3,7 +3,7 @@ import type { MaybeRefOrGetter } from 'vue';
 import type { CategoryRule, NewCategoryRule, RuleOperator, RulePreview } from '../../types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { toValue } from 'vue';
-import { applyCategoryRule, createCategoryRule, deleteCategoryRule, getCategoryRules, previewCategoryRule } from './category-rules.api';
+import { applyCategoryRule, createCategoryRule, deleteCategoryRule, getCategoryRules, previewCategoryRule, updateCategoryRule } from './category-rules.api';
 
 /**
  * Query for the user's category rules.
@@ -49,6 +49,23 @@ export function useCreateCategoryRule(): UseMutationReturnType<CategoryRule, Err
 
   return useMutation({
     mutationFn: (rule: NewCategoryRule) => createCategoryRule(rule),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['category-rules'] }),
+  });
+}
+
+/**
+ * Mutation that updates a rule and refreshes the cached rules.
+ *
+ * @returns The TanStack mutation for updating a rule.
+ * @example
+ * const { mutateAsync } = useUpdateCategoryRule();
+ * const rule = await mutateAsync({ id: 'abc', changes: { category: 'food' } });
+ */
+export function useUpdateCategoryRule(): UseMutationReturnType<CategoryRule, Error, { id: string; changes: Partial<NewCategoryRule> }, unknown> {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, changes }: { id: string; changes: Partial<NewCategoryRule> }) => updateCategoryRule(id, changes),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['category-rules'] }),
   });
 }

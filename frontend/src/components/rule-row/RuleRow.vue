@@ -9,13 +9,20 @@ interface Props {
 }
 
 const { rule } = defineProps<Props>();
-const emit = defineEmits<{ (e: 'delete', id: string): void }>();
+const emit = defineEmits<{
+  (e: 'edit', rule: CategoryRule): void;
+  (e: 'delete', id: string): void;
+}>();
 
 const BARS = [1, 2, 3];
 
 const isConfirming = ref(false);
 
 const menuItems = [[{
+  label: 'Edit',
+  icon: 'i-lucide-pencil',
+  onSelect: () => emit('edit', rule),
+}], [{
   label: 'Delete',
   icon: 'i-lucide-trash-2',
   color: 'error' as const,

@@ -19,11 +19,11 @@ const stubs = {
   Icon: { template: '<i />' },
 };
 
-interface Draft { pattern?: string; operator?: RuleOperator; categoryKey?: string | null; preview?: RulePreview }
+interface Draft { pattern?: string; operator?: RuleOperator; categoryKey?: string | null; preview?: RulePreview; editingId?: string }
 
-function mountForm({ pattern = '', operator = 'contains', categoryKey = null, preview }: Draft = {}): VueWrapper {
+function mountForm({ pattern = '', operator = 'contains', categoryKey = null, preview, editingId }: Draft = {}): VueWrapper {
   return mount(RuleForm, {
-    props: { open: true, operator, pattern, categoryKey, categories: CATEGORIES, rules: RULES, preview },
+    props: { open: true, operator, pattern, categoryKey, categories: CATEGORIES, rules: RULES, preview, editingId },
     global: { stubs },
   });
 }
@@ -120,5 +120,20 @@ describe('ruleForm', () => {
   it('shows the preview once there is a pattern', () => {
     expect(mountForm({ pattern: 'albert heijn', preview: PREVIEW }).text()).toContain('3 matching');
     expect(mountForm({ pattern: '', preview: PREVIEW }).text()).not.toContain('matching');
+  });
+
+  it('titles the drawer by whether a rule is being created or edited', () => {
+    expect(mountForm().text()).toContain('New rule');
+    expect(mountForm({ editingId: 'r1' }).text()).toContain('Edit rule');
+  });
+
+  it('lets the rule being edited keep its own pattern', async () => {
+    const wrapper = mountForm({ pattern: 'ziggo', categoryKey: 'housing', editingId: 'r1' });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(wrapper.text()).not.toContain('This rule already exists');
+    expect(wrapper.emitted('saveAndApply')).toHaveLength(1);
   });
 });
