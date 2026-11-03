@@ -1,5 +1,6 @@
 export * from './banks';
 export * from './categories';
+export * from './drawer-ui';
 export * from './nav-items';
 export * from './rule-fields';
 export * from './rule-operators';

@@ -12,9 +12,9 @@ const RULES: CategoryRule[] = [
 
 const stubs = {
   Icon: { template: '<i class="icon" />' },
-  DropdownMenu: {
-    props: ['items'],
-    template: '<div><button v-for="item in items.flat()" :key="item.label" class="menu-item" @click="item.onSelect()">{{ item.label }}</button></div>',
+  Drawer: {
+    props: ['open', 'title', 'description'],
+    template: '<div v-if="open" class="drawer"><h2>{{ title }}</h2><p>{{ description }}</p><slot name="body" /></div>',
   },
 };
 
@@ -23,6 +23,11 @@ function mountGroup(group: Partial<RuleGroupData> = {}): VueWrapper {
     props: { group: { category: { key: 'food', label: 'Food' }, rules: RULES, matches: 15, ...group } },
     global: { stubs },
   });
+}
+
+async function chooseMenuItem(wrapper: VueWrapper, row: number, label: string): Promise<void> {
+  await wrapper.findAll('[aria-label="Rule actions"]')[row]!.trigger('click');
+  await wrapper.findAll('.drawer button').find(item => item.text() === label)!.trigger('click');
 }
 
 describe('ruleGroup', () => {
@@ -49,7 +54,7 @@ describe('ruleGroup', () => {
   it('re-emits delete from a row with the rule id', async () => {
     const wrapper = mountGroup();
 
-    await wrapper.findAll('.menu-item').filter(item => item.text() === 'Delete')[1]!.trigger('click');
+    await chooseMenuItem(wrapper, 1, 'Delete');
     await wrapper.findAll('button').find(button => button.text() === 'Delete rule')!.trigger('click');
 
     expect(wrapper.emitted('delete')).toEqual([['rule-2']]);
@@ -58,7 +63,7 @@ describe('ruleGroup', () => {
   it('re-emits edit from a row with the rule', async () => {
     const wrapper = mountGroup();
 
-    await wrapper.findAll('.menu-item').filter(item => item.text() === 'Edit')[1]!.trigger('click');
+    await chooseMenuItem(wrapper, 1, 'Edit');
 
     expect(wrapper.emitted('edit')).toEqual([[RULES[1]]]);
   });

@@ -8,9 +8,9 @@ const RULE: CategoryRule = { id: 'rule-1', pattern: 'Albert Heijn', operator: 's
 
 const stubs = {
   Icon: { template: '<i class="icon" />' },
-  DropdownMenu: {
-    props: ['items'],
-    template: '<div><button v-for="item in items.flat()" :key="item.label" class="menu-item" @click="item.onSelect()">{{ item.label }}</button></div>',
+  Drawer: {
+    props: ['open', 'title', 'description'],
+    template: '<div v-if="open" class="drawer"><h2>{{ title }}</h2><p>{{ description }}</p><slot name="body" /></div>',
   },
 };
 
@@ -19,7 +19,8 @@ function mountRow(rule: Partial<CategoryRule> = {}): VueWrapper {
 }
 
 async function chooseMenuItem(wrapper: VueWrapper, label: string): Promise<void> {
-  await wrapper.findAll('.menu-item').find(item => item.text() === label)!.trigger('click');
+  await wrapper.find('[aria-label="Rule actions"]').trigger('click');
+  await wrapper.findAll('.drawer button').find(item => item.text() === label)!.trigger('click');
 }
 
 async function openConfirmation(wrapper: VueWrapper): Promise<void> {
@@ -87,6 +88,20 @@ describe('ruleRow', () => {
     await findButton(wrapper, 'Delete rule').trigger('click');
 
     expect(wrapper.emitted('delete')).toEqual([['rule-1']]);
+  });
+
+  it('keeps the actions drawer closed until the menu button is pressed, and closes it on a choice', async () => {
+    const wrapper = mountRow();
+
+    expect(wrapper.find('.drawer').exists()).toBe(false);
+
+    await wrapper.find('[aria-label="Rule actions"]').trigger('click');
+
+    expect(wrapper.find('.drawer').exists()).toBe(true);
+
+    await wrapper.findAll('.drawer button').find(item => item.text() === 'Edit')!.trigger('click');
+
+    expect(wrapper.find('.drawer').exists()).toBe(false);
   });
 
   it('emits edit with the rule when Edit is chosen', async () => {

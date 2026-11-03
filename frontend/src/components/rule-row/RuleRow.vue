@@ -16,20 +16,23 @@ const emit = defineEmits<{
 
 const BARS = [1, 2, 3];
 
+const isMenuOpen = ref(false);
 const isConfirming = ref(false);
 
-const menuItems = [[{
-  label: 'Edit',
-  icon: 'i-lucide-pencil',
-  onSelect: () => emit('edit', rule),
-}], [{
-  label: 'Delete',
-  icon: 'i-lucide-trash-2',
-  color: 'error' as const,
-  onSelect: () => {
-    isConfirming.value = true;
-  },
-}]];
+function edit(): void {
+  isMenuOpen.value = false;
+  emit('edit', rule);
+}
+
+function confirmDelete(): void {
+  isConfirming.value = false;
+  emit('delete', rule.id);
+}
+
+function startDelete(): void {
+  isMenuOpen.value = false;
+  isConfirming.value = true;
+}
 </script>
 
 <template>
@@ -53,18 +56,14 @@ const menuItems = [[{
 
       <span class="text-highlighted min-w-0 flex-1 truncate font-mono">“{{ rule.pattern }}”</span>
 
-      <UDropdownMenu
-        :items="menuItems"
-        :content="{ align: 'end' }"
-      >
-        <UButton
-          color="neutral"
-          variant="ghost"
-          size="sm"
-          icon="i-lucide-ellipsis"
-          aria-label="Rule actions"
-        />
-      </UDropdownMenu>
+      <UButton
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        icon="i-lucide-ellipsis"
+        aria-label="Rule actions"
+        @click="isMenuOpen = true"
+      />
     </div>
 
     <div class="flex items-center gap-2">
@@ -86,42 +85,18 @@ const menuItems = [[{
       </span>
     </div>
 
-    <div
-      v-if="isConfirming"
-      class="bg-error/10 border-error/20 flex flex-col gap-3 rounded-xl border p-4"
-    >
-      <div class="flex flex-col gap-1">
-        <p class="text-highlighted font-medium">
-          Delete this rule?
-        </p>
+    <RuleActions
+      v-model:open="isMenuOpen"
+      :rule
+      :category-label
+      @edit="edit"
+      @delete="startDelete"
+    />
 
-        <p class="text-toned text-sm">
-          The {{ rule.matches }} matched {{ rule.matches === 1 ? 'transaction keeps' : 'transactions keep' }} their current category.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3">
-        <UButton
-          color="neutral"
-          variant="outline"
-          block
-          size="lg"
-          class="justify-center"
-          @click="isConfirming = false"
-        >
-          Cancel
-        </UButton>
-
-        <UButton
-          color="error"
-          block
-          size="lg"
-          class="justify-center"
-          @click="emit('delete', rule.id)"
-        >
-          Delete rule
-        </UButton>
-      </div>
-    </div>
+    <RuleDeleteDrawer
+      v-model:open="isConfirming"
+      :rule
+      @delete="confirmDelete"
+    />
   </div>
 </template>
