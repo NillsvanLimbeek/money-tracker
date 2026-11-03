@@ -102,6 +102,7 @@
     }
   ],
   "rule_delete_confirm": "Regel verwijderen",
+  "rule_form_edit_existing": "Bestaande regel bewerken",
   "rule_form_edit_title": "Regel bewerken",
   "rule_form_new_title": "Nieuwe regel",
   "rule_form_choose_category": "Kies een categorie.",

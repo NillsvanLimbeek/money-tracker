@@ -20,6 +20,7 @@ const { categories, rules, preview, pending = false, editingId } = defineProps<P
 const emit = defineEmits<{
   (e: 'save'): void;
   (e: 'saveAndApply'): void;
+  (e: 'editExisting', id: string): void;
 }>();
 
 const isOpen = defineModel<boolean>('open', { required: true });
@@ -111,6 +112,16 @@ async function save(): Promise<void> {
             />
             {{ warning }}
           </p>
+
+          <UButton
+            v-if="validation.duplicateId"
+            variant="link"
+            size="sm"
+            class="self-start p-0"
+            @click="emit('editExisting', validation.duplicateId)"
+          >
+            {{ m.rule_form_edit_existing() }}
+          </UButton>
         </div>
 
         <CategorySelect

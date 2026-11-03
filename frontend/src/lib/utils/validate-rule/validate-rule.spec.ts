@@ -19,6 +19,7 @@ describe('validateRule', () => {
       level: 'error',
       message: 'This rule already exists: contains “Ziggo” → Housing.',
       canSave: false,
+      duplicateId: 'r1',
     });
   });
 

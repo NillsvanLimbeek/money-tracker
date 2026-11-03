@@ -54,6 +54,13 @@ function editRule(rule: CategoryRule): void {
   isFormOpen.value = true;
 }
 
+function editExistingRule(id: string): void {
+  const rule = rules.value.find(item => item.id === id);
+
+  if (rule)
+    editRule(rule);
+}
+
 async function saveRule(shouldApply: boolean): Promise<void> {
   if (!categoryKey.value)
     return;
@@ -178,6 +185,7 @@ async function saveRule(shouldApply: boolean): Promise<void> {
     :preview="preview.data.value"
     :pending="isSaving"
     :editing-id
+    @edit-existing="editExistingRule"
     @save="saveRule(false)"
     @save-and-apply="saveRule(true)"
   />

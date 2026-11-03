@@ -8,6 +8,8 @@ export interface RuleValidation {
   level: 'error' | 'warning' | null;
   message: string | null;
   canSave: boolean;
+  // Id of the existing rule that makes this draft a duplicate.
+  duplicateId?: string;
 }
 
 /**
@@ -46,6 +48,7 @@ export function validateRule(
       level: 'error',
       message: m.rule_validation_duplicate({ operator: RULE_OPERATORS[duplicate.operator].label, pattern: duplicate.pattern, category }),
       canSave: false,
+      duplicateId: duplicate.id,
     };
   }
 

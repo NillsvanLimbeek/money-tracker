@@ -110,6 +110,14 @@ describe('ruleForm', () => {
     expect(wrapper.emitted('saveAndApply')).toBeUndefined();
   });
 
+  it('offers to edit the existing rule when the draft is a duplicate', async () => {
+    const wrapper = mountForm({ pattern: 'ziggo', categoryKey: 'food' });
+
+    await button(wrapper, 'Edit existing rule').trigger('click');
+
+    expect(wrapper.emitted('editExisting')).toEqual([['r1']]);
+  });
+
   it('shows no error before the user has submitted or typed', () => {
     const wrapper = mountForm();
 
