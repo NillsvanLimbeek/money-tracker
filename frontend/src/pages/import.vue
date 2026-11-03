@@ -2,6 +2,7 @@
 import type { ImportRow, ImportSummary } from '@/lib/types';
 import type { ParseResult } from '@/lib/utils';
 import { computed, ref, watch } from 'vue';
+import { useCategoryRules } from '@/lib/api/category-rules/category-rules.queries';
 import { getImportedHashes } from '@/lib/api/transactions/transactions.api';
 import { useImportTransactions } from '@/lib/api/transactions/transactions.queries';
 import { MAX_FILE_BYTES } from '@/lib/constants';
@@ -19,6 +20,7 @@ const importedRows = ref<ImportRow[]>([]);
 const error = ref('');
 
 const importMutation = useImportTransactions();
+const rulesQuery = useCategoryRules();
 
 const step = computed(() => parsed.value ? 2 : 1);
 
@@ -167,6 +169,7 @@ async function confirm(rows: ImportRow[]): Promise<void> {
       :rows="parsed.rows"
       :errors="parsed.errors"
       :duplicate-hashes="duplicateHashes"
+      :rules="rulesQuery.data.value"
       :is-submitting="importMutation.isPending.value"
       @confirm="confirm"
     />

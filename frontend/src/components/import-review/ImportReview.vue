@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ImportRow } from '@/lib/types';
+import type { CategoryRule, ImportRow } from '@/lib/types';
 import type { ParseError } from '@/lib/utils';
 import { computed, ref } from 'vue';
 import { CATEGORIES } from '@/lib/constants';
@@ -10,10 +10,12 @@ interface Props {
   rows: ImportRow[];
   errors: ParseError[];
   duplicateHashes: string[];
+  // The user's rules, oldest first, used to show the category each row will get.
+  rules?: CategoryRule[];
   isSubmitting: boolean;
 }
 
-const { rows, errors, duplicateHashes } = defineProps<Props>();
+const { rows, errors, duplicateHashes, rules = [] } = defineProps<Props>();
 const emit = defineEmits<{
   (e: 'confirm', rows: ImportRow[]): void;
 }>();
@@ -119,7 +121,7 @@ function toggleGroup(groupRows: ImportRow[]): void {
           <TransactionRow
             v-for="row in group.rows"
             :key="row.importHash"
-            :transaction="importRowToTransaction(row)"
+            :transaction="importRowToTransaction(row, rules)"
             :categories="CATEGORIES"
             selectable
             :selected="selected.has(row.importHash)"
