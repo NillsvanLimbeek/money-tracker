@@ -31,6 +31,7 @@ Progress, what has been built and what is next live in [`project-status.md`](./p
 | State management | Pinia | Transactions, filters, UI state |
 | Server state | TanStack Query (`@tanstack/vue-query`) | Queries and mutations per API area in `lib/api/` |
 | UI | Nuxt UI | Forms (`UForm` / `UFormField`), drawers, toasts; category colours are CSS variables in `main.css` |
+| i18n | Paraglide JS (`@inlang/paraglide-js`) | Compiled, tree-shakeable messages (`m.some_key()`); English and Dutch. Messages live in `frontend/messages/{locale}/<section>.json` |
 | PWA | `vite-plugin-pwa` | Installable from the browser |
 | Charts | vue-chartjs | Chart.js wrapper for Vue |
 
@@ -278,6 +279,7 @@ Full phase breakdown with individual tasks is in `finance-app-roadmap.docx`.
 | ORM | Drizzle ORM | Already familiar; SQLite dialect for D1, type-safe, good migration story |
 | Backend deployment | Cloudflare Workers | Free tier, native fit for Hono; Fly.io/Railway lost free tiers, Render has cold starts |
 | AI integration | Copy-for-AI button | No API costs, no credentials, works with any AI tool |
+| Translations | Paraglide JS, no locale in the URL | Type-safe compiled messages; locale comes from `localStorage`, then the browser language, then `en`, so routes stay unchanged |
 | Categorisation | Operator rules (contains / equals / starts with / ends with) + manual override | Simple, transparent, user-controlled; most specific rule wins so there is no ordering to manage |
 
 ---

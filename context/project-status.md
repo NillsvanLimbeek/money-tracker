@@ -8,7 +8,7 @@ _Last updated: 03-11-2026_
 |---|---|
 | 1. Project setup | Done |
 | 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
-| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend, the rules screen and the add / edit / delete rule flow (forms and drawers) done, the manual-change rule prompt done, rule-based categorisation shown on the review screen still to do |
+| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend, the rules screen and the add / edit / delete rule flow (forms and drawers) done, the manual-change rule prompt done, rule-based categorisation shown on the review screen done; UI strings moved to Paraglide (English and Dutch) |
 | 4–7 | Not started |
 
 ---
@@ -52,7 +52,8 @@ _Last updated: 03-11-2026_
   - Import applies the user's rules (`categorySource` `rule`, otherwise the `income` / `other` placeholder as `default`); `PATCH /api/transactions/:id` sets `manual`. `IMPORT_CHUNK_SIZE` dropped to 8 because a row now binds 12 parameters
   - `routes/category-rules.ts` (behind `requireAuth`): `GET /` (each rule with a `matches` count, computed by running the matcher over the user's descriptions), `POST /`, `PATCH /:id`, `DELETE /:id` (204), `GET /:id/preview` (`{ count }`), `POST /:id/apply` (`{ updated }`). Apply and preview only touch non-manual rows that this rule wins and that aren't already in its category. A duplicate pattern + operator (normalised) is rejected with 409
   - `GET /api/category-rules/preview?pattern&operator` previews an unsaved rule: `{ count, descriptions }`, one entry per distinct description (newest date and amount, `count` of repeats), most frequent first
-  - Not done: the import response has no `uncategorised` count yet, and the frontend still has its own `RuleOperator` type rather than importing from shared
+  - `POST /api/transactions/import` now responds `{ imported, skipped, uncategorised }`: `uncategorised` counts newly stored debits no rule matched (skipped duplicates and income excluded), and `ImportSummary` shows it instead of counting every debit
+  - Not done: the frontend still has its own `RuleOperator` type rather than importing from shared
 
 - New rule form, opened from "Add rule" on `pages/settings/rules.vue` (the page owns the draft state, the preview query and the create / apply mutations, and shows a toast on success or failure):
   - `RuleForm` (`components/rule-form/`) is a Nuxt UI `UForm` whose fields are generated from `RULE_FIELDS` (`lib/constants/rule-fields.ts`, typed by `RuleFieldConfig` / `RuleDraft`). Its `validate` function blocks an empty or duplicate pattern and a missing category; the short-pattern warning is a separate amber box and does not block saving. Save & apply is the form's submit button, Save validates silently and then emits
@@ -64,17 +65,29 @@ _Last updated: 03-11-2026_
   - Rule actions use drawers instead of a dropdown or inline box. `RuleRow` shows the rule and a `⋯` button; the button opens `RuleActions` (`components/rule-actions/`, a short bottom sheet titled with the rule, with Edit and Delete), and Delete opens `RuleDeleteDrawer` (`components/rule-delete-drawer/`, "Delete this rule?" with Cancel / Delete rule). Both take `v-model:open` (`defineModel`) and emit `edit` / `delete`; `RuleRow` owns the open state and closes one before opening the other, and `RuleGroup` re-emits `edit` and `delete` up to the page. They use `UDrawer` directly with the shared `DRAWER_UI` overlay style (`lib/constants/drawer-ui.ts`) rather than `AppDrawer`, which is too tall for two buttons
   - `Chip` (`components/chip/`) is the category filter chip on the rules screen (label, count, selected state, emits `select`)
   - Create-rule prompt: after a manual category change on the transactions page (except to `other`), `RulePromptDrawer` (`components/rule-prompt-drawer/`) asks "Always categorise as X?" with the description prefilled as an editable `contains` pattern, a live match count and the same `validateRule` checks. "Create rule" creates and applies the rule (toast with the updated count); "Not now" dismisses. State lives in `pages/index.vue`
-  - Not done: the "Edit existing rule" link on the duplicate error (the edit form now exists, so it can be wired up)
+  - Duplicate error: `validateRule` returns the `duplicateId`; `RuleForm` shows an "Edit existing rule" link button under the pattern and emits `editExisting`, and the page switches the drawer to editing that rule
   - Open issue: the confirmation toast sometimes doesn't auto-close. Reka UI pauses the timer while the pointer or focus is on the toast area or the window is blurred (for example with DevTools focused); not yet confirmed whether it also happens in a normal window
+
+---
+
+## Translations (Paraglide)
+
+- `@inlang/paraglide-js` is set up in `frontend/` with `en` (base) and `nl`. The Vite plugin (`paraglideVitePlugin` in `vite.config.ts`) compiles the messages into `src/paraglide/` on dev and build; that folder, `project.inlang/cache` and `project.inlang/.meta.json` are gitignored. `allowJs` is on in `tsconfig.app.json` because the output is JS with JSDoc types, and ESLint ignores it
+- Strategy is `['localStorage', 'preferredLanguage', 'baseLocale']`: no locale in the URL, so the router is unchanged. `App.vue` sets `<html lang>` and passes the matching Nuxt UI locale to `UApp`
+- Messages are split by section, one file per section and locale: `frontend/messages/{en,nl}/{common,transactions,rules,settings,import,auth}.json` (listed in `pathPattern` in `project.inlang/settings.json`). Keys are flat snake_case with a section prefix (`common_save`, `rule_form_new_title`); JSON can't be nested. A new key goes in the matching section file in both locales
+- Used as `import { m } from '@/paraglide/messages'` and `m.key({ param })`. Singular / plural pairs are plural variants on `count` (`local countPlural = count: plural`), replacing the old `=== 1 ? … : …` branches
+- Everything user-facing is translated: components, pages, category / operator / nav labels, form fields, zod messages, rule validation messages, CSV parse errors and the "Today ·" day label. Constants and zod schemas read the locale once at startup, so changing language needs a page reload (`setLocale` reloads by default)
+- Not done: there is no language switcher in Settings; dates and currency keep their current formatting (date-fns English month names, `nl-NL` euros) so month names stay English in the Dutch UI; the `nl` translations are unreviewed
 
 ---
 
 ## Next up
 
-1. Finish rule-based categorisation (import already applies the user's rules; the placeholder `income` / `other` is only the fallback). The summary's "Uncategorised" count is still every imported debit, and it can't link to a filtered list because the ledger has no category filter. Design is in `docs/category-rules.md`; steps:
-   1. Rules UI: the list screen, the add and edit forms (with apply on save) and the actions / delete drawers are built; still needs the "Edit existing rule" link on the duplicate error
-   2. Return an `uncategorised` count from import and show category previews on the review screen
+1. Finish rule-based categorisation (import already applies the user's rules; the placeholder `income` / `other` is only the fallback). The summary's "Uncategorised" row can't link to a filtered list because the ledger has no category filter. Design is in `docs/category-rules.md`; steps:
+   1. Rules UI: done — the list screen, the add and edit forms (with apply on save), the actions / delete drawers and the "Edit existing rule" link on the duplicate error are built
+   2. Done — the review screen previews each row's category: `pages/import.vue` loads the rules (`useCategoryRules`) and passes them to `ImportReview`, which calls `importRowToTransaction(row, rules)`; that runs the shared `matchCategory` (list order stands in for `createdAt` in the tie-break) and falls back to `income` / `other`
 2. Wire the transactions page's search box and category filter to the list
+3. Add a language switcher to Settings and localise date formatting
 
 ---
 
