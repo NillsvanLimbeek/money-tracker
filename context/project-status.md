@@ -2,13 +2,13 @@
 
 > What's done and what's next. For goals, stack, architecture and data model see `project-overview.md`.
 
-_Last updated: 30-10-2026_
+_Last updated: 03-11-2026_
 
 | Phase | State |
 |---|---|
 | 1. Project setup | Done |
 | 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
-| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend and the add / edit rule form done, rule-based categorisation shown on the review screen and the manual-change prompt still to do |
+| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend, the rules screen and the add / edit / delete rule flow (forms and drawers) done, the manual-change rule prompt done, rule-based categorisation shown on the review screen still to do |
 | 4–7 | Not started |
 
 ---
@@ -59,8 +59,11 @@ _Last updated: 30-10-2026_
   - `validateRule` (`lib/utils/`) holds the pattern checks; it warns under `MIN_PATTERN_LENGTH` (3) characters and uses `normalise` from `@money-tracker/shared` (now a frontend dependency) for the duplicate check
   - `CategorySelect` (category grid with icons from `CATEGORY_ICONS`, `v-model` is the selected key) and `RulePreview` (match count plus one row per distinct description with date, `×N` and amount) are standalone components
   - `AppDrawer` (`components/app-drawer/`) is the generic drawer: title, close button, default slot as body, optional `footer` slot. It is a fixed `92dvh` so the sheet doesn't shift as content appears, and only the body scrolls. `CategoryDrawer` (the filter drawer) still uses `UDrawer` directly because it needs a Reset button in the header
-  - Frontend API: `createCategoryRule`, `applyCategoryRule`, `previewCategoryRule` with `useCreateCategoryRule`, `useApplyCategoryRule`, `useRulePreview`
+  - Frontend API (`lib/api/category-rules/`): `createCategoryRule`, `updateCategoryRule`, `applyCategoryRule`, `previewCategoryRule`, `deleteCategoryRule` with `useCreateCategoryRule`, `useUpdateCategoryRule`, `useApplyCategoryRule`, `useRulePreview`, `useDeleteCategoryRule`
   - Editing: the "Edit" item in a rule's menu opens the same drawer ("Edit rule") prefilled; the page tracks `editingId` and saves through `useUpdateCategoryRule` (`PATCH /api/category-rules/:id`) instead of create. `validateRule` takes an `ignoreId` so a rule isn't its own duplicate. Save & apply re-applies the edited rule; plain Save leaves already-categorised transactions as they are
+  - Rule actions use drawers instead of a dropdown or inline box. `RuleRow` shows the rule and a `⋯` button; the button opens `RuleActions` (`components/rule-actions/`, a short bottom sheet titled with the rule, with Edit and Delete), and Delete opens `RuleDeleteDrawer` (`components/rule-delete-drawer/`, "Delete this rule?" with Cancel / Delete rule). Both take `v-model:open` (`defineModel`) and emit `edit` / `delete`; `RuleRow` owns the open state and closes one before opening the other, and `RuleGroup` re-emits `edit` and `delete` up to the page. They use `UDrawer` directly with the shared `DRAWER_UI` overlay style (`lib/constants/drawer-ui.ts`) rather than `AppDrawer`, which is too tall for two buttons
+  - `Chip` (`components/chip/`) is the category filter chip on the rules screen (label, count, selected state, emits `select`)
+  - Create-rule prompt: after a manual category change on the transactions page (except to `other`), `RulePromptDrawer` (`components/rule-prompt-drawer/`) asks "Always categorise as X?" with the description prefilled as an editable `contains` pattern, a live match count and the same `validateRule` checks. "Create rule" creates and applies the rule (toast with the updated count); "Not now" dismisses. State lives in `pages/index.vue`
   - Not done: the "Edit existing rule" link on the duplicate error (the edit form now exists, so it can be wired up)
   - Open issue: the confirmation toast sometimes doesn't auto-close. Reka UI pauses the timer while the pointer or focus is on the toast area or the window is blurred (for example with DevTools focused); not yet confirmed whether it also happens in a normal window
 
@@ -68,8 +71,8 @@ _Last updated: 30-10-2026_
 
 ## Next up
 
-1. Rule-based categorisation on import using `category_rules` (the import route currently assigns a placeholder: `income` for positive amounts, otherwise `other`). Until then the summary's "Uncategorised" count is every imported debit, and it can't link to a filtered list because the ledger has no category filter. Design is in `docs/category-rules.md`; steps:
-   1. Rules UI: the list screen and the add and edit forms (with apply on save) are built; still needs a "create rule" prompt after a manual category change
+1. Finish rule-based categorisation (import already applies the user's rules; the placeholder `income` / `other` is only the fallback). The summary's "Uncategorised" count is still every imported debit, and it can't link to a filtered list because the ledger has no category filter. Design is in `docs/category-rules.md`; steps:
+   1. Rules UI: the list screen, the add and edit forms (with apply on save) and the actions / delete drawers are built; still needs the "Edit existing rule" link on the duplicate error
    2. Return an `uncategorised` count from import and show category previews on the review screen
 2. Wire the transactions page's search box and category filter to the list
 
