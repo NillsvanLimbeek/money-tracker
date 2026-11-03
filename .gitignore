@@ -57,3 +57,8 @@ backend/wrangler.toml
 # Bank exports (contain IBANs and transaction history)
 *.csv
 !frontend/public/sample-ing.csv
+
+# Paraglide
+frontend/src/paraglide
+frontend/project.inlang/cache
+frontend/project.inlang/.meta.json

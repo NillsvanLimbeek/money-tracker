@@ -10,6 +10,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    // Paraglide generates JS (with JSDoc types) in src/paraglide.
+    "allowJs": true,
     // Extra safety for array and object lookups, but may have false positives.
     "noUncheckedIndexedAccess": true
   },

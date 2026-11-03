@@ -1,6 +1,7 @@
 import antfu from '@antfu/eslint-config';
 
 export default antfu({
+  ignores: ['src/paraglide', 'project.inlang'],
   vue: true,
   typescript: true,
 

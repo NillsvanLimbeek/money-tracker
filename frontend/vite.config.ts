@@ -1,5 +1,6 @@
 import { fileURLToPath, URL } from 'node:url';
 
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import ui from '@nuxt/ui/vite';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
@@ -9,6 +10,13 @@ import VueRouter from 'vue-router/vite';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    paraglideVitePlugin({
+      project: './project.inlang',
+      outdir: './src/paraglide',
+      // SPA without locale-prefixed URLs: remember the choice, then fall
+      // back to the browser language and finally the base locale.
+      strategy: ['localStorage', 'preferredLanguage', 'baseLocale'],
+    }),
     VueRouter(),
     vue(),
     vueDevTools(),

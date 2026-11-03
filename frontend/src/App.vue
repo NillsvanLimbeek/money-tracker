@@ -1,8 +1,16 @@
 <script setup lang="ts">
+import { en, nl } from '@nuxt/ui/locale';
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
-import { computed } from 'vue';
+import { computed, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import BottomNav from '@/components/bottom-nav/BottomNav.vue';
+import { getLocale } from '@/paraglide/runtime';
+
+const locale = getLocale();
+const uiLocale = locale === 'nl' ? nl : en;
+watchEffect(() => {
+  document.documentElement.lang = locale;
+});
 
 const breakpoints = useBreakpoints(breakpointsTailwind);
 const isMobile = breakpoints.smaller('md');
@@ -15,7 +23,7 @@ const showBottomNav = computed(() => !HIDDEN_NAV_PATHS.includes(route.path));
 </script>
 
 <template>
-  <UApp>
+  <UApp :locale="uiLocale">
     <template v-if="isMobile">
       <div class="bg-olive-50 h-screen">
         <RouterView />
