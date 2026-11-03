@@ -78,7 +78,7 @@ describe('transaction routes', () => {
         importRow(3, { description: 'Salary', amountCents: 250000 }),
       ]));
 
-      expect(await res.json()).toEqual({ imported: 3, skipped: 0 });
+      expect(await res.json()).toEqual({ imported: 3, skipped: 0, uncategorised: 1 });
       const rows = await db.select().from(transactions).orderBy(transactions.importHash);
       expect(rows.map(row => [row.category, row.categorySource])).toEqual([
         ['food', 'rule'],
@@ -93,7 +93,7 @@ describe('transaction routes', () => {
 
       const res = await asAlice('/import', jsonInit('POST', [importRow(2), importRow(3)]));
 
-      expect(await res.json()).toEqual({ imported: 1, skipped: 1 });
+      expect(await res.json()).toEqual({ imported: 1, skipped: 1, uncategorised: 1 });
       expect(await db.select().from(transactions)).toHaveLength(3);
     });
 
@@ -102,7 +102,7 @@ describe('transaction routes', () => {
 
       const res = await asAlice('/import', jsonInit('POST', [importRow(1)]));
 
-      expect(await res.json()).toEqual({ imported: 1, skipped: 0 });
+      expect(await res.json()).toEqual({ imported: 1, skipped: 0, uncategorised: 1 });
     });
 
     it('imports more rows than fit in one statement', async () => {
@@ -110,7 +110,7 @@ describe('transaction routes', () => {
 
       const res = await asAlice('/import', jsonInit('POST', rows));
 
-      expect(await res.json()).toEqual({ imported: 50, skipped: 0 });
+      expect(await res.json()).toEqual({ imported: 50, skipped: 0, uncategorised: 50 });
       expect(await db.select().from(transactions)).toHaveLength(50);
     });
 

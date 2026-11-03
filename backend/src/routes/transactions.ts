@@ -64,7 +64,8 @@ transactionRoutes.get('/hashes', validate('query', hashRangeQuerySchema), async 
  * A row without a matching rule falls back to `income` for a positive amount
  * and `other` otherwise. Rows already stored (same user and import hash) are
  * skipped. Inserts run in chunks of `IMPORT_CHUNK_SIZE` rows. Responds with
- * `{ imported, skipped }`.
+ * `{ imported, skipped, uncategorised }`, where `uncategorised` counts the
+ * newly stored debits that no rule matched.
  */
 transactionRoutes.post('/import', validate('json', importBodySchema), async (c) => {
   const userId = c.get('userId');
@@ -100,9 +101,11 @@ transactionRoutes.post('/import', validate('json', importBodySchema), async (c) 
   }
 
   const results = await db.batch(statements as [typeof statements[number], ...typeof statements]);
-  const imported = results.reduce((total, inserted) => total + inserted.length, 0);
+  const insertedIds = new Set(results.flat().map(row => row.id));
+  const imported = insertedIds.size;
+  const uncategorised = values.filter(value => insertedIds.has(value.id) && value.categorySource === 'default' && value.amountCents < 0).length;
 
-  return c.json({ imported, skipped: rows.length - imported });
+  return c.json({ imported, skipped: rows.length - imported, uncategorised });
 });
 
 /**

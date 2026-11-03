@@ -21,9 +21,6 @@ const expense = computed(() => rows
   .filter(row => row.amountCents < 0)
   .reduce((sum, row) => sum - row.amountCents, 0) / 100);
 
-// Until keyword categorisation lands every debit is stored as "Other".
-const uncategorised = computed(() => rows.filter(row => row.amountCents < 0).length);
-
 const period = computed(() => formatPeriod(rows.map(row => row.date)));
 
 const stats = computed(() => [
@@ -58,7 +55,7 @@ const stats = computed(() => [
       <StatStrip :stats />
 
       <RouterLink
-        v-if="uncategorised > 0"
+        v-if="summary.uncategorised > 0"
         to="/"
         class="border-accented bg-default flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm"
       >
@@ -67,7 +64,7 @@ const stats = computed(() => [
         </span>
 
         <span class="text-muted flex-1">
-          {{ m.import_needs_category({ count: uncategorised }) }}
+          {{ m.import_needs_category({ count: summary.uncategorised }) }}
         </span>
 
         <UIcon

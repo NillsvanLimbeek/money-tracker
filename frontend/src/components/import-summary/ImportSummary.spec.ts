@@ -18,7 +18,7 @@ const stubs = {
 
 function mountSummary(overrides: Record<string, unknown> = {}): VueWrapper {
   return mount(ImportSummary, {
-    props: { summary: { imported: 3, skipped: 2 }, rows: ROWS, fileName: 'ing_okt_2026.csv', ...overrides },
+    props: { summary: { imported: 3, skipped: 2, uncategorised: 2 }, rows: ROWS, fileName: 'ing_okt_2026.csv', ...overrides },
     global: { stubs },
   });
 }
@@ -44,13 +44,13 @@ describe('importSummary', () => {
     expect(stat(wrapper, 'Skipped')).toBe('2');
   });
 
-  it('counts debits as needing a category and hides the row when there are none', () => {
+  it('shows the uncategorised count from the response and hides the row when it is zero', () => {
     expect(mountSummary().text()).toContain('2 need a category');
-    expect(mountSummary({ rows: [row('2026-10-16', 1000)] }).text()).not.toContain('Uncategorised');
+    expect(mountSummary({ summary: { imported: 3, skipped: 0, uncategorised: 0 } }).text()).not.toContain('Uncategorised');
   });
 
   it('uses the singular for one transaction', () => {
-    const wrapper = mountSummary({ summary: { imported: 1, skipped: 0 }, rows: [row('2026-10-18', -5230)] });
+    const wrapper = mountSummary({ summary: { imported: 1, skipped: 0, uncategorised: 1 }, rows: [row('2026-10-18', -5230)] });
 
     expect(wrapper.text()).toContain('1 transaction imported');
     expect(wrapper.text()).toContain('1 needs a category');

@@ -40,9 +40,10 @@ export async function updateTransactionCategory(id: string, categoryKey: string)
  * Imports parsed bank rows into the user's transactions.
  *
  * @param rows - The rows to import.
- * @returns How many rows were imported and how many were skipped.
+ * @returns How many rows were imported and how many were skipped,
+ * and how many new debits no rule categorised.
  * @example
- * const { imported, skipped } = await importTransactions(rows);
+ * const { imported, skipped, uncategorised } = await importTransactions(rows);
  */
 export async function importTransactions(rows: ImportRow[]): Promise<ImportSummary> {
   return await post('/api/transactions/import', rows);
