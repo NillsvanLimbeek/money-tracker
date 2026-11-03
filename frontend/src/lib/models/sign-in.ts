@@ -1,8 +1,9 @@
 import * as z from 'zod';
+import { m } from '@/paraglide/messages';
 
 export const SignInSchema = z.object({
-  email: z.email('Enter a valid email address'),
-  password: z.string().min(1, 'Enter your password'),
+  email: z.email(m.validation_email()),
+  password: z.string().min(1, m.validation_password_required()),
 });
 
 export type SignIn = z.output<typeof SignInSchema>;

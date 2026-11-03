@@ -2,6 +2,7 @@
 import { useDropZone, useFileDialog } from '@vueuse/core';
 import { ref } from 'vue';
 import { MAX_FILE_BYTES, SUPPORTED_BANKS } from '@/lib/constants';
+import { m } from '@/paraglide/messages';
 
 const emit = defineEmits<{
   (e: 'select', file: File): void;
@@ -47,13 +48,13 @@ async function useSample(): Promise<void> {
           CSV
         </span>
         <span class="flex flex-col items-center gap-1">
-          <span class="text-highlighted text-xl font-semibold">Choose a CSV file</span>
-          <span class="text-muted font-mono text-sm">or drop it here · max {{ maxSizeLabel }}</span>
+          <span class="text-highlighted text-xl font-semibold">{{ m.import_choose_title() }}</span>
+          <span class="text-muted font-mono text-sm">{{ m.import_drop_hint({ size: maxSizeLabel }) }}</span>
         </span>
       </button>
 
       <div class="flex flex-col gap-3">
-        <span class="text-muted font-mono text-xs tracking-wide uppercase">Recognised formats</span>
+        <span class="text-muted font-mono text-xs tracking-wide uppercase">{{ m.import_recognised_formats() }}</span>
         <ul class="flex flex-wrap gap-2">
           <li
             v-for="bank in SUPPORTED_BANKS"
@@ -74,13 +75,13 @@ async function useSample(): Promise<void> {
         class="justify-center rounded-2xl py-4"
         @click="open()"
       >
-        Choose file
+        {{ m.import_choose_file() }}
       </UButton>
       <UButton
         variant="link"
         @click="useSample"
       >
-        Try with a sample file
+        {{ m.import_try_sample() }}
       </UButton>
     </div>
   </div>

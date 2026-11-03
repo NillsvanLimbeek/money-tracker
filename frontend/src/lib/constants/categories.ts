@@ -1,13 +1,14 @@
 import type { Category } from '../types';
+import { m } from '@/paraglide/messages';
 
 export const CATEGORIES: Category[] = [
-  { key: 'food', label: 'Food' },
-  { key: 'entertainment', label: 'Entertainment' },
-  { key: 'income', label: 'Income' },
-  { key: 'transport', label: 'Transport' },
-  { key: 'housing', label: 'Housing' },
-  { key: 'shopping', label: 'Shopping' },
-  { key: 'other', label: 'Other' },
+  { key: 'food', label: m.category_food() },
+  { key: 'entertainment', label: m.category_entertainment() },
+  { key: 'income', label: m.category_income() },
+  { key: 'transport', label: m.category_transport() },
+  { key: 'housing', label: m.category_housing() },
+  { key: 'shopping', label: m.category_shopping() },
+  { key: 'other', label: m.category_other() },
 ];
 
 export const CATEGORY_ICONS: Record<string, string> = {

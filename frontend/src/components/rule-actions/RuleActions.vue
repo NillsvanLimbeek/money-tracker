@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CategoryRule } from '@/lib/types';
 import { DRAWER_UI, RULE_OPERATORS } from '@/lib/constants';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   rule: CategoryRule;
@@ -19,8 +20,8 @@ const isOpen = defineModel<boolean>('open', { required: true });
 <template>
   <UDrawer
     v-model:open="isOpen"
-    :title="`Rule ${RULE_OPERATORS[rule.operator].label} “${rule.pattern}”`"
-    :description="`Assigns ${categoryLabel} · ${rule.matches} ${rule.matches === 1 ? 'match' : 'matches'}`"
+    :title="m.rule_actions_title({ operator: RULE_OPERATORS[rule.operator].label, pattern: rule.pattern })"
+    :description="m.rule_actions_description({ category: categoryLabel, count: rule.matches })"
     :ui="DRAWER_UI"
   >
     <template #body>
@@ -34,7 +35,7 @@ const isOpen = defineModel<boolean>('open', { required: true });
           class="justify-center"
           @click="emit('edit')"
         >
-          Edit
+          {{ m.common_edit() }}
         </UButton>
 
         <UButton
@@ -46,7 +47,7 @@ const isOpen = defineModel<boolean>('open', { required: true });
           class="justify-center"
           @click="emit('delete')"
         >
-          Delete
+          {{ m.common_delete() }}
         </UButton>
       </div>
     </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { m } from '@/paraglide/messages';
+
 interface Props {
   active: 'signin' | 'signup';
 }
@@ -16,7 +18,7 @@ defineProps<Props>();
         'text-muted': active !== 'signin',
       }"
     >
-      Sign in
+      {{ m.auth_tab_signin() }}
     </RouterLink>
     <RouterLink
       to="/signup"
@@ -26,7 +28,7 @@ defineProps<Props>();
         'text-muted': active !== 'signup',
       }"
     >
-      Sign up
+      {{ m.auth_tab_signup() }}
     </RouterLink>
   </div>
 </template>

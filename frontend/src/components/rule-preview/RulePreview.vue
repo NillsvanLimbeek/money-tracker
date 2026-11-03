@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { RulePreview } from '@/lib/types';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   preview: RulePreview;
@@ -12,8 +13,8 @@ defineProps<Props>();
 <template>
   <section class="border-accented bg-default overflow-hidden rounded-2xl border">
     <header class="border-accented bg-elevated flex items-center justify-between border-b px-4 py-3">
-      <span class="text-muted font-mono text-xs tracking-wide uppercase">Preview</span>
-      <span class="text-highlighted font-semibold">{{ preview.count }} matching</span>
+      <span class="text-muted font-mono text-xs tracking-wide uppercase">{{ m.rule_preview_title() }}</span>
+      <span class="text-highlighted font-semibold">{{ m.rule_preview_matching({ count: preview.count }) }}</span>
     </header>
 
     <ul
@@ -41,7 +42,7 @@ defineProps<Props>();
       v-else
       class="text-muted px-4 py-3 text-sm"
     >
-      No transactions match yet.
+      {{ m.rule_preview_none() }}
     </p>
   </section>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CategoryRule } from '@/lib/types';
 import { DRAWER_UI } from '@/lib/constants';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   rule: CategoryRule;
@@ -17,8 +18,8 @@ const isOpen = defineModel<boolean>('open', { required: true });
 <template>
   <UDrawer
     v-model:open="isOpen"
-    title="Delete this rule?"
-    :description="`The ${rule.matches} matched ${rule.matches === 1 ? 'transaction keeps' : 'transactions keep'} their current category.`"
+    :title="m.rule_delete_title()"
+    :description="m.rule_delete_description({ count: rule.matches })"
     :ui="DRAWER_UI"
   >
     <template #body>
@@ -31,7 +32,7 @@ const isOpen = defineModel<boolean>('open', { required: true });
           class="justify-center"
           @click="isOpen = false"
         >
-          Cancel
+          {{ m.common_cancel() }}
         </UButton>
 
         <UButton
@@ -41,7 +42,7 @@ const isOpen = defineModel<boolean>('open', { required: true });
           class="justify-center"
           @click="emit('delete')"
         >
-          Delete rule
+          {{ m.rule_delete_confirm() }}
         </UButton>
       </div>
     </template>

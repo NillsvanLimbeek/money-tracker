@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { m } from '@/paraglide/messages';
 
 interface Field {
   name: string;
@@ -47,10 +48,10 @@ const passwordStrength = computed(() => {
     score += 1;
 
   if (score <= 1)
-    return { label: 'Weak', percent: 33, color: 'error' as const };
+    return { label: m.password_weak(), percent: 33, color: 'error' as const };
   if (score <= 2)
-    return { label: 'Okay', percent: 66, color: 'warning' as const };
-  return { label: 'Strong', percent: 100, color: 'primary' as const };
+    return { label: m.password_okay(), percent: 66, color: 'warning' as const };
+  return { label: m.password_strong(), percent: 100, color: 'primary' as const };
 });
 </script>
 
@@ -89,7 +90,7 @@ const passwordStrength = computed(() => {
           class="text-muted font-mono text-xs tracking-wide uppercase"
           @click="showPassword = !showPassword"
         >
-          {{ showPassword ? 'Hide' : 'Show' }}
+          {{ showPassword ? m.password_hide() : m.password_show() }}
         </button>
       </template>
     </UInput>

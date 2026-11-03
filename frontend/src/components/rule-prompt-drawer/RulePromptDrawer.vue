@@ -3,6 +3,7 @@ import type { Category, CategoryRule, RulePreview } from '@/lib/types';
 import { computed } from 'vue';
 import { CATEGORIES, DRAWER_UI } from '@/lib/constants';
 import { validateRule } from '@/lib/utils';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   category: Category;
@@ -32,21 +33,21 @@ const matchText = computed(() => {
   if (!preview || pattern.value.trim() === '')
     return null;
 
-  return `Matches ${preview.count} ${preview.count === 1 ? 'transaction' : 'transactions'}`;
+  return m.rule_prompt_matches({ count: preview.count });
 });
 </script>
 
 <template>
   <UDrawer
     v-model:open="isOpen"
-    :title="`Always categorise as ${category.label}?`"
-    description="Create a rule so future transactions with this description are categorised automatically."
+    :title="m.rule_prompt_title({ category: category.label })"
+    :description="m.rule_prompt_description()"
     :ui="DRAWER_UI"
   >
     <template #body>
       <div class="flex flex-col gap-4">
         <UFormField
-          label="Description contains"
+          :label="m.rule_prompt_field()"
           :error="errorMessage"
         >
           <UInput
@@ -80,7 +81,7 @@ const matchText = computed(() => {
             :disabled="!validation.canSave"
             @click="emit('create')"
           >
-            Create rule
+            {{ m.rule_prompt_create() }}
           </UButton>
 
           <UButton
@@ -91,7 +92,7 @@ const matchText = computed(() => {
             class="justify-center"
             @click="isOpen = false"
           >
-            Not now
+            {{ m.rule_prompt_not_now() }}
           </UButton>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { computed, ref } from 'vue';
 import CategoryBadge from '@/components/category-badge/CategoryBadge.vue';
 import CategoryPicker from '@/components/category-picker/CategoryPicker.vue';
 import { formatCurrency, splitNotes } from '@/lib/utils';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   transaction: Transaction;
@@ -103,7 +104,7 @@ const amountClass = computed(() => {
             v-if="duplicate"
             class="border-accented text-muted rounded-full border border-dashed px-3 py-1 text-xs"
           >
-            Already imported
+            {{ m.transaction_already_imported() }}
           </p>
         </div>
 
@@ -138,7 +139,7 @@ const amountClass = computed(() => {
         type="button"
         class="text-muted hover:text-highlighted cursor-pointer"
         :aria-expanded="expanded"
-        aria-label="Toggle details"
+        :aria-label="m.transaction_toggle_details()"
       >
         <UIcon
           :name="expanded ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"

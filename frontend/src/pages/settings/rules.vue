@@ -4,6 +4,7 @@ import { computed, ref } from 'vue';
 import { useApplyCategoryRule, useCategoryRules, useCreateCategoryRule, useDeleteCategoryRule, useRulePreview, useUpdateCategoryRule } from '@/lib/api/category-rules/category-rules.queries';
 import { CATEGORIES } from '@/lib/constants';
 import { groupRulesByCategory } from '@/lib/utils';
+import { m } from '@/paraglide/messages';
 
 const rulesQuery = useCategoryRules();
 const { mutate: deleteRule } = useDeleteCategoryRule();
@@ -66,12 +67,12 @@ async function saveRule(shouldApply: boolean): Promise<void> {
 
     isFormOpen.value = false;
     toast.add({
-      title: 'Rule saved',
-      description: updated === null ? undefined : `${updated} ${updated === 1 ? 'transaction' : 'transactions'} updated`,
+      title: m.rule_saved_title(),
+      description: updated === null ? undefined : m.transactions_updated({ count: updated }),
     });
   }
   catch {
-    toast.add({ title: 'Could not save the rule', description: 'Try again in a moment.', color: 'error' });
+    toast.add({ title: m.rule_save_failed(), description: m.common_try_again(), color: 'error' });
   }
   finally {
     isSaving.value = false;
@@ -88,7 +89,7 @@ async function saveRule(shouldApply: boolean): Promise<void> {
         icon="i-lucide-chevron-left"
         class="p-0"
       >
-        Settings
+        {{ m.settings_title() }}
       </UButton>
 
       <UButton
@@ -96,12 +97,12 @@ async function saveRule(shouldApply: boolean): Promise<void> {
         size="lg"
         @click="addRule"
       >
-        Add rule
+        {{ m.rules_add() }}
       </UButton>
     </div>
   </div>
 
-  <PageHeader title="Category rules" />
+  <PageHeader :title="m.rules_title()" />
 
   <QueryBoundary :query="rulesQuery">
     <RulesEmptyState
@@ -117,7 +118,7 @@ async function saveRule(shouldApply: boolean): Promise<void> {
         v-model="search"
         size="xl"
         icon="i-lucide-search"
-        placeholder="Search patterns"
+        :placeholder="m.rules_search()"
       />
 
       <div class="-mx-4 flex gap-2 overflow-x-auto px-4">
@@ -127,7 +128,7 @@ async function saveRule(shouldApply: boolean): Promise<void> {
           :class="{ 'border-primary bg-primary/10 text-primary': !selectedKey, 'bg-default text-highlighted': selectedKey }"
           @click="selectedKey = null"
         >
-          All <span class="font-mono text-sm opacity-70">{{ rules.length }}</span>
+          {{ m.rules_all() }} <span class="font-mono text-sm opacity-70">{{ rules.length }}</span>
         </button>
 
         <Chip
@@ -145,8 +146,8 @@ async function saveRule(shouldApply: boolean): Promise<void> {
           class="text-muted mt-0.5 size-4 shrink-0"
         />
         <span>
-          Overlaps resolve to the most specific rule: <b class="text-highlighted">equals</b> &gt;
-          <b class="text-highlighted">starts/ends</b> &gt; <b class="text-highlighted">contains</b>, then longer, then older.
+          {{ m.rules_overlap_intro() }} <b class="text-highlighted">{{ m.rules_overlap_equals() }}</b> &gt;
+          <b class="text-highlighted">{{ m.rules_overlap_starts_ends() }}</b> &gt; <b class="text-highlighted">{{ m.rules_overlap_contains() }}</b>{{ m.rules_overlap_tail() }}
         </span>
       </p>
 
@@ -162,7 +163,7 @@ async function saveRule(shouldApply: boolean): Promise<void> {
         v-if="groups.length === 0"
         class="text-muted py-8 text-center"
       >
-        No rules match your search.
+        {{ m.rules_none_match() }}
       </p>
     </div>
   </QueryBoundary>

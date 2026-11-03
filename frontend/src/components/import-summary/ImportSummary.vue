@@ -2,6 +2,7 @@
 import type { ImportRow, ImportSummary } from '@/lib/types';
 import { computed } from 'vue';
 import { formatCurrency, formatPeriod } from '@/lib/utils';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   summary: ImportSummary;
@@ -26,9 +27,9 @@ const uncategorised = computed(() => rows.filter(row => row.amountCents < 0).len
 const period = computed(() => formatPeriod(rows.map(row => row.date)));
 
 const stats = computed(() => [
-  { label: 'In', value: formatCurrency(income.value), valueClass: 'text-primary' },
-  { label: 'Out', value: formatCurrency(-expense.value) },
-  { label: 'Skipped', value: summary.skipped },
+  { label: m.summary_in(), value: formatCurrency(income.value), valueClass: 'text-primary' },
+  { label: m.summary_out(), value: formatCurrency(-expense.value) },
+  { label: m.import_stat_skipped(), value: summary.skipped },
 ]);
 </script>
 
@@ -45,11 +46,11 @@ const stats = computed(() => [
 
         <div class="flex flex-col gap-2">
           <h2 class="text-highlighted text-2xl font-bold">
-            {{ summary.imported }} {{ summary.imported === 1 ? 'transaction' : 'transactions' }} imported
+            {{ m.import_done_title({ count: summary.imported }) }}
           </h2>
 
           <p class="text-muted">
-            Added from {{ fileName }} to {{ period }}.
+            {{ m.import_done_added({ fileName, period }) }}
           </p>
         </div>
       </div>
@@ -62,11 +63,11 @@ const stats = computed(() => [
         class="border-accented bg-default flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm"
       >
         <span class="border-accented bg-elevated text-muted rounded-full border border-dashed px-3 py-1 text-xs font-medium">
-          Uncategorised
+          {{ m.import_uncategorised() }}
         </span>
 
         <span class="text-muted flex-1">
-          {{ uncategorised }} {{ uncategorised === 1 ? 'needs' : 'need' }} a category
+          {{ m.import_needs_category({ count: uncategorised }) }}
         </span>
 
         <UIcon
@@ -84,14 +85,14 @@ const stats = computed(() => [
         color="neutral"
         class="justify-center rounded-2xl py-4"
       >
-        View transactions
+        {{ m.import_view_transactions() }}
       </UButton>
 
       <UButton
         variant="link"
         @click="emit('reset')"
       >
-        Import another file
+        {{ m.import_another_file() }}
       </UButton>
     </div>
   </div>

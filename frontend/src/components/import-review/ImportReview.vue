@@ -4,6 +4,7 @@ import type { ParseError } from '@/lib/utils';
 import { computed, ref } from 'vue';
 import { CATEGORIES } from '@/lib/constants';
 import { formatCurrency, groupRowsByMonth, importRowToTransaction } from '@/lib/utils';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   rows: ImportRow[];
@@ -27,9 +28,9 @@ const selectedRows = computed(() => rows.filter(row => selected.value.has(row.im
 const duplicateCount = computed(() => rows.filter(isDuplicate).length);
 
 const stats = computed(() => [
-  { label: 'Found', value: rows.length },
-  { label: 'Selected', value: selectedRows.value.length, valueClass: 'text-primary' },
-  { label: 'Duplicates', value: duplicateCount.value },
+  { label: m.import_stat_found(), value: rows.length },
+  { label: m.import_stat_selected(), value: selectedRows.value.length, valueClass: 'text-primary' },
+  { label: m.import_stat_duplicates(), value: duplicateCount.value },
 ]);
 
 const income = computed(() => selectedRows.value
@@ -80,7 +81,7 @@ function toggleGroup(groupRows: ImportRow[]): void {
         color="warning"
         variant="subtle"
         icon="i-lucide-triangle-alert"
-        :title="`${errors.length} ${errors.length === 1 ? 'row' : 'rows'} could not be read and will be skipped`"
+        :title="m.import_unreadable_rows({ count: errors.length })"
       >
         <template #description>
           <ul class="mt-1 flex flex-col gap-0.5">
@@ -88,7 +89,7 @@ function toggleGroup(groupRows: ImportRow[]): void {
               v-for="error in errors"
               :key="error.line"
             >
-              Line {{ error.line }}: {{ error.message }}
+              {{ m.import_error_line({ line: error.line, message: error.message }) }}
             </li>
           </ul>
         </template>
@@ -110,7 +111,7 @@ function toggleGroup(groupRows: ImportRow[]): void {
             :disabled="selectable(group.rows).length === 0"
             @click="toggleGroup(group.rows)"
           >
-            {{ allSelected(group.rows) ? 'Deselect all' : 'Select all' }}
+            {{ allSelected(group.rows) ? m.import_deselect_all() : m.import_select_all() }}
           </UButton>
         </div>
 
@@ -139,9 +140,9 @@ function toggleGroup(groupRows: ImportRow[]): void {
         :disabled="selectedRows.length === 0"
         @click="emit('confirm', selectedRows)"
       >
-        Import {{ selectedRows.length }} {{ selectedRows.length === 1 ? 'transaction' : 'transactions' }}
+        {{ m.import_confirm({ count: selectedRows.length }) }}
       </UButton>
-      <span class="text-muted font-mono text-sm">{{ formatCurrency(income) }} in · {{ formatCurrency(-expense) }} out</span>
+      <span class="text-muted font-mono text-sm">{{ m.import_totals({ income: formatCurrency(income), expense: formatCurrency(-expense) }) }}</span>
     </div>
   </div>
 </template>

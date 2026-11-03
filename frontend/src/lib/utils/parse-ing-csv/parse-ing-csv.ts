@@ -1,5 +1,6 @@
 import type { ImportRow } from '../../types';
 import { format, isValid, parse } from 'date-fns';
+import { m } from '@/paraglide/messages';
 
 export interface ParseError {
   line: number;
@@ -140,7 +141,7 @@ export async function parseIngCsv(text: string): Promise<ParseResult> {
   const indexOf = (name: Column): number => header.findIndex(title => (COLUMN_ALIASES[name] as readonly string[]).includes(title));
   const missing = REQUIRED_COLUMNS.filter(name => indexOf(name) === -1);
   if (missing.length > 0)
-    return { rows: [], errors: [{ line: 1, message: `Missing columns: ${missing.join(', ')}` }] };
+    return { rows: [], errors: [{ line: 1, message: m.csv_missing_columns({ columns: missing.join(', ') }) }] };
 
   const column = (record: string[], name: Column): string => record[indexOf(name)]?.trim() ?? '';
 
@@ -160,16 +161,16 @@ export async function parseIngCsv(text: string): Promise<ParseResult> {
     const description = column(record, 'description');
 
     if (!date) {
-      errors.push({ line, message: `Invalid date "${column(record, 'date')}"` });
+      errors.push({ line, message: m.csv_invalid_date({ value: column(record, 'date') }) });
     }
     else if (cents === null) {
-      errors.push({ line, message: `Invalid amount "${column(record, 'amount')}"` });
+      errors.push({ line, message: m.csv_invalid_amount({ value: column(record, 'amount') }) });
     }
     else if (!DEBIT.has(direction) && !CREDIT.has(direction)) {
-      errors.push({ line, message: `Unknown debit/credit value "${column(record, 'direction')}"` });
+      errors.push({ line, message: m.csv_unknown_direction({ value: column(record, 'direction') }) });
     }
     else if (!description) {
-      errors.push({ line, message: 'Missing description' });
+      errors.push({ line, message: m.csv_missing_description() });
     }
     else {
       const amountCents = DEBIT.has(direction) ? -cents : cents;

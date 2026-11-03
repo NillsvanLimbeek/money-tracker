@@ -1,0 +1,134 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "rule_prompt_title": "Altijd categoriseren als {category}?",
+  "rule_prompt_description": "Maak een regel zodat toekomstige transacties met deze omschrijving automatisch worden gecategoriseerd.",
+  "rule_prompt_field": "Omschrijving bevat",
+  "rule_prompt_matches": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "Komt overeen met {count} transactie",
+        "countPlural=other": "Komt overeen met {count} transacties"
+      }
+    }
+  ],
+  "rule_prompt_create": "Regel maken",
+  "rule_prompt_not_now": "Niet nu",
+  "rule_created_title": "Regel gemaakt",
+  "rule_create_failed": "Kon de regel niet maken",
+  "rules_title": "Categorieregels",
+  "rules_add": "Regel toevoegen",
+  "rules_search": "Zoek patronen",
+  "rules_all": "Alle",
+  "rules_none_match": "Geen regels gevonden voor je zoekopdracht.",
+  "rules_overlap_intro": "Overlap wordt opgelost met de meest specifieke regel:",
+  "rules_overlap_equals": "is gelijk aan",
+  "rules_overlap_starts_ends": "begint/eindigt",
+  "rules_overlap_contains": "bevat",
+  "rules_overlap_tail": ", dan langer, dan ouder.",
+  "rule_saved_title": "Regel opgeslagen",
+  "rule_save_failed": "Kon de regel niet opslaan",
+  "rules_empty_title": "Nog geen regels",
+  "rules_empty_body": "Regels sorteren je imports voor je. Begin met een winkel die je elke maand ziet.",
+  "rules_empty_add": "Voeg je eerste regel toe",
+  "rule_group_summary": "{rules} · {matches} gecategoriseerd",
+  "rule_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} regel",
+        "countPlural=other": "{count} regels"
+      }
+    }
+  ],
+  "rule_matches_label": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "treffer",
+        "countPlural=other": "treffers"
+      }
+    }
+  ],
+  "rule_actions_aria": "Regelacties",
+  "rule_actions_title": "Regel {operator} “{pattern}”",
+  "rule_actions_description": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "Wijst {category} toe · {count} treffer",
+        "countPlural=other": "Wijst {category} toe · {count} treffers"
+      }
+    }
+  ],
+  "rule_delete_title": "Deze regel verwijderen?",
+  "rule_delete_description": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "De {count} gevonden transactie behoudt de huidige categorie.",
+        "countPlural=other": "De {count} gevonden transacties behouden hun huidige categorie."
+      }
+    }
+  ],
+  "rule_delete_confirm": "Regel verwijderen",
+  "rule_form_edit_title": "Regel bewerken",
+  "rule_form_new_title": "Nieuwe regel",
+  "rule_form_choose_category": "Kies een categorie.",
+  "rule_form_save_apply": "Opslaan en toepassen",
+  "rule_field_operator": "Als de omschrijving",
+  "rule_field_pattern_placeholder": "bijv. Albert Heijn",
+  "rule_field_category": "Categorie toewijzen",
+  "rule_preview_title": "Voorbeeld",
+  "rule_preview_matching": "{count} gevonden",
+  "rule_preview_none": "Nog geen transacties gevonden.",
+  "rule_validation_required": "Voer een patroon in.",
+  "rule_validation_duplicate": "Deze regel bestaat al: {operator} “{pattern}” → {category}.",
+  "rule_validation_short": "Heel kort patroon — “{pattern}” komt overeen met {matches}. Maak het specifieker.",
+  "rule_validation_many": "veel verschillende omschrijvingen",
+  "rule_validation_descriptions": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} andere omschrijving",
+        "countPlural=other": "{count} andere omschrijvingen"
+      }
+    }
+  ]
+}

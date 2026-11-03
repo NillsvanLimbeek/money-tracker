@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useCategoryRules } from '@/lib/api/category-rules/category-rules.queries';
 import { usePreferences } from '@/lib/composables/use-preferences';
+import { m } from '@/paraglide/messages';
 
 const { autoCategorise, suggestRule } = usePreferences();
 
@@ -10,19 +11,19 @@ const rules = computed(() => rulesQuery.data.value);
 </script>
 
 <template>
-  <PageHeader title="Settings" />
+  <PageHeader :title="m.settings_title()" />
 
   <div class="flex flex-col gap-6 px-4">
-    <SettingsSection title="Accounts">
+    <SettingsSection :title="m.settings_accounts()">
       <SettingsRow
-        label="Add account"
+        :label="m.settings_add_account()"
         action
       />
     </SettingsSection>
 
-    <SettingsSection title="Categorisation">
+    <SettingsSection :title="m.settings_categorisation()">
       <SettingsRow
-        label="Category rules"
+        :label="m.settings_category_rules()"
         to="/settings/rules"
       >
         <template
@@ -39,13 +40,13 @@ const rules = computed(() => rulesQuery.data.value);
         </template>
       </SettingsRow>
 
-      <SettingsRow label="Auto-categorise on import">
+      <SettingsRow :label="m.settings_auto_categorise()">
         <template #trailing>
           <USwitch v-model="autoCategorise" />
         </template>
       </SettingsRow>
 
-      <SettingsRow label="Suggest a rule after manual changes">
+      <SettingsRow :label="m.settings_suggest_rule()">
         <template #trailing>
           <USwitch v-model="suggestRule" />
         </template>

@@ -4,6 +4,7 @@ import type { Category, CategoryRule, RuleDraft, RuleOperator, RulePreview } fro
 import { computed, reactive, useTemplateRef } from 'vue';
 import { RULE_FIELDS } from '@/lib/constants';
 import { validateRule } from '@/lib/utils';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   categories: Category[];
@@ -50,7 +51,7 @@ function validate(): FormError[] {
     errors.push({ name: 'pattern', message: validation.value.message ?? '' });
 
   if (categoryKey.value === null)
-    errors.push({ name: 'categoryKey', message: 'Choose a category.' });
+    errors.push({ name: 'categoryKey', message: m.rule_form_choose_category() });
 
   return errors;
 }
@@ -64,7 +65,7 @@ async function save(): Promise<void> {
 <template>
   <AppDrawer
     v-model:open="isOpen"
-    :title="editingId ? 'Edit rule' : 'New rule'"
+    :title="editingId ? m.rule_form_edit_title() : m.rule_form_new_title()"
   >
     <UForm
       :id="FORM_ID"
@@ -135,7 +136,7 @@ async function save(): Promise<void> {
           class="justify-center"
           :loading="pending"
         >
-          Save &amp; apply
+          {{ m.rule_form_save_apply() }}
         </UButton>
 
         <div class="grid grid-cols-2 gap-3">
@@ -147,7 +148,7 @@ async function save(): Promise<void> {
             class="justify-center"
             @click="isOpen = false"
           >
-            Cancel
+            {{ m.common_cancel() }}
           </UButton>
 
           <UButton
@@ -159,7 +160,7 @@ async function save(): Promise<void> {
             :disabled="pending"
             @click="save"
           >
-            Save
+            {{ m.common_save() }}
           </UButton>
         </div>
       </div>

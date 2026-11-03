@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { m } from '@/paraglide/messages';
+
 interface Props {
   title: string;
 }
@@ -29,7 +31,7 @@ const DRAWER_UI = {
         color="neutral"
         variant="ghost"
         icon="i-lucide-x"
-        aria-label="Close"
+        :aria-label="m.common_close()"
         @click="isOpen = false"
       />
     </template>

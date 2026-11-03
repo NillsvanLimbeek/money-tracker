@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="T">
 import type { UseQueryReturnType } from '@tanstack/vue-query';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   query: UseQueryReturnType<T, Error>;
@@ -11,7 +12,7 @@ defineSlots<{ default: (props: { data: NonNullable<T> }) => unknown }>();
 
 <template>
   <div v-if="query.isLoading.value">
-    Loading...
+    {{ m.common_loading() }}
   </div>
 
   <div v-else-if="query.error.value">

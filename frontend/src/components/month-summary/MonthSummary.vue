@@ -2,6 +2,7 @@
 import { addMonths, format } from 'date-fns';
 import { computed } from 'vue';
 import CurrencyAmount from '@/components/currency-amount/CurrencyAmount.vue';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   income: number;
@@ -29,7 +30,7 @@ function shiftMonth(delta: number): void {
         icon="i-lucide-chevron-left"
         square
         class="bg-accented rounded-lg"
-        aria-label="Previous month"
+        :aria-label="m.month_previous()"
         @click="shiftMonth(-1)"
       />
 
@@ -41,26 +42,26 @@ function shiftMonth(delta: number): void {
         icon="i-lucide-chevron-right"
         square
         class="bg-accented rounded-lg"
-        aria-label="Next month"
+        :aria-label="m.month_next()"
         @click="shiftMonth(1)"
       />
     </div>
 
     <div class="border-accented flex items-end justify-between border-t px-4 py-4">
       <CurrencyAmount
-        label="In"
+        :label="m.summary_in()"
         :value="income"
         class="text-primary text-sm"
       />
 
       <CurrencyAmount
-        label="Out"
+        :label="m.summary_out()"
         :value="-expense"
         class="text-highlighted text-sm"
       />
 
       <CurrencyAmount
-        label="Net"
+        :label="m.summary_net()"
         :value="net"
         class="text-highlighted pt-1 text-lg"
         align="end"

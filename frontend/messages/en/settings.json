@@ -1,0 +1,10 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "settings_title": "Settings",
+  "settings_accounts": "Accounts",
+  "settings_add_account": "Add account",
+  "settings_categorisation": "Categorisation",
+  "settings_category_rules": "Category rules",
+  "settings_auto_categorise": "Auto-categorise on import",
+  "settings_suggest_rule": "Suggest a rule after manual changes"
+}

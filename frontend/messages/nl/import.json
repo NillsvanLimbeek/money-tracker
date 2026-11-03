@@ -1,0 +1,96 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "import_title": "Importeren",
+  "import_heading": "Transacties importeren",
+  "import_subtitle": "Upload een CSV-export van je bank. Je controleert elke rij voordat er iets wordt toegevoegd.",
+  "import_review_heading": "Controleren",
+  "import_review_subtitle": "Vink uit wat je niet wilt. Categorieën kun je later in de lijst wijzigen.",
+  "import_back_aria": "Terug naar bestandskeuze",
+  "import_close_aria": "Import sluiten",
+  "import_error_too_large": "Dit bestand is groter dan {size}.",
+  "import_error_no_transactions": "Geen transacties gevonden in dit bestand.",
+  "import_error_too_many": "Dit bestand heeft meer dan {max} transacties. Exporteer een kortere periode.",
+  "import_error_failed": "Importeren mislukt. Controleer je verbinding en probeer het opnieuw.",
+  "import_choose_title": "Kies een CSV-bestand",
+  "import_drop_hint": "of sleep het hierheen · max {size}",
+  "import_recognised_formats": "Herkende formaten",
+  "import_choose_file": "Kies bestand",
+  "import_try_sample": "Probeer met een voorbeeldbestand",
+  "import_stat_found": "Gevonden",
+  "import_stat_selected": "Geselecteerd",
+  "import_stat_duplicates": "Dubbel",
+  "import_stat_skipped": "Overgeslagen",
+  "import_unreadable_rows": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} rij kon niet worden gelezen en wordt overgeslagen",
+        "countPlural=other": "{count} rijen konden niet worden gelezen en worden overgeslagen"
+      }
+    }
+  ],
+  "import_error_line": "Regel {line}: {message}",
+  "import_select_all": "Alles selecteren",
+  "import_deselect_all": "Alles deselecteren",
+  "import_confirm": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} transactie importeren",
+        "countPlural=other": "{count} transacties importeren"
+      }
+    }
+  ],
+  "import_totals": "{income} in · {expense} uit",
+  "import_done_title": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} transactie geïmporteerd",
+        "countPlural=other": "{count} transacties geïmporteerd"
+      }
+    }
+  ],
+  "import_done_added": "Toegevoegd uit {fileName} aan {period}.",
+  "import_uncategorised": "Zonder categorie",
+  "import_needs_category": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} heeft een categorie nodig",
+        "countPlural=other": "{count} hebben een categorie nodig"
+      }
+    }
+  ],
+  "import_view_transactions": "Bekijk transacties",
+  "import_another_file": "Nog een bestand importeren",
+  "csv_missing_columns": "Ontbrekende kolommen: {columns}",
+  "csv_invalid_date": "Ongeldige datum \"{value}\"",
+  "csv_invalid_amount": "Ongeldig bedrag \"{value}\"",
+  "csv_unknown_direction": "Onbekende waarde voor af/bij \"{value}\"",
+  "csv_missing_description": "Omschrijving ontbreekt"
+}

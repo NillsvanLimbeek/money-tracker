@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CategoryRule } from '@/lib/types';
 import type { RuleGroup } from '@/lib/utils';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   group: RuleGroup;
@@ -24,7 +25,7 @@ const emit = defineEmits<{
       />
 
       <span class="text-muted font-mono text-xs">
-        {{ group.rules.length }} {{ group.rules.length === 1 ? 'rule' : 'rules' }} · {{ group.matches }} categorised
+        {{ m.rule_group_summary({ rules: m.rule_count({ count: group.rules.length }), matches: group.matches }) }}
       </span>
     </header>
 

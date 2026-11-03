@@ -10,6 +10,7 @@ import { useApplyCategoryRule, useCategoryRules, useCreateCategoryRule, useRuleP
 import { useTransactions, useUpdateTransactionCategory } from '@/lib/api/transactions/transactions.queries';
 import { CATEGORIES } from '@/lib/constants';
 import { categoryIsSelected } from '@/lib/utils';
+import { m } from '@/paraglide/messages';
 
 const now = new Date();
 const selectedMonth = ref(new Date(now.getFullYear(), now.getMonth(), 1));
@@ -63,10 +64,10 @@ async function createPromptedRule(): Promise<void> {
     const { updated } = await applyRule(rule.id);
 
     isRulePromptOpen.value = false;
-    toast.add({ title: 'Rule created', description: `${updated} ${updated === 1 ? 'transaction' : 'transactions'} updated` });
+    toast.add({ title: m.rule_created_title(), description: m.transactions_updated({ count: updated }) });
   }
   catch {
-    toast.add({ title: 'Could not create the rule', description: 'Try again in a moment.', color: 'error' });
+    toast.add({ title: m.rule_create_failed(), description: m.common_try_again(), color: 'error' });
   }
 }
 
@@ -87,7 +88,7 @@ function resetCategories(): void {
 
 <template>
   <div class="bg-olive-50 sticky top-0 z-10">
-    <PageHeader title="Transactions" />
+    <PageHeader :title="m.transactions_title()" />
 
     <div class="border-accented flex w-full gap-4 border-b px-4 pb-4">
       <UInput
@@ -95,7 +96,7 @@ function resetCategories(): void {
         class="w-full"
         size="lg"
         icon="i-lucide-search"
-        placeholder="Search Transactions"
+        :placeholder="m.transactions_search()"
       />
 
       <CategoryDrawer

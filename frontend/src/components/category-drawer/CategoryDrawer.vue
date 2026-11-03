@@ -2,6 +2,7 @@
 import type { CSSProperties } from 'vue';
 import type { Category } from '@/lib/types';
 import { categoryIsSelected } from '@/lib/utils';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   categories: Category[];
@@ -44,12 +45,12 @@ function categoryStyle(key: string): CSSProperties {
       icon="i-lucide-list-sort-descending"
       size="lg"
     >
-      Filter
+      {{ m.filter_button() }}
     </UButton>
 
     <template #header>
       <h2 class="text-highlighted flex-1 text-lg font-semibold">
-        Filter by category
+        {{ m.filter_title() }}
       </h2>
 
       <UButton
@@ -58,7 +59,7 @@ function categoryStyle(key: string): CSSProperties {
         class="p-0"
         @click="emit('resetCategories')"
       >
-        Reset
+        {{ m.filter_reset() }}
       </UButton>
     </template>
 
@@ -85,7 +86,7 @@ function categoryStyle(key: string): CSSProperties {
         size="lg"
         @click="isFilterOpen = false"
       >
-        Show items
+        {{ m.filter_show_items() }}
       </UButton>
     </template>
   </UDrawer>

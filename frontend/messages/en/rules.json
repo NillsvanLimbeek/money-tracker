@@ -1,0 +1,134 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "rule_prompt_title": "Always categorise as {category}?",
+  "rule_prompt_description": "Create a rule so future transactions with this description are categorised automatically.",
+  "rule_prompt_field": "Description contains",
+  "rule_prompt_matches": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "Matches {count} transaction",
+        "countPlural=other": "Matches {count} transactions"
+      }
+    }
+  ],
+  "rule_prompt_create": "Create rule",
+  "rule_prompt_not_now": "Not now",
+  "rule_created_title": "Rule created",
+  "rule_create_failed": "Could not create the rule",
+  "rules_title": "Category rules",
+  "rules_add": "Add rule",
+  "rules_search": "Search patterns",
+  "rules_all": "All",
+  "rules_none_match": "No rules match your search.",
+  "rules_overlap_intro": "Overlaps resolve to the most specific rule:",
+  "rules_overlap_equals": "equals",
+  "rules_overlap_starts_ends": "starts/ends",
+  "rules_overlap_contains": "contains",
+  "rules_overlap_tail": ", then longer, then older.",
+  "rule_saved_title": "Rule saved",
+  "rule_save_failed": "Could not save the rule",
+  "rules_empty_title": "No rules yet",
+  "rules_empty_body": "Rules sort imports for you. Start with a merchant you see every month.",
+  "rules_empty_add": "Add your first rule",
+  "rule_group_summary": "{rules} · {matches} categorised",
+  "rule_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} rule",
+        "countPlural=other": "{count} rules"
+      }
+    }
+  ],
+  "rule_matches_label": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "match",
+        "countPlural=other": "matches"
+      }
+    }
+  ],
+  "rule_actions_aria": "Rule actions",
+  "rule_actions_title": "Rule {operator} “{pattern}”",
+  "rule_actions_description": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "Assigns {category} · {count} match",
+        "countPlural=other": "Assigns {category} · {count} matches"
+      }
+    }
+  ],
+  "rule_delete_title": "Delete this rule?",
+  "rule_delete_description": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "The {count} matched transaction keeps their current category.",
+        "countPlural=other": "The {count} matched transactions keep their current category."
+      }
+    }
+  ],
+  "rule_delete_confirm": "Delete rule",
+  "rule_form_edit_title": "Edit rule",
+  "rule_form_new_title": "New rule",
+  "rule_form_choose_category": "Choose a category.",
+  "rule_form_save_apply": "Save & apply",
+  "rule_field_operator": "If the description",
+  "rule_field_pattern_placeholder": "e.g. Albert Heijn",
+  "rule_field_category": "Assign category",
+  "rule_preview_title": "Preview",
+  "rule_preview_matching": "{count} matching",
+  "rule_preview_none": "No transactions match yet.",
+  "rule_validation_required": "Enter a pattern to match.",
+  "rule_validation_duplicate": "This rule already exists: {operator} “{pattern}” → {category}.",
+  "rule_validation_short": "Very short pattern — “{pattern}” matches {matches}. Make it more specific.",
+  "rule_validation_many": "many different descriptions",
+  "rule_validation_descriptions": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} different description",
+        "countPlural=other": "{count} different descriptions"
+      }
+    }
+  ]
+}

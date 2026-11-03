@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { m } from '@/paraglide/messages';
+
 const emit = defineEmits<{ (e: 'add'): void }>();
 </script>
 
@@ -12,11 +14,11 @@ const emit = defineEmits<{ (e: 'add'): void }>();
     </div>
 
     <h2 class="text-highlighted text-lg font-semibold">
-      No rules yet
+      {{ m.rules_empty_title() }}
     </h2>
 
     <p class="text-muted max-w-xs">
-      Rules sort imports for you. Start with a merchant you see every month.
+      {{ m.rules_empty_body() }}
     </p>
 
     <UButton
@@ -25,7 +27,7 @@ const emit = defineEmits<{ (e: 'add'): void }>();
       class="justify-center rounded-2xl py-4"
       @click="emit('add')"
     >
-      Add your first rule
+      {{ m.rules_empty_add() }}
     </UButton>
   </div>
 </template>

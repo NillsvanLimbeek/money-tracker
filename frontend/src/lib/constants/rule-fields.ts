@@ -1,13 +1,14 @@
 import type { RuleFieldConfig, RuleOperator } from '@/lib/types';
+import { m } from '@/paraglide/messages';
 import { RULE_OPERATORS } from './rule-operators';
 
 export const RULE_FIELDS: RuleFieldConfig[] = [
   {
     name: 'operator',
     type: 'select',
-    label: 'If the description',
+    label: m.rule_field_operator(),
     items: (Object.keys(RULE_OPERATORS) as RuleOperator[]).map(value => ({ value, label: RULE_OPERATORS[value].label })),
   },
-  { name: 'pattern', type: 'text', placeholder: 'e.g. Albert Heijn' },
-  { name: 'categoryKey', type: 'categories', label: 'Assign category' },
+  { name: 'pattern', type: 'text', placeholder: m.rule_field_pattern_placeholder() },
+  { name: 'categoryKey', type: 'categories', label: m.rule_field_category() },
 ];

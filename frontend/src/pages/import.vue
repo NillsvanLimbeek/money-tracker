@@ -6,6 +6,7 @@ import { getImportedHashes } from '@/lib/api/transactions/transactions.api';
 import { useImportTransactions } from '@/lib/api/transactions/transactions.queries';
 import { MAX_FILE_BYTES } from '@/lib/constants';
 import { decodeIngCsv, parseIngCsv } from '@/lib/utils';
+import { m } from '@/paraglide/messages';
 
 const MAX_IMPORT_ROWS = 5000;
 const STEP_COUNT = 2;
@@ -23,11 +24,11 @@ const step = computed(() => parsed.value ? 2 : 1);
 
 const description = computed(() => {
   if (parsed.value)
-    return { title: 'Review', subtitle: 'Untick anything you don\'t want. Categories can be changed later from the list.' };
+    return { title: m.import_review_heading(), subtitle: m.import_review_subtitle() };
 
   return {
-    title: 'Import transactions',
-    subtitle: 'Upload a CSV export from your bank. You\'ll review every row before anything is added.',
+    title: m.import_heading(),
+    subtitle: m.import_subtitle(),
   };
 });
 
@@ -39,7 +40,7 @@ watch(file, async (selected) => {
     return;
 
   if (selected.size > MAX_FILE_BYTES) {
-    error.value = 'This file is larger than 10 MB.';
+    error.value = m.import_error_too_large({ size: `${MAX_FILE_BYTES / 1024 / 1024} MB` });
     file.value = null;
     return;
   }
@@ -47,11 +48,11 @@ watch(file, async (selected) => {
   const result = await parseIngCsv(decodeIngCsv(await selected.arrayBuffer()));
 
   if (result.rows.length === 0) {
-    error.value = result.errors[0]?.message ?? 'No transactions found in this file.';
+    error.value = result.errors[0]?.message ?? m.import_error_no_transactions();
     file.value = null;
   }
   else if (result.rows.length > MAX_IMPORT_ROWS) {
-    error.value = `This file has more than ${MAX_IMPORT_ROWS} transactions. Export a shorter period.`;
+    error.value = m.import_error_too_many({ max: MAX_IMPORT_ROWS });
     file.value = null;
   }
   else {
@@ -94,14 +95,14 @@ async function confirm(rows: ImportRow[]): Promise<void> {
     parsed.value = null;
   }
   catch {
-    error.value = 'Import failed. Check your connection and try again.';
+    error.value = m.import_error_failed();
   }
 }
 </script>
 
 <template>
   <div class="flex min-h-screen flex-col">
-    <PageHeader title="Import">
+    <PageHeader :title="m.import_title()">
       <template #left>
         <UButton
           v-if="parsed || summary"
@@ -109,7 +110,7 @@ async function confirm(rows: ImportRow[]): Promise<void> {
           variant="outline"
           size="xl"
           icon="i-lucide-chevron-left"
-          aria-label="Back to file selection"
+          :aria-label="m.import_back_aria()"
           @click="reset"
         />
 
@@ -120,7 +121,7 @@ async function confirm(rows: ImportRow[]): Promise<void> {
           variant="outline"
           size="xl"
           icon="i-lucide-x"
-          aria-label="Close import"
+          :aria-label="m.import_close_aria()"
         />
       </template>
 

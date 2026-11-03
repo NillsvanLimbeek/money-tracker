@@ -2,6 +2,7 @@
 import type { CategoryRule } from '@/lib/types';
 import { ref } from 'vue';
 import { RULE_OPERATORS } from '@/lib/constants';
+import { m } from '@/paraglide/messages';
 
 interface Props {
   rule: CategoryRule;
@@ -61,7 +62,7 @@ function startDelete(): void {
         variant="ghost"
         size="sm"
         icon="i-lucide-ellipsis"
-        aria-label="Rule actions"
+        :aria-label="m.rule_actions_aria()"
         @click="isMenuOpen = true"
       />
     </div>
@@ -81,7 +82,7 @@ function startDelete(): void {
 
       <span class="ml-auto font-mono text-sm">
         <span class="text-highlighted">{{ rule.matches }}</span>
-        <span class="text-muted">&nbsp;{{ rule.matches === 1 ? 'match' : 'matches' }}</span>
+        <span class="text-muted">&nbsp;{{ m.rule_matches_label({ count: rule.matches }) }}</span>
       </span>
     </div>
 

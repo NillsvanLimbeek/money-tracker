@@ -1,0 +1,28 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "transactions_title": "Transactions",
+  "transactions_search": "Search Transactions",
+  "transaction_bank_description": "Bank description",
+  "transaction_already_imported": "Already imported",
+  "transaction_toggle_details": "Toggle details",
+  "transactions_updated": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} transaction updated",
+        "countPlural=other": "{count} transactions updated"
+      }
+    }
+  ],
+  "category_picker_title": "Change category",
+  "filter_button": "Filter",
+  "filter_title": "Filter by category",
+  "filter_reset": "Reset",
+  "filter_show_items": "Show items"
+}

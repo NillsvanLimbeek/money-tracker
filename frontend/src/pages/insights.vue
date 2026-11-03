@@ -1,5 +1,9 @@
+<script setup lang="ts">
+import { m } from '@/paraglide/messages';
+</script>
+
 <template>
-  <PageHeader title="Insights" />
+  <PageHeader :title="m.insights_title()" />
 
   <div class="text-muted flex flex-col items-center justify-center gap-2 p-4 pt-24 text-center">
     <UIcon
@@ -7,7 +11,7 @@
       class="size-10"
     />
     <p class="text-sm">
-      Insights are coming soon.
+      {{ m.insights_coming_soon() }}
     </p>
   </div>
 

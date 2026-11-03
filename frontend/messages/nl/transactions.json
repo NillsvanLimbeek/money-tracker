@@ -1,0 +1,28 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "transactions_title": "Transacties",
+  "transactions_search": "Zoek transacties",
+  "transaction_bank_description": "Bankomschrijving",
+  "transaction_already_imported": "Al geïmporteerd",
+  "transaction_toggle_details": "Details tonen of verbergen",
+  "transactions_updated": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} transactie bijgewerkt",
+        "countPlural=other": "{count} transacties bijgewerkt"
+      }
+    }
+  ],
+  "category_picker_title": "Categorie wijzigen",
+  "filter_button": "Filter",
+  "filter_title": "Filter op categorie",
+  "filter_reset": "Herstellen",
+  "filter_show_items": "Toon resultaten"
+}

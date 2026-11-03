@@ -1,0 +1,96 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "import_title": "Import",
+  "import_heading": "Import transactions",
+  "import_subtitle": "Upload a CSV export from your bank. You'll review every row before anything is added.",
+  "import_review_heading": "Review",
+  "import_review_subtitle": "Untick anything you don't want. Categories can be changed later from the list.",
+  "import_back_aria": "Back to file selection",
+  "import_close_aria": "Close import",
+  "import_error_too_large": "This file is larger than {size}.",
+  "import_error_no_transactions": "No transactions found in this file.",
+  "import_error_too_many": "This file has more than {max} transactions. Export a shorter period.",
+  "import_error_failed": "Import failed. Check your connection and try again.",
+  "import_choose_title": "Choose a CSV file",
+  "import_drop_hint": "or drop it here · max {size}",
+  "import_recognised_formats": "Recognised formats",
+  "import_choose_file": "Choose file",
+  "import_try_sample": "Try with a sample file",
+  "import_stat_found": "Found",
+  "import_stat_selected": "Selected",
+  "import_stat_duplicates": "Duplicates",
+  "import_stat_skipped": "Skipped",
+  "import_unreadable_rows": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} row could not be read and will be skipped",
+        "countPlural=other": "{count} rows could not be read and will be skipped"
+      }
+    }
+  ],
+  "import_error_line": "Line {line}: {message}",
+  "import_select_all": "Select all",
+  "import_deselect_all": "Deselect all",
+  "import_confirm": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "Import {count} transaction",
+        "countPlural=other": "Import {count} transactions"
+      }
+    }
+  ],
+  "import_totals": "{income} in · {expense} out",
+  "import_done_title": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} transaction imported",
+        "countPlural=other": "{count} transactions imported"
+      }
+    }
+  ],
+  "import_done_added": "Added from {fileName} to {period}.",
+  "import_uncategorised": "Uncategorised",
+  "import_needs_category": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} needs a category",
+        "countPlural=other": "{count} need a category"
+      }
+    }
+  ],
+  "import_view_transactions": "View transactions",
+  "import_another_file": "Import another file",
+  "csv_missing_columns": "Missing columns: {columns}",
+  "csv_invalid_date": "Invalid date \"{value}\"",
+  "csv_invalid_amount": "Invalid amount \"{value}\"",
+  "csv_unknown_direction": "Unknown debit/credit value \"{value}\"",
+  "csv_missing_description": "Missing description"
+}

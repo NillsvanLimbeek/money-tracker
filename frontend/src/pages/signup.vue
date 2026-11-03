@@ -5,6 +5,7 @@ import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { SIGN_UP_FIELDS } from '@/lib/constants';
 import { SignUpSchema } from '@/lib/models/sign-up';
+import { m } from '@/paraglide/messages';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
@@ -29,7 +30,7 @@ async function onSubmit(event: FormSubmitEvent<SignUp>): Promise<void> {
   isSubmitting.value = false;
 
   if (result.error) {
-    error.value = result.error.message ?? 'Something went wrong. Please try again.';
+    error.value = result.error.message ?? m.common_error_generic();
     return;
   }
 
@@ -41,7 +42,7 @@ async function onSubmit(event: FormSubmitEvent<SignUp>): Promise<void> {
   <div class="bg-olive-50 flex min-h-screen flex-col gap-6 overflow-y-auto p-6">
     <div>
       <h1 class="text-highlighted flex justify-center text-2xl font-bold">
-        Sign Up
+        {{ m.signup_title() }}
       </h1>
     </div>
 
@@ -74,17 +75,17 @@ async function onSubmit(event: FormSubmitEvent<SignUp>): Promise<void> {
         color="neutral"
         :loading="isSubmitting"
       >
-        Sign Up
+        {{ m.signup_submit() }}
       </UButton>
     </UForm>
 
     <p class="text-muted mt-auto pb-2 text-center text-sm">
-      Already a account?
+      {{ m.signup_have_account() }}
       <RouterLink
         to="/signin"
         class="text-primary font-medium"
       >
-        Sign in
+        {{ m.signup_link_signin() }}
       </RouterLink>
     </p>
   </div>

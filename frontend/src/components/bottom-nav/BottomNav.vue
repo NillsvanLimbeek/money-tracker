@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { NAV_ITEMS } from '@/lib/constants/nav-items';
+import { m } from '@/paraglide/messages';
 
 const route = useRoute();
 const showImport = computed(() => route.path === '/');
@@ -13,7 +14,7 @@ const isActive = (to: string): boolean => to === '/' ? route.path === '/' : rout
     <RouterLink
       v-if="showImport"
       to="/import"
-      aria-label="Import transactions"
+      :aria-label="m.nav_import_aria()"
       class="bg-inverted text-inverted absolute top-0 left-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl border-4 shadow-md"
     >
       <UIcon

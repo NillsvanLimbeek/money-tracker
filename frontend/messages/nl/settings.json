@@ -1,0 +1,10 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "settings_title": "Instellingen",
+  "settings_accounts": "Rekeningen",
+  "settings_add_account": "Rekening toevoegen",
+  "settings_categorisation": "Categorisering",
+  "settings_category_rules": "Categorieregels",
+  "settings_auto_categorise": "Automatisch categoriseren bij import",
+  "settings_suggest_rule": "Regel voorstellen na handmatige wijzigingen"
+}

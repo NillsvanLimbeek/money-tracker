@@ -1,5 +1,6 @@
 import type { Transaction } from '@/lib/types';
 import { format, isToday } from 'date-fns';
+import { m } from '@/paraglide/messages';
 
 export interface TransactionGroup {
   key: string;
@@ -10,7 +11,7 @@ export interface TransactionGroup {
 
 function dayLabel(date: Date): string {
   const day = format(date, 'EEE d MMM');
-  return isToday(date) ? `Today · ${day}` : day;
+  return isToday(date) ? m.day_today({ day }) : day;
 }
 
 /**

@@ -5,6 +5,7 @@ import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { SIGN_IN_FIELDS } from '@/lib/constants';
 import { SignInSchema } from '@/lib/models/sign-in';
+import { m } from '@/paraglide/messages';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
@@ -28,7 +29,7 @@ async function onSubmit(event: FormSubmitEvent<SignIn>): Promise<void> {
   isSubmitting.value = false;
 
   if (result.error) {
-    error.value = result.error.message ?? 'Something went wrong. Please try again.';
+    error.value = result.error.message ?? m.common_error_generic();
     return;
   }
 
@@ -39,7 +40,7 @@ async function onSubmit(event: FormSubmitEvent<SignIn>): Promise<void> {
 <template>
   <div class="bg-olive-50 flex min-h-screen flex-col gap-6 overflow-y-auto p-6">
     <h1 class="text-highlighted flex justify-center text-2xl font-bold">
-      Sign In
+      {{ m.signin_title() }}
     </h1>
 
     <AuthTabs active="signin" />
@@ -60,13 +61,13 @@ async function onSubmit(event: FormSubmitEvent<SignIn>): Promise<void> {
       <div class="flex items-center justify-between">
         <UCheckbox
           v-model="rememberMe"
-          label="Keep me signed in on this device"
+          :label="m.signin_remember()"
         />
         <button
           type="button"
           class="text-primary text-sm font-medium"
         >
-          Forgot?
+          {{ m.signin_forgot() }}
         </button>
       </div>
 
@@ -84,17 +85,17 @@ async function onSubmit(event: FormSubmitEvent<SignIn>): Promise<void> {
         color="neutral"
         :loading="isSubmitting"
       >
-        Sign in
+        {{ m.signin_submit() }}
       </UButton>
     </UForm>
 
     <p class="text-muted mt-auto pb-2 text-center text-sm">
-      No ledger yet?
+      {{ m.signin_no_ledger() }}
       <RouterLink
         to="/signup"
         class="text-primary font-medium"
       >
-        Create one
+        {{ m.signin_create_one() }}
       </RouterLink>
     </p>
   </div>

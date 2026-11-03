@@ -1,5 +1,6 @@
 import type { Category, CategoryRule, RuleOperator } from '../../types';
 import { normalise } from '@money-tracker/shared';
+import { m } from '@/paraglide/messages';
 import { MIN_PATTERN_LENGTH, RULE_OPERATORS } from '../../constants';
 
 export interface RuleValidation {
@@ -34,7 +35,7 @@ export function validateRule(
   const pattern = normalise(draft.pattern);
 
   if (pattern === '')
-    return { level: 'error', message: 'Enter a pattern to match.', canSave: false };
+    return { level: 'error', message: m.rule_validation_required(), canSave: false };
 
   const duplicate = rules.find(rule => rule.id !== ignoreId && rule.operator === draft.operator && normalise(rule.pattern) === pattern);
 
@@ -43,15 +44,15 @@ export function validateRule(
 
     return {
       level: 'error',
-      message: `This rule already exists: ${RULE_OPERATORS[duplicate.operator].label} “${duplicate.pattern}” → ${category}.`,
+      message: m.rule_validation_duplicate({ operator: RULE_OPERATORS[duplicate.operator].label, pattern: duplicate.pattern, category }),
       canSave: false,
     };
   }
 
   if (pattern.length < MIN_PATTERN_LENGTH) {
-    const matches = distinctMatches === undefined ? 'many different descriptions' : `${distinctMatches} different ${distinctMatches === 1 ? 'description' : 'descriptions'}`;
+    const matches = distinctMatches === undefined ? m.rule_validation_many() : m.rule_validation_descriptions({ count: distinctMatches });
 
-    return { level: 'warning', message: `Very short pattern — “${pattern}” matches ${matches}. Make it more specific.`, canSave: true };
+    return { level: 'warning', message: m.rule_validation_short({ pattern, matches }), canSave: true };
   }
 
   return { level: null, message: null, canSave: true };
