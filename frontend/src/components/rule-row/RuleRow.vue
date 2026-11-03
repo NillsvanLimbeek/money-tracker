@@ -15,8 +15,6 @@ const emit = defineEmits<{
   (e: 'delete', id: string): void;
 }>();
 
-const BARS = [1, 2, 3];
-
 const isMenuOpen = ref(false);
 const isConfirming = ref(false);
 
@@ -40,18 +38,6 @@ function startDelete(): void {
   <div class="flex flex-col gap-3 px-4 py-3">
     <div class="flex items-center gap-2">
       <span class="border-accented bg-elevated flex shrink-0 items-center gap-1.5 rounded-lg border px-2 py-1 font-mono text-xs">
-        <span class="flex items-end gap-0.5">
-          <span
-            v-for="bar in BARS"
-            :key="bar"
-            class="w-0.5 rounded-full"
-            :class="{
-              'bg-highlighted': bar <= RULE_OPERATORS[rule.operator].strength,
-              'bg-accented': bar > RULE_OPERATORS[rule.operator].strength }"
-            :style="{ height: `${bar * 4}px` }"
-          />
-        </span>
-
         {{ RULE_OPERATORS[rule.operator].label }}
       </span>
 

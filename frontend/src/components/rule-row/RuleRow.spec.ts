@@ -52,14 +52,6 @@ describe('ruleRow', () => {
     expect(text).not.toContain('1 matches');
   });
 
-  it('highlights as many strength bars as the operator is specific', () => {
-    const highlighted = (operator: CategoryRule['operator']): number => mountRow({ operator }).findAll('.bg-highlighted').length;
-
-    expect(highlighted('contains')).toBe(1);
-    expect(highlighted('startsWith')).toBe(2);
-    expect(highlighted('equals')).toBe(3);
-  });
-
   it('hides the confirmation until Delete is chosen', async () => {
     const wrapper = mountRow();
 
