@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { format } from 'date-fns';
 import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import CategoryDrawer from '@/components/category-drawer/CategoryDrawer.vue';
 import MonthSummary from '@/components/month-summary/MonthSummary.vue';
 import QueryBoundary from '@/components/query-boundary/QueryBoundary.vue';
@@ -73,7 +74,22 @@ async function createPromptedRule(): Promise<void> {
 
 const search = ref('');
 const isFilterOpen = ref(false);
-const selectedCategories = ref<string[]>([]);
+const route = useRoute();
+const router = useRouter();
+
+// The selected categories live in the URL (`?category=food,other`) so other screens can link to a filtered ledger.
+const selectedCategories = computed<string[]>({
+  get() {
+    const raw = [route.query.category].flat().join(',');
+    return raw
+      .split(',')
+      .filter(key => CATEGORIES.some(category => category.key === key));
+  },
+  set(keys) {
+    const { category: _category, ...rest } = route.query;
+    router.replace({ query: keys.length > 0 ? { ...rest, category: keys.join(',') } : rest });
+  },
+});
 
 const filteredTransactions = computed(() => filterTransactions(transactions.value, {
   search: search.value,

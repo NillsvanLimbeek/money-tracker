@@ -2,13 +2,13 @@
 
 > What's done and what's next. For goals, stack, architecture and data model see `project-overview.md`.
 
-_Last updated: 03-11-2026_
+_Last updated: 06-11-2026_
 
 | Phase | State |
 |---|---|
 | 1. Project setup | Done |
 | 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
-| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend, the rules screen and the add / edit / delete rule flow (forms and drawers) done, the manual-change rule prompt done, rule-based categorisation shown on the review screen done; UI strings moved to Paraglide (English and Dutch) |
+| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend, the rules screen and the add / edit / delete rule flow (forms and drawers) done, the manual-change rule prompt done, rule-based categorisation shown on the review screen done, transactions page search and category filter done; UI strings moved to Paraglide (English and Dutch) |
 | 4–7 | Not started |
 
 ---
@@ -40,7 +40,7 @@ _Last updated: 03-11-2026_
   - Clicking the row or the chevron in the disclosure column on the far right expands it: the full name wraps (collapsed names truncate) and a "Bank description" box shows `transaction.notes` split by `splitNotes`. The category badge opens the picker without expanding the row
   - `importRowToTransaction` (`lib/utils/`) adapts a parsed `ImportRow` to a `Transaction` (import hash as id, euros, placeholder `income` / `other` category). `Transaction.notes` is optional and nothing fills it on the transactions page yet
   - `TransactionList` groups transactions by day (`groupTransactionsByDay`) and keeps which row's picker is open, so only one is open at a time
-- Transactions page (`pages/index.vue`) now uses real data: `useTransactions(month)` (`GET /api/transactions?month=YYYY-MM`, mapped to `Transaction` in `transactions.api.ts`) feeds the list and the month summary totals, wrapped in `QueryBoundary`. Changing a category calls `PATCH /api/transactions/:id` via `useUpdateTransactionCategory` and refetches. `MOCK_TRANSACTIONS` is gone. The search box and category filter are still not applied to the list
+- Transactions page (`pages/index.vue`) now uses real data: `useTransactions(month)` (`GET /api/transactions?month=YYYY-MM`, mapped to `Transaction` in `transactions.api.ts`) feeds the list and the month summary totals, wrapped in `QueryBoundary`. Changing a category calls `PATCH /api/transactions/:id` via `useUpdateTransactionCategory` and refetches. `MOCK_TRANSACTIONS` is gone
 - The import route's placeholder categories are now the lowercase keys `income` / `other` so they match `CATEGORIES`; rows imported earlier with `Income` / `Other` need re-importing or a manual fix
 - Conditional classes in templates use object syntax or a computed instead of ternaries
 
@@ -68,6 +68,14 @@ _Last updated: 03-11-2026_
   - Duplicate error: `validateRule` returns the `duplicateId`; `RuleForm` shows an "Edit existing rule" link button under the pattern and emits `editExisting`, and the page switches the drawer to editing that rule
   - Open issue: the confirmation toast sometimes doesn't auto-close. Reka UI pauses the timer while the pointer or focus is on the toast area or the window is blurred (for example with DevTools focused); not yet confirmed whether it also happens in a normal window
 
+- Transactions page search and category filter (`pages/index.vue`):
+  - `filterTransactions` (`lib/utils/filter-transactions/`) combines the selected categories with a Fuse.js fuzzy search over merchant and bank notes (best matches first); `TransactionFilters` is its input type. The page shows "No transactions found" when nothing matches
+  - `CategoryDrawer` (the filter drawer) holds the category chips. Its trigger button is tinted (`primary` / `soft`) while filters are active and reads "Filter", "1 filter" or "N filters" from a single `filter_count` message (`count=0` plus plural variants, two selectors); it is `shrink-0 whitespace-nowrap` so the search input can't squeeze the label onto two lines
+  - `SearchFilterSelection` (`components/search-filter-selection/`) is the results banner under the search row, shown while any category is selected: a dot per category, "N of M in Food, …" and a Clear button that resets the categories. The counts follow the current month and search text. It sits inside the sticky header
+  - The search input shows a trailing cross icon (`transactions_search_clear` aria label) while it has text, which empties it
+  - `TransactionList` renders each day as its own rounded card with a `gap-4` between days instead of one shared card
+  - Sticky header fix: the app wrapper in `App.vue` is `min-h-screen` rather than `h-screen`. A sticky element only stays pinned inside its parent, and a fixed one-screen parent let the header scroll away on long lists
+
 ---
 
 ## Translations (Paraglide)
@@ -83,11 +91,11 @@ _Last updated: 03-11-2026_
 
 ## Next up
 
-1. Finish rule-based categorisation (import already applies the user's rules; the placeholder `income` / `other` is only the fallback). The summary's "Uncategorised" row can't link to a filtered list because the ledger has no category filter. Design is in `docs/category-rules.md`; steps:
+1. Finish rule-based categorisation (import already applies the user's rules; the placeholder `income` / `other` is only the fallback). Design is in `docs/category-rules.md`; steps:
+   0. Done — the category filter on `pages/index.vue` is driven by the URL (`?category=food,other`, unknown keys ignored, changes use `router.replace`); the summary's "Uncategorised" row links to `/?category=other`. The month isn't in the URL, so rows imported into past months still need the month picked by hand
    1. Rules UI: done — the list screen, the add and edit forms (with apply on save), the actions / delete drawers and the "Edit existing rule" link on the duplicate error are built
    2. Done — the review screen previews each row's category: `pages/import.vue` loads the rules (`useCategoryRules`) and passes them to `ImportReview`, which calls `importRowToTransaction(row, rules)`; that runs the shared `matchCategory` (list order stands in for `createdAt` in the tie-break) and falls back to `income` / `other`
-2. Wire the transactions page's search box and category filter to the list
-3. Add a language switcher to Settings and localise date formatting
+2. Add a language switcher to Settings and localise date formatting
 
 ---
 

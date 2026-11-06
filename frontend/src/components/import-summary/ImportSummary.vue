@@ -56,7 +56,7 @@ const stats = computed(() => [
 
       <RouterLink
         v-if="summary.uncategorised > 0"
-        to="/"
+        :to="{ path: '/', query: { category: 'other' } }"
         class="border-accented bg-default flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm"
       >
         <span class="border-accented bg-elevated text-muted rounded-full border border-dashed px-3 py-1 text-xs font-medium">
