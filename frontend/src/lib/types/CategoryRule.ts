@@ -1,4 +1,6 @@
-export type RuleOperator = 'contains' | 'equals' | 'startsWith' | 'endsWith';
+import type { RuleOperator } from '@money-tracker/shared';
+
+export type { RuleOperator };
 
 export interface CategoryRule {
   id: string;
