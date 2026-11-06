@@ -28,31 +28,30 @@ function selectCategory(id: string, categoryKey: string): void {
 </script>
 
 <template>
-  <div class="p-4">
-    <div class="border-accented bg-default overflow-hidden rounded-2xl border shadow-sm">
-      <section
-        v-for="group in groups"
-        :key="group.key"
-      >
-        <div class="border-accented bg-elevated text-muted flex items-center justify-between border-b px-4 py-2 font-mono text-xs tracking-wide uppercase not-first:border-t">
-          <h3>{{ group.label }}</h3>
-          <span>{{ formatCurrency(group.total) }}</span>
-        </div>
+  <div class="flex flex-col gap-4 p-4">
+    <section
+      v-for="group in groups"
+      :key="group.key"
+      class="border-accented bg-default overflow-hidden rounded-2xl border shadow-sm"
+    >
+      <div class="border-accented bg-elevated text-muted flex items-center justify-between border-b px-4 py-2 font-mono text-xs tracking-wide uppercase">
+        <h3>{{ group.label }}</h3>
+        <span>{{ formatCurrency(group.total) }}</span>
+      </div>
 
-        <div class="divide-accented divide-y">
-          <TransactionRow
-            v-for="transaction in group.transactions"
-            :key="transaction.id"
-            :transaction
-            :categories
-            grouped
-            :picker-open="openRowId === transaction.id"
-            @toggle-picker="toggleRow(transaction.id)"
-            @close-picker="openRowId = null"
-            @select-category="key => selectCategory(transaction.id, key)"
-          />
-        </div>
-      </section>
-    </div>
+      <div class="divide-accented divide-y">
+        <TransactionRow
+          v-for="transaction in group.transactions"
+          :key="transaction.id"
+          :transaction
+          :categories
+          grouped
+          :picker-open="openRowId === transaction.id"
+          @toggle-picker="toggleRow(transaction.id)"
+          @close-picker="openRowId = null"
+          @select-category="key => selectCategory(transaction.id, key)"
+        />
+      </div>
+    </section>
   </div>
 </template>

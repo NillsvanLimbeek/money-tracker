@@ -40,12 +40,13 @@ function categoryStyle(key: string): CSSProperties {
     :ui="{ overlay: 'bg-black/50' }"
   >
     <UButton
-      color="neutral"
-      variant="outline"
+      :color="selectedCategories.length > 0 ? 'primary' : 'neutral'"
+      :variant="selectedCategories.length > 0 ? 'soft' : 'outline'"
       icon="i-lucide-list-sort-descending"
       size="lg"
+      class="shrink-0 whitespace-nowrap"
     >
-      {{ m.filter_button() }}
+      {{ m.filter_count({ count: selectedCategories.length }) }}
     </UButton>
 
     <template #header>

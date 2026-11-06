@@ -80,6 +80,8 @@ const filteredTransactions = computed(() => filterTransactions(transactions.valu
   categories: selectedCategories.value,
 }));
 
+const selectedCategoryItems = computed(() => CATEGORIES.filter(category => selectedCategories.value.includes(category.key)));
+
 function toggleCategory(key: string): void {
   selectedCategories.value = categoryIsSelected(selectedCategories.value, key)
     ? selectedCategories.value.filter(k => k !== key)
@@ -102,7 +104,21 @@ function resetCategories(): void {
         size="lg"
         icon="i-lucide-search"
         :placeholder="m.transactions_search()"
-      />
+      >
+        <template
+          v-if="search"
+          #trailing
+        >
+          <UButton
+            color="neutral"
+            variant="link"
+            size="sm"
+            icon="i-lucide-x"
+            :aria-label="m.transactions_search_clear()"
+            @click="search = ''"
+          />
+        </template>
+      </UInput>
 
       <CategoryDrawer
         v-model:open="isFilterOpen"
@@ -112,6 +128,14 @@ function resetCategories(): void {
         @reset-categories="resetCategories"
       />
     </div>
+
+    <SearchFilterSelection
+      :selected-categories
+      :selected-category-items
+      :transactions
+      :filtered-transactions
+      @clear="resetCategories"
+    />
   </div>
 
   <MonthSummary

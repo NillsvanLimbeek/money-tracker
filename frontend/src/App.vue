@@ -25,7 +25,7 @@ const showBottomNav = computed(() => !HIDDEN_NAV_PATHS.includes(route.path));
 <template>
   <UApp :locale="uiLocale">
     <template v-if="isMobile">
-      <div class="bg-olive-50 h-screen">
+      <div class="bg-olive-50 min-h-screen">
         <RouterView />
         <BottomNav v-if="showBottomNav" />
       </div>

@@ -2,6 +2,7 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "transactions_title": "Transacties",
   "transactions_search": "Zoek transacties",
+  "transactions_search_clear": "Zoekopdracht wissen",
   "transactions_empty": "Geen transacties gevonden",
   "transaction_bank_description": "Bankomschrijving",
   "transaction_already_imported": "Al geïmporteerd",
@@ -22,8 +23,27 @@
     }
   ],
   "category_picker_title": "Categorie wijzigen",
-  "filter_button": "Filter",
   "filter_title": "Filter op categorie",
   "filter_reset": "Herstellen",
-  "filter_show_items": "Toon resultaten"
+  "filter_show_items": "Toon resultaten",
+  "filter_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "count",
+        "countPlural"
+      ],
+      "match": {
+        "count=0, countPlural=*": "Filter",
+        "count=*, countPlural=one": "{count} filter",
+        "count=*, countPlural=other": "{count} filters"
+      }
+    }
+  ],
+  "filter_results_count": "{shown} van {total}",
+  "filter_results_in": " in {categories}",
+  "filter_clear": "Wissen"
 }
