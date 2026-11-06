@@ -1,3 +1,4 @@
+export * from './filter-transactions/filter-transactions';
 export * from './format-currency/format-currency';
 export * from './format-date/format-date';
 export * from './format-period/format-period';

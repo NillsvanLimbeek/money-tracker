@@ -7,3 +7,4 @@ export * from './ImportSummary';
 export * from './NavItem';
 export * from './RuleField';
 export * from './Transaction';
+export * from './TransactionFilters';

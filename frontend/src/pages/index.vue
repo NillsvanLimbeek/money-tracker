@@ -9,7 +9,7 @@ import TransactionList from '@/components/transaction-list/TransactionList.vue';
 import { useApplyCategoryRule, useCategoryRules, useCreateCategoryRule, useRulePreview } from '@/lib/api/category-rules/category-rules.queries';
 import { useTransactions, useUpdateTransactionCategory } from '@/lib/api/transactions/transactions.queries';
 import { CATEGORIES } from '@/lib/constants';
-import { categoryIsSelected } from '@/lib/utils';
+import { categoryIsSelected, filterTransactions } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 const now = new Date();
@@ -75,6 +75,11 @@ const search = ref('');
 const isFilterOpen = ref(false);
 const selectedCategories = ref<string[]>([]);
 
+const filteredTransactions = computed(() => filterTransactions(transactions.value, {
+  search: search.value,
+  categories: selectedCategories.value,
+}));
+
 function toggleCategory(key: string): void {
   selectedCategories.value = categoryIsSelected(selectedCategories.value, key)
     ? selectedCategories.value.filter(k => k !== key)
@@ -116,9 +121,17 @@ function resetCategories(): void {
   />
 
   <QueryBoundary :query="transactionsQuery">
-    <template #default="{ data }">
+    <template #default>
+      <p
+        v-if="filteredTransactions.length === 0"
+        class="text-muted px-4 pt-16 text-center"
+      >
+        {{ m.transactions_empty() }}
+      </p>
+
       <TransactionList
-        :transactions="data"
+        v-else
+        :transactions="filteredTransactions"
         :categories="CATEGORIES"
         @change-category="changeCategory"
       />
