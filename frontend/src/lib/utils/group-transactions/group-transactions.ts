@@ -1,17 +1,12 @@
 import type { Transaction } from '@/lib/types';
-import { format, isToday } from 'date-fns';
-import { m } from '@/paraglide/messages';
+import { format } from 'date-fns';
+import { dayLabel } from '..';
 
 export interface TransactionGroup {
   key: string;
   label: string;
   total: number;
   transactions: Transaction[];
-}
-
-function dayLabel(date: Date): string {
-  const day = format(date, 'EEE d MMM');
-  return isToday(date) ? m.day_today({ day }) : day;
 }
 
 /**

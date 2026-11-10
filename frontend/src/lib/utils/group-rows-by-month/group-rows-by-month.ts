@@ -1,4 +1,5 @@
 import { format, parseISO } from 'date-fns';
+import { dateFnsLocale } from '@/lib/utils/date-fns-locale/date-fns-locale';
 
 export interface MonthGroup<T> {
   key: string;
@@ -23,7 +24,7 @@ export function groupRowsByMonth<T extends { date: string }>(rows: T[]): MonthGr
     let group = groups.get(key);
 
     if (!group) {
-      group = { key, label: format(parseISO(row.date), 'MMMM yyyy'), rows: [] };
+      group = { key, label: format(parseISO(row.date), 'MMMM yyyy', { locale: dateFnsLocale() }), rows: [] };
       groups.set(key, group);
     }
 

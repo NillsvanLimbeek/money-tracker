@@ -1,7 +1,18 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { overwriteGetLocale } from '@/paraglide/runtime';
 import { formatPeriod } from './format-period';
 
 describe('formatPeriod', () => {
+  afterEach(() => {
+    overwriteGetLocale(() => 'en');
+  });
+
+  it('uses Dutch month names when the locale is nl', () => {
+    overwriteGetLocale(() => 'nl');
+
+    expect(formatPeriod(['2026-10-03', '2026-10-20'])).toBe('oktober 2026');
+  });
+
   it('names a single month', () => {
     expect(formatPeriod(['2026-10-18', '2026-10-02'])).toBe('October 2026');
   });

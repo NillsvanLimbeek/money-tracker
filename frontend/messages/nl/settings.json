@@ -6,5 +6,9 @@
   "settings_categorisation": "Categorisering",
   "settings_category_rules": "Categorieregels",
   "settings_auto_categorise": "Automatisch categoriseren bij import",
-  "settings_suggest_rule": "Regel voorstellen na handmatige wijzigingen"
+  "settings_suggest_rule": "Regel voorstellen na handmatige wijzigingen",
+  "settings_language_region": "Taal en regio",
+  "settings_language": "Taal",
+  "settings_number_format": "Getalnotatie",
+  "settings_date_format": "Datumnotatie"
 }

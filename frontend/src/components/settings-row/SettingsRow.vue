@@ -7,20 +7,23 @@ interface Props {
   description?: string;
   to?: string;
   action?: boolean;
+  // A plain tappable row (button) that keeps the normal label colour, unlike `action`.
+  pressable?: boolean;
 }
 
-const { to, action = false } = defineProps<Props>();
+const { to, action = false, pressable = false } = defineProps<Props>();
 
 defineSlots<{
   trailing?: () => unknown;
 }>();
 
-const interactive = computed(() => !!to || action);
+const isButton = computed(() => action || pressable);
+const interactive = computed(() => !!to || isButton.value);
 const element = computed(() => {
   if (to)
     return RouterLink;
 
-  return action ? 'button' : 'div';
+  return isButton.value ? 'button' : 'div';
 });
 </script>
 
@@ -28,7 +31,7 @@ const element = computed(() => {
   <component
     :is="element"
     :to
-    :type="action ? 'button' : undefined"
+    :type="isButton ? 'button' : undefined"
     class="flex w-full items-center gap-3 px-4 py-4 text-left"
     :class="{ 'active:bg-elevated': interactive }"
   >

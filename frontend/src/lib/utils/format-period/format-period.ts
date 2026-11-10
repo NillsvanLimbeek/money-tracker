@@ -1,4 +1,5 @@
 import { format, parseISO } from 'date-fns';
+import { dateFnsLocale } from '@/lib/utils/date-fns-locale/date-fns-locale';
 
 /**
  * Describes the months covered by a list of ISO dates. The year is only repeated when the period crosses a year boundary.
@@ -14,15 +15,16 @@ export function formatPeriod(dates: string[]): string {
   if (dates.length === 0)
     return '';
 
+  const locale = dateFnsLocale();
   const sorted = [...dates].sort();
   const first = parseISO(sorted[0]!);
   const last = parseISO(sorted.at(-1)!);
 
   if (format(first, 'yyyy-MM') === format(last, 'yyyy-MM'))
-    return format(first, 'MMMM yyyy');
+    return format(first, 'MMMM yyyy', { locale });
 
   if (first.getFullYear() === last.getFullYear())
-    return `${format(first, 'MMMM')} – ${format(last, 'MMMM yyyy')}`;
+    return `${format(first, 'MMMM', { locale })} – ${format(last, 'MMMM yyyy', { locale })}`;
 
-  return `${format(first, 'MMMM yyyy')} – ${format(last, 'MMMM yyyy')}`;
+  return `${format(first, 'MMMM yyyy', { locale })} – ${format(last, 'MMMM yyyy', { locale })}`;
 }

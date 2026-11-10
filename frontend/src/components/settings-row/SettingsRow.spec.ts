@@ -41,4 +41,11 @@ describe('settingsRow', () => {
     expect(wrapper.find('.count').text()).toBe('14');
     expect(wrapper.find('svg').exists()).toBe(false);
   });
+
+  it('renders a button that keeps the normal label colour for a pressable row', () => {
+    const wrapper = mount(SettingsRow, { props: { label: 'Number format', pressable: true }, global: { stubs } });
+
+    expect(wrapper.element.tagName).toBe('BUTTON');
+    expect(wrapper.find('span span').classes()).not.toContain('text-primary');
+  });
 });

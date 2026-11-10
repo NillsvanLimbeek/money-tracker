@@ -1,7 +1,18 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { overwriteGetLocale } from '@/paraglide/runtime';
 import { groupRowsByMonth } from './group-rows-by-month';
 
 describe('groupRowsByMonth', () => {
+  afterEach(() => {
+    overwriteGetLocale(() => 'en');
+  });
+
+  it('labels months in Dutch when the locale is nl', () => {
+    overwriteGetLocale(() => 'nl');
+
+    expect(groupRowsByMonth([{ date: '2026-10-03' }])[0]!.label).toBe('oktober 2026');
+  });
+
   it('groups by month, newest first, keeping row order', () => {
     const groups = groupRowsByMonth([
       { date: '2026-09-30', id: 'a' },

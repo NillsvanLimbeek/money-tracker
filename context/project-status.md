@@ -84,7 +84,9 @@ _Last updated: 10-11-2026_
 - Messages are split by section, one file per section and locale: `frontend/messages/{en,nl}/{common,transactions,rules,settings,import,auth}.json` (listed in `pathPattern` in `project.inlang/settings.json`). Keys are flat snake_case with a section prefix (`common_save`, `rule_form_new_title`); JSON can't be nested. A new key goes in the matching section file in both locales
 - Used as `import { m } from '@/paraglide/messages'` and `m.key({ param })`. Singular / plural pairs are plural variants on `count` (`local countPlural = count: plural`), replacing the old `=== 1 ? … : …` branches
 - Everything user-facing is translated: components, pages, category / operator / nav labels, form fields, zod messages, rule validation messages, CSV parse errors and the "Today ·" day label. Constants and zod schemas read the locale once at startup, so changing language needs a page reload (`setLocale` reloads by default)
-- Not done: there is no language switcher in Settings; dates and currency keep their current formatting (date-fns English month names, `nl-NL` euros) so month names stay English in the Dutch UI; the `nl` translations are unreviewed
+- Settings has a "Language & region" section (`pages/settings/index.vue`): an EN / NL `SegmentedControl` (calls `setLocale`, which reloads the page), and "Number format" (`1.234,56` or `1,234.56`) and "Date format" (`DD-MM-YYYY` or `MM-DD-YYYY`) rows that open an `OptionDrawer`. The two format choices live in `usePreferences` (localStorage, shared module-level refs) and are read by `formatCurrency` and `formatDate`; `SettingsRow` got a `pressable` prop for a plain tappable row
+- Month and weekday names follow the language: `dateFnsLocale()` (`lib/utils/date-fns-locale/`) maps the active Paraglide locale to the date-fns one and is passed to `format` for the day headers, month picker, import month groups, period label and the row date badge
+- Not done: the day / month labels in the transaction list ignore the date format preference (only `formatDate` follows it); the `nl` translations are unreviewed
 
 ---
 
@@ -99,8 +101,6 @@ _Last updated: 10-11-2026_
 ---
 
 ## Later phases
-
-Also later: a language switcher in Settings and localised date formatting (see Translations).
 
 | Phase | Focus | Est. time |
 |---|---|---|

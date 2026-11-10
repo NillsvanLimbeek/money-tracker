@@ -2,6 +2,7 @@
 import { addMonths, format } from 'date-fns';
 import { computed } from 'vue';
 import CurrencyAmount from '@/components/currency-amount/CurrencyAmount.vue';
+import { dateFnsLocale } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 interface Props {
@@ -13,7 +14,7 @@ const { income, expense } = defineProps<Props>();
 
 const modelValue = defineModel<Date>({ required: true });
 
-const monthLabel = computed(() => format(modelValue.value, 'MMMM yyyy'));
+const monthLabel = computed(() => format(modelValue.value, 'MMMM yyyy', { locale: dateFnsLocale() }));
 const net = computed(() => income - expense);
 
 function shiftMonth(delta: number): void {

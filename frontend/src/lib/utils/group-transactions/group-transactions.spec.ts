@@ -1,6 +1,7 @@
 import type { Transaction } from '@/lib/types';
 import { format } from 'date-fns';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { overwriteGetLocale } from '@/paraglide/runtime';
 import { groupTransactionsByDay } from './group-transactions';
 
 function transaction(id: string, date: Date, amount: number): Transaction {
@@ -8,6 +9,10 @@ function transaction(id: string, date: Date, amount: number): Transaction {
 }
 
 describe('groupTransactionsByDay', () => {
+  afterEach(() => {
+    overwriteGetLocale(() => 'en');
+  });
+
   it('returns no groups for no transactions', () => {
     expect(groupTransactionsByDay([])).toEqual([]);
   });
@@ -22,6 +27,13 @@ describe('groupTransactionsByDay', () => {
     expect(groups.map(group => group.key)).toEqual(['2020-01-06', '2020-01-05']);
     expect(groups[1]!.total).toBe(-7.5);
     expect(groups[1]!.transactions.map(t => t.id)).toEqual(['c', 'a']);
+  });
+
+  it('labels days in Dutch when the locale is nl', () => {
+    overwriteGetLocale(() => 'nl');
+    const [group] = groupTransactionsByDay([transaction('a', new Date(2026, 0, 5), -10)]);
+
+    expect(group!.label).toBe('maa 5 jan');
   });
 
   it('labels days as EEE d MMM', () => {

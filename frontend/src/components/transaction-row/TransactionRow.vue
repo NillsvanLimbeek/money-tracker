@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { computed, ref } from 'vue';
 import CategoryBadge from '@/components/category-badge/CategoryBadge.vue';
 import CategoryPicker from '@/components/category-picker/CategoryPicker.vue';
-import { formatCurrency, splitNotes } from '@/lib/utils';
+import { formatCurrency, formatLocalised, splitNotes } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 interface Props {
@@ -71,7 +71,7 @@ const amountClass = computed(() => {
           class="text-muted flex w-9 shrink-0 flex-col items-start pt-0.5 font-mono text-xs leading-tight uppercase"
         >
           <p>{{ format(transaction.date, 'dd') }}</p>
-          <p>{{ format(transaction.date, 'MMM') }}</p>
+          <p>{{ formatLocalised(transaction.date, 'MMM') }}</p>
         </div>
 
         <div class="flex min-w-0 flex-1 flex-col items-start gap-2">
