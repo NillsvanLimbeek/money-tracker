@@ -2,13 +2,13 @@
 
 > What's done and what's next. For goals, stack, architecture and data model see `project-overview.md`.
 
-_Last updated: 06-11-2026_
+_Last updated: 10-11-2026_
 
 | Phase | State |
 |---|---|
 | 1. Project setup | Done |
 | 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
-| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend, the rules screen and the add / edit / delete rule flow (forms and drawers) done, the manual-change rule prompt done, rule-based categorisation shown on the review screen done, transactions page search and category filter done; UI strings moved to Paraglide (English and Dutch) |
+| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend, the rules screen and the add / edit / delete rule flow (forms and drawers) done, the manual-change rule prompt done, rule-based categorisation shown on the review screen done, transactions page search and category filter done, suggested rules for the empty rules screen done; UI strings moved to Paraglide (English and Dutch) |
 | 4–7 | Not started |
 
 ---
@@ -53,7 +53,7 @@ _Last updated: 06-11-2026_
   - `routes/category-rules.ts` (behind `requireAuth`): `GET /` (each rule with a `matches` count, computed by running the matcher over the user's descriptions), `POST /`, `PATCH /:id`, `DELETE /:id` (204), `GET /:id/preview` (`{ count }`), `POST /:id/apply` (`{ updated }`). Apply and preview only touch non-manual rows that this rule wins and that aren't already in its category. A duplicate pattern + operator (normalised) is rejected with 409
   - `GET /api/category-rules/preview?pattern&operator` previews an unsaved rule: `{ count, descriptions }`, one entry per distinct description (newest date and amount, `count` of repeats), most frequent first
   - `POST /api/transactions/import` now responds `{ imported, skipped, uncategorised }`: `uncategorised` counts newly stored debits no rule matched (skipped duplicates and income excluded), and `ImportSummary` shows it instead of counting every debit
-  - Not done: the frontend still has its own `RuleOperator` type rather than importing from shared
+  - The frontend now imports `RuleOperator` from `@money-tracker/shared`
 
 - New rule form, opened from "Add rule" on `pages/settings/rules.vue` (the page owns the draft state, the preview query and the create / apply mutations, and shows a toast on success or failure):
   - `RuleForm` (`components/rule-form/`) is a Nuxt UI `UForm` whose fields are generated from `RULE_FIELDS` (`lib/constants/rule-fields.ts`, typed by `RuleFieldConfig` / `RuleDraft`). Its `validate` function blocks an empty or duplicate pattern and a missing category; the short-pattern warning is a separate amber box and does not block saving. Save & apply is the form's submit button, Save validates silently and then emits
