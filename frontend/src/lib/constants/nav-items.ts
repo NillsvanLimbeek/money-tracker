@@ -1,4 +1,4 @@
-import type { NavItem } from '../types';
+import type { NavItem } from '@/lib/types';
 import { m } from '@/paraglide/messages';
 
 export const NAV_ITEMS: NavItem[] = [

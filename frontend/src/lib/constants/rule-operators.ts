@@ -1,4 +1,4 @@
-import type { RuleOperator } from '../types';
+import type { RuleOperator } from '@/lib/types';
 import { m } from '@/paraglide/messages';
 
 export const RULE_OPERATORS: Record<RuleOperator, { label: string }> = {

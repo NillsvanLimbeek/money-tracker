@@ -1,4 +1,4 @@
-import type { CategoryRule } from '../../types';
+import type { CategoryRule } from '@/lib/types';
 import { describe, expect, it } from 'vitest';
 import { groupRulesByCategory } from './group-rules-by-category';
 

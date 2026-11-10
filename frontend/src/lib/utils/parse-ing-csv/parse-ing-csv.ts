@@ -1,4 +1,4 @@
-import type { ImportRow } from '../../types';
+import type { ImportRow } from '@/lib/types';
 import { format, isValid, parse } from 'date-fns';
 import { m } from '@/paraglide/messages';
 

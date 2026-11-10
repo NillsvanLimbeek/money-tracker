@@ -35,5 +35,10 @@
   "summary_net": "Net",
   "month_previous": "Previous month",
   "month_next": "Next month",
-  "day_today": "Today · {day}"
+  "day_today": "Today · {day}",
+  "month_pick": "Choose month",
+  "month_year_previous": "Previous year",
+  "month_year_next": "Next year",
+  "month_legend_imported": "Imported",
+  "month_legend_current": "Current month"
 }

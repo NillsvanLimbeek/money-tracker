@@ -1,5 +1,5 @@
 import { format, parseISO } from 'date-fns';
-import { usePreferences } from '@/lib/composables/use-preferences';
+import { usePreferences } from '@/lib/composables';
 
 const { dateFormat } = usePreferences();
 

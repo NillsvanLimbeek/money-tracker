@@ -1,4 +1,4 @@
-import type { Category, CategoryRule, RuleOperator } from '../../types';
+import type { Category, CategoryRule, RuleOperator } from '@/lib/types';
 import { normalise } from '@money-tracker/shared';
 import { m } from '@/paraglide/messages';
 import { MIN_PATTERN_LENGTH, RULE_OPERATORS } from '../../constants';

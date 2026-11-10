@@ -1,4 +1,4 @@
-import type { CategoryRule, NewCategoryRule, RuleOperator, RulePreview } from '../../types';
+import type { CategoryRule, NewCategoryRule, RuleOperator, RulePreview } from '@/lib/types';
 import { del, get, patch, post } from '../client/fetch';
 
 /**

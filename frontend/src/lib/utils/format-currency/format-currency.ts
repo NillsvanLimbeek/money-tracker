@@ -1,5 +1,5 @@
 import type { NumberFormat } from '@/lib/types';
-import { usePreferences } from '@/lib/composables/use-preferences';
+import { usePreferences } from '@/lib/composables';
 
 const NUMBER_LOCALES: Record<NumberFormat, string> = { nl: 'nl-NL', en: 'en-US' };
 

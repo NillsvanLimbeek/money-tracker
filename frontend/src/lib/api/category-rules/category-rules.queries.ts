@@ -1,6 +1,6 @@
 import type { UseMutationReturnType, UseQueryReturnType } from '@tanstack/vue-query';
 import type { MaybeRefOrGetter } from 'vue';
-import type { CategoryRule, NewCategoryRule, RuleOperator, RulePreview } from '../../types';
+import type { CategoryRule, NewCategoryRule, RuleOperator, RulePreview } from '@/lib/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { toValue } from 'vue';
 import { addSuggestedRules, applyCategoryRule, createCategoryRule, deleteCategoryRule, getCategoryRules, previewCategoryRule, updateCategoryRule } from './category-rules.api';

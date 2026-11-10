@@ -1,5 +1,5 @@
 import type { RemovableRef } from '@vueuse/core';
-import type { DateFormat, NumberFormat } from '../types';
+import type { DateFormat, NumberFormat } from '@/lib/types';
 import { useLocalStorage } from '@vueuse/core';
 
 // Shared module-level refs so plain formatting helpers react to a change on the Settings page.

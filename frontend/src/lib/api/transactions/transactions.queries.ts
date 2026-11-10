@@ -1,9 +1,9 @@
 import type { UseMutationReturnType, UseQueryReturnType } from '@tanstack/vue-query';
 import type { MaybeRefOrGetter } from 'vue';
-import type { ImportRow, ImportSummary, Transaction } from '../../types';
+import type { ImportRow, ImportSummary, Transaction } from '@/lib/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { toValue } from 'vue';
-import { getTransactions, importTransactions, updateTransactionCategory } from './transactions.api';
+import { getImportedMonths, getTransactions, importTransactions, updateTransactionCategory } from './transactions.api';
 
 /**
  * Query for the user's transactions in one month.
@@ -17,6 +17,20 @@ export function useTransactions(month: MaybeRefOrGetter<string>): UseQueryReturn
   return useQuery({
     queryKey: ['transactions', month],
     queryFn: () => getTransactions(toValue(month)),
+  });
+}
+
+/**
+ * Query for the months (`YYYY-MM`) that have imported transactions.
+ *
+ * @returns The TanStack query result for the list of months.
+ * @example
+ * const { data } = useImportedMonths();
+ */
+export function useImportedMonths(): UseQueryReturnType<string[], Error> {
+  return useQuery({
+    queryKey: ['transactions', 'months'],
+    queryFn: getImportedMonths,
   });
 }
 

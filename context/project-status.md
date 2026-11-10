@@ -40,7 +40,7 @@ _Last updated: 10-11-2026_
   - Clicking the row or the chevron in the disclosure column on the far right expands it: the full name wraps (collapsed names truncate) and a "Bank description" box shows `transaction.notes` split by `splitNotes`. The category badge opens the picker without expanding the row
   - `importRowToTransaction` (`lib/utils/`) adapts a parsed `ImportRow` to a `Transaction` (import hash as id, euros, placeholder `income` / `other` category). `Transaction.notes` is optional and nothing fills it on the transactions page yet
   - `TransactionList` groups transactions by day (`groupTransactionsByDay`) and keeps which row's picker is open, so only one is open at a time
-- Transactions page (`pages/index.vue`) now uses real data: `useTransactions(month)` (`GET /api/transactions?month=YYYY-MM`, mapped to `Transaction` in `transactions.api.ts`) feeds the list and the month summary totals, wrapped in `QueryBoundary`. Changing a category calls `PATCH /api/transactions/:id` via `useUpdateTransactionCategory` and refetches. `MOCK_TRANSACTIONS` is gone
+- Transactions page (`pages/index.vue`) now uses real data: `useTransactions(monthKey)` (`GET /api/transactions?month=YYYY-MM`, mapped to `Transaction` in `transactions.api.ts`) feeds the list and the month summary totals, wrapped in `QueryBoundary`. Changing a category calls `PATCH /api/transactions/:id` via `useUpdateTransactionCategory` and refetches. `MOCK_TRANSACTIONS` is gone
 - The import route's placeholder categories are now the lowercase keys `income` / `other` so they match `CATEGORIES`, and the local database has no leftover `Income` / `Other` rows
 - Conditional classes in templates use object syntax or a computed instead of ternaries
 
@@ -74,6 +74,18 @@ _Last updated: 10-11-2026_
   - The search input shows a trailing cross icon (`transactions_search_clear` aria label) while it has text, which empties it
   - `TransactionList` renders each day as its own rounded card with a `gap-4` between days instead of one shared card
   - Sticky header fix: the app wrapper in `App.vue` is `min-h-screen` rather than `h-screen`. A sticky element only stays pinned inside its parent, and a fixed one-screen parent let the header scroll away on long lists
+
+- Month picker, shared by the transactions and Insights pages (step 1 of the Insights page, which is otherwise still the header and picker only):
+  - `MonthPicker` (`components/month-picker/`) is the prev / month label with chevron / next row. The side buttons are a fixed `size-12` so they stay square next to the taller label button; the label emits `open`
+  - `MonthPickerDrawer` (`components/month-picker-drawer/`) is the "Choose month" bottom sheet: year stepper (next disabled on the current year), 3×4 month grid, a dot on imported months, an outline on the current month, future months disabled. Selecting a month closes the sheet. The dot is absolutely positioned so the label stays centred in the button
+  - `GET /api/transactions/months` lists the `YYYY-MM` months the user has transactions in (`useImportedMonths` on the frontend, `getImportedMonths` in `transactions.api.ts`) and feeds the dots
+  - `useDateStore` (`stores/date.ts`, Pinia) holds `selectedMonth` (first of the current month) and a `monthKey` getter (`yyyy-MM`). Both pages bind to it through `storeToRefs`, so the chosen month carries across pages. It is not persisted, so a reload goes back to the current month. The unused `stores/counter.ts` is gone
+  - `MonthSummary` is now only the In / Out / Net card; the month navigation moved out into `MonthPicker`, which `pages/index.vue` renders above it
+  - The "N transactions" count that was briefly in the Insights header is removed, along with its message and the page's transactions query
+- `useMonthTotals(transactions)` (`lib/composables/use-month-totals/`) returns `{ income, expense }` computeds (expense as a positive number). `pages/index.vue` uses it, and Insights will for its summary card
+- Composables live in folders with a spec each (`use-month-totals/`, `use-preferences/`) and are imported from the `@/lib/composables` barrel. `use-preferences.spec.ts` covers defaults, restoring and saving to `localStorage`, and the shared refs
+- Test setup: `vitest.setup.ts` installs an in-memory `localStorage` (`src/test/create-storage.ts`), because Node's `--localstorage-file` flag leaves the jsdom one without `getItem`. It is defined directly rather than with `vi.stubGlobal`, so a spec's own `vi.stubGlobal` / `unstubAllGlobals` falls back to it
+- Type imports use the `@/lib/types` alias everywhere instead of relative `../types` paths
 
 ---
 

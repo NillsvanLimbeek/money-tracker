@@ -35,5 +35,10 @@
   "summary_net": "Saldo",
   "month_previous": "Vorige maand",
   "month_next": "Volgende maand",
-  "day_today": "Vandaag · {day}"
+  "day_today": "Vandaag · {day}",
+  "month_pick": "Kies maand",
+  "month_year_previous": "Vorig jaar",
+  "month_year_next": "Volgend jaar",
+  "month_legend_imported": "Geïmporteerd",
+  "month_legend_current": "Huidige maand"
 }

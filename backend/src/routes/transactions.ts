@@ -1,6 +1,6 @@
 import type { AppEnv } from '../bindings';
 import { matchCategory } from '@money-tracker/shared';
-import { and, asc, desc, eq, gte, lt, lte } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, lt, lte, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { IMPORT_CHUNK_SIZE } from '../constants';
 import { createDb } from '../db';
@@ -32,6 +32,25 @@ transactionRoutes.get('/', validate('query', listQuerySchema), async (c) => {
     .orderBy(desc(transactions.date), asc(transactions.id));
 
   return c.json(rows);
+});
+
+/**
+ * Lists the months (`YYYY-MM`) in which the user has at least one transaction, oldest first.
+ *
+ * Lets the month picker mark which months have imported data.
+ */
+transactionRoutes.get('/months', async (c) => {
+  const userId = c.get('userId');
+  const db = createDb(c.env.DB);
+  const month = sql<string>`substr(${transactions.date}, 1, 7)`;
+
+  const rows = await db
+    .selectDistinct({ month })
+    .from(transactions)
+    .where(eq(transactions.userId, userId))
+    .orderBy(month);
+
+  return c.json(rows.map(row => row.month));
 });
 
 /**

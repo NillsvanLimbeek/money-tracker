@@ -1,19 +1,31 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { ref } from 'vue';
+import MonthPickerDrawer from '@/components/month-picker-drawer/MonthPickerDrawer.vue';
+import MonthPicker from '@/components/month-picker/MonthPicker.vue';
+import { useImportedMonths } from '@/lib/api/transactions/transactions.queries';
 import { m } from '@/paraglide/messages';
+import { useDateStore } from '@/stores/date';
+
+const { selectedMonth } = storeToRefs(useDateStore());
+const isMonthPickerOpen = ref(false);
+
+const importedMonthsQuery = useImportedMonths();
 </script>
 
 <template>
   <PageHeader :title="m.insights_title()" />
 
-  <div class="text-muted flex flex-col items-center justify-center gap-2 p-4 pt-24 text-center">
-    <UIcon
-      name="i-lucide-bar-chart-3"
-      class="size-10"
-    />
-    <p class="text-sm">
-      {{ m.insights_coming_soon() }}
-    </p>
-  </div>
+  <MonthPicker
+    v-model="selectedMonth"
+    @open="isMonthPickerOpen = true"
+  />
+
+  <MonthPickerDrawer
+    v-model="selectedMonth"
+    v-model:open="isMonthPickerOpen"
+    :imported-months="importedMonthsQuery.data.value ?? []"
+  />
 
   <div class="h-28" />
 </template>

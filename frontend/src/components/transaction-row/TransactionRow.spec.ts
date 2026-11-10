@@ -2,7 +2,7 @@ import type { VueWrapper } from '@vue/test-utils';
 import type { Transaction } from '@/lib/types';
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { usePreferences } from '@/lib/composables/use-preferences';
+import { usePreferences } from '@/lib/composables';
 import CategoryBadge from '../category-badge/CategoryBadge.vue';
 import CategoryPicker from '../category-picker/CategoryPicker.vue';
 import TransactionRow from './TransactionRow.vue';

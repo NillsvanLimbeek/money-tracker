@@ -48,6 +48,23 @@ describe('transaction routes', () => {
     });
   });
 
+  describe('get /months', () => {
+    it('lists the distinct months with transactions for the user, oldest first', async () => {
+      await seedTransaction({ id: 'a', userId: 'alice', date: '2026-10-31' });
+      await seedTransaction({ id: 'b', userId: 'alice', date: '2026-10-01' });
+      await seedTransaction({ id: 'c', userId: 'alice', date: '2026-02-15' });
+      await seedTransaction({ id: 'theirs', userId: 'bob', date: '2026-05-01' });
+
+      const res = await asAlice('/months');
+
+      expect(await res.json()).toEqual(['2026-02', '2026-10']);
+    });
+
+    it('returns an empty list when there are no transactions', async () => {
+      expect(await (await asAlice('/months')).json()).toEqual([]);
+    });
+  });
+
   describe('get /hashes', () => {
     it('returns the user\'s import hashes within the inclusive date range', async () => {
       await seedTransaction({ id: 'before', userId: 'alice', date: '2026-01-09' });

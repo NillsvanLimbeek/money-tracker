@@ -17,6 +17,10 @@ export interface ApiGetRoutes {
     query: { pattern: string; operator: RuleOperator };
     response: RulePreview;
   };
+  '/api/transactions/months': {
+    query?: undefined;
+    response: string[];
+  };
   '/api/transactions/hashes': {
     query: { from: string; to: string };
     response: string[];

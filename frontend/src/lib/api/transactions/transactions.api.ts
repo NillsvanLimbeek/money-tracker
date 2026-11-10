@@ -1,4 +1,4 @@
-import type { ApiTransaction, ImportRow, ImportSummary, Transaction } from '../../types';
+import type { ApiTransaction, ImportRow, ImportSummary, Transaction } from '@/lib/types';
 import { parseISO } from 'date-fns';
 import { get, patch, post } from '../client/fetch';
 
@@ -60,4 +60,15 @@ export async function importTransactions(rows: ImportRow[]): Promise<ImportSumma
  */
 export async function getImportedHashes(from: string, to: string): Promise<string[]> {
   return await get('/api/transactions/hashes', { from, to });
+}
+
+/**
+ * Fetches the months in which the user has imported transactions.
+ *
+ * @returns The months as `YYYY-MM`, oldest first.
+ * @example
+ * const months = await getImportedMonths(); // ['2026-09', '2026-10']
+ */
+export async function getImportedMonths(): Promise<string[]> {
+  return await get('/api/transactions/months');
 }

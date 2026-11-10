@@ -1,4 +1,4 @@
-import type { Category } from '../types';
+import type { Category } from '@/lib/types';
 import { m } from '@/paraglide/messages';
 
 export const CATEGORIES: Category[] = [

@@ -1,4 +1,4 @@
-import type { Category, CategoryRule } from '../../types';
+import type { Category, CategoryRule } from '@/lib/types';
 
 export interface RuleGroup {
   category: Category;

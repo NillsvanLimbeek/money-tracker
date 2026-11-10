@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { usePreferences } from '@/lib/composables/use-preferences';
+import { usePreferences } from '@/lib/composables';
 import { formatCurrency } from './format-currency';
 
 describe('formatCurrency', () => {

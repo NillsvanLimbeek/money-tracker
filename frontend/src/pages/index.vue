@@ -1,32 +1,27 @@
 <script setup lang="ts">
-import { format } from 'date-fns';
+import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import CategoryDrawer from '@/components/category-drawer/CategoryDrawer.vue';
-import MonthSummary from '@/components/month-summary/MonthSummary.vue';
-import QueryBoundary from '@/components/query-boundary/QueryBoundary.vue';
-import RulePromptDrawer from '@/components/rule-prompt-drawer/RulePromptDrawer.vue';
-import TransactionList from '@/components/transaction-list/TransactionList.vue';
 import { useApplyCategoryRule, useCategoryRules, useCreateCategoryRule, useRulePreview } from '@/lib/api/category-rules/category-rules.queries';
-import { useTransactions, useUpdateTransactionCategory } from '@/lib/api/transactions/transactions.queries';
+import { useImportedMonths, useTransactions, useUpdateTransactionCategory } from '@/lib/api/transactions/transactions.queries';
+import { useMonthTotals } from '@/lib/composables';
 import { CATEGORIES } from '@/lib/constants';
 import { categoryIsSelected, filterTransactions } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
+import { useDateStore } from '@/stores/date';
 
-const now = new Date();
-const selectedMonth = ref(new Date(now.getFullYear(), now.getMonth(), 1));
+const dateStore = useDateStore();
+const { selectedMonth, monthKey } = storeToRefs(dateStore);
 
-const transactionsQuery = useTransactions(() => format(selectedMonth.value, 'yyyy-MM'));
+const isMonthPickerOpen = ref(false);
+const importedMonthsQuery = useImportedMonths();
+
+const transactionsQuery = useTransactions(monthKey);
 const { mutate: updateCategory } = useUpdateTransactionCategory();
 
 const transactions = computed(() => transactionsQuery.data.value ?? []);
 
-const income = computed(() => transactions.value
-  .filter(t => t.amount > 0)
-  .reduce((sum, t) => sum + t.amount, 0));
-const expense = computed(() => transactions.value
-  .filter(t => t.amount < 0)
-  .reduce((sum, t) => sum - t.amount, 0));
+const { income, expense } = useMonthTotals(transactions);
 
 const toast = useToast();
 const rulesQuery = useCategoryRules();
@@ -154,8 +149,19 @@ function resetCategories(): void {
     />
   </div>
 
-  <MonthSummary
+  <MonthPicker
     v-model="selectedMonth"
+    class="mt-4 mb-2"
+    @open="isMonthPickerOpen = true"
+  />
+
+  <MonthPickerDrawer
+    v-model="selectedMonth"
+    v-model:open="isMonthPickerOpen"
+    :imported-months="importedMonthsQuery.data.value ?? []"
+  />
+
+  <MonthSummary
     :income="income"
     :expense="expense"
   />

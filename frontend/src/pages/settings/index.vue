@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useCategoryRules } from '@/lib/api/category-rules/category-rules.queries';
-import { usePreferences } from '@/lib/composables/use-preferences';
+import { usePreferences } from '@/lib/composables';
 import { DATE_FORMAT_OPTIONS, LANGUAGE_OPTIONS, NUMBER_FORMAT_OPTIONS } from '@/lib/constants';
 import { m } from '@/paraglide/messages';
 import { getLocale, setLocale } from '@/paraglide/runtime';

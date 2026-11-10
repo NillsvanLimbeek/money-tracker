@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { usePreferences } from '@/lib/composables/use-preferences';
+import { usePreferences } from '@/lib/composables';
 import { overwriteGetLocale } from '@/paraglide/runtime';
 import { dayLabel } from './day-label';
 
