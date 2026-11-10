@@ -6,7 +6,7 @@ import { createDb } from '../db';
 import { categoryRules, transactions } from '../db/schema';
 import { validate } from '../middleware/validate';
 import { createRuleBodySchema, previewRuleQuerySchema, updateRuleBodySchema } from '../schemas';
-import { findChangedIds, isDuplicate, loadDescriptions, loadRules, previewRuleMatches, toApiRule } from '../utils';
+import { addSuggestedRules, findChangedIds, isDuplicate, loadDescriptions, loadRules, previewRuleMatches, toApiRule } from '../utils';
 
 const categoryRuleRoutes = new Hono<AppEnv>();
 
@@ -57,6 +57,16 @@ categoryRuleRoutes.post('/', validate('json', createRuleBodySchema), async (c) =
     .returning();
 
   return c.json(toApiRule(created!, await loadDescriptions(db, userId)), 201);
+});
+
+/**
+ * Adds the suggested starter rules the user doesn't have yet and applies them.
+ *
+ * Responds with 201 and `{ created, updated }`: the number of new rules and the
+ * number of existing transactions they recategorised.
+ */
+categoryRuleRoutes.post('/suggested', async (c) => {
+  return c.json(await addSuggestedRules(createDb(c.env.DB), c.get('userId')), 201);
 });
 
 /**

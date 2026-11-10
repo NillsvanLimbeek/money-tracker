@@ -14,9 +14,19 @@ describe('rulesEmptyState', () => {
   it('emits add from the call to action', async () => {
     const wrapper = mount(RulesEmptyState, { global: { stubs } });
 
-    await wrapper.find('button').trigger('click');
+    await wrapper.findAll('button')[0]!.trigger('click');
 
     expect(wrapper.text()).toContain('Add your first rule');
     expect(wrapper.emitted('add')).toHaveLength(1);
+  });
+
+  it('emits suggest from the suggested rules button', async () => {
+    const wrapper = mount(RulesEmptyState, { global: { stubs } });
+
+    await wrapper.findAll('button')[1]!.trigger('click');
+
+    expect(wrapper.text()).toContain('Add suggested rules');
+    expect(wrapper.emitted('suggest')).toHaveLength(1);
+    expect(wrapper.emitted('add')).toBeUndefined();
   });
 });

@@ -5,6 +5,10 @@ export interface ApiPostRoutes {
     body: NewCategoryRule;
     response: CategoryRule;
   };
+  '/api/category-rules/suggested': {
+    body: undefined;
+    response: { created: number; updated: number };
+  };
   [route: `/api/category-rules/${string}/apply`]: {
     body: undefined;
     response: { updated: number };

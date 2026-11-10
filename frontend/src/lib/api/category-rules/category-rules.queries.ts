@@ -3,7 +3,7 @@ import type { MaybeRefOrGetter } from 'vue';
 import type { CategoryRule, NewCategoryRule, RuleOperator, RulePreview } from '../../types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { toValue } from 'vue';
-import { applyCategoryRule, createCategoryRule, deleteCategoryRule, getCategoryRules, previewCategoryRule, updateCategoryRule } from './category-rules.api';
+import { addSuggestedRules, applyCategoryRule, createCategoryRule, deleteCategoryRule, getCategoryRules, previewCategoryRule, updateCategoryRule } from './category-rules.api';
 
 /**
  * Query for the user's category rules.
@@ -105,5 +105,25 @@ export function useRulePreview(pattern: MaybeRefOrGetter<string>, operator: Mayb
     queryFn: () => previewCategoryRule(toValue(pattern).trim(), toValue(operator)),
     enabled: () => toValue(pattern).trim() !== '',
     placeholderData: previous => previous,
+  });
+}
+
+/**
+ * Mutation that adds the suggested starter rules and refreshes the cached rules and transactions.
+ *
+ * @returns The TanStack mutation for adding the suggested rules.
+ * @example
+ * const { mutateAsync } = useAddSuggestedRules();
+ * const { created, updated } = await mutateAsync();
+ */
+export function useAddSuggestedRules(): UseMutationReturnType<{ created: number; updated: number }, Error, void, unknown> {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => addSuggestedRules(),
+    onSuccess: () => Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['category-rules'] }),
+      queryClient.invalidateQueries({ queryKey: ['transactions'] }),
+    ]),
   });
 }

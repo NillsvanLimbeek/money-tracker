@@ -37,6 +37,10 @@
   "rules_empty_title": "Nog geen regels",
   "rules_empty_body": "Regels sorteren je imports voor je. Begin met een winkel die je elke maand ziet.",
   "rules_empty_add": "Voeg je eerste regel toe",
+  "rules_empty_suggested": "Voeg voorgestelde regels toe",
+  "rules_suggested_added": "Voorgestelde regels toegevoegd",
+  "rules_suggested_none": "Je hebt alle voorgestelde regels al",
+  "rules_suggested_failed": "Kon de voorgestelde regels niet toevoegen",
   "rule_group_summary": "{rules} · {matches} gecategoriseerd",
   "rule_count": [
     {

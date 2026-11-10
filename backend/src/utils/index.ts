@@ -1,3 +1,4 @@
+export * from './add-suggested-rules/add-suggested-rules';
 export * from './category-rule-row/category-rule-row';
 export * from './find-changed-ids/find-changed-ids';
 export * from './is-duplicate/is-duplicate';

@@ -37,6 +37,10 @@
   "rules_empty_title": "No rules yet",
   "rules_empty_body": "Rules sort imports for you. Start with a merchant you see every month.",
   "rules_empty_add": "Add your first rule",
+  "rules_empty_suggested": "Add suggested rules",
+  "rules_suggested_added": "Suggested rules added",
+  "rules_suggested_none": "You already have all the suggested rules",
+  "rules_suggested_failed": "Could not add the suggested rules",
   "rule_group_summary": "{rules} · {matches} categorised",
   "rule_count": [
     {

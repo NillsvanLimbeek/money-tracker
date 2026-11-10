@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CategoryRule, RuleOperator } from '@/lib/types';
 import { computed, ref } from 'vue';
-import { useApplyCategoryRule, useCategoryRules, useCreateCategoryRule, useDeleteCategoryRule, useRulePreview, useUpdateCategoryRule } from '@/lib/api/category-rules/category-rules.queries';
+import { useAddSuggestedRules, useApplyCategoryRule, useCategoryRules, useCreateCategoryRule, useDeleteCategoryRule, useRulePreview, useUpdateCategoryRule } from '@/lib/api/category-rules/category-rules.queries';
 import { CATEGORIES } from '@/lib/constants';
 import { groupRulesByCategory } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
@@ -11,6 +11,7 @@ const { mutate: deleteRule } = useDeleteCategoryRule();
 const { mutateAsync: createRule } = useCreateCategoryRule();
 const { mutateAsync: updateRule } = useUpdateCategoryRule();
 const { mutateAsync: applyRule } = useApplyCategoryRule();
+const { mutateAsync: addSuggested, isPending: isAddingSuggested } = useAddSuggestedRules();
 const toast = useToast();
 
 const isFormOpen = ref(false);
@@ -59,6 +60,19 @@ function editExistingRule(id: string): void {
 
   if (rule)
     editRule(rule);
+}
+
+async function addSuggestedRules(): Promise<void> {
+  try {
+    const { created, updated } = await addSuggested();
+
+    toast.add(created === 0
+      ? { title: m.rules_suggested_none() }
+      : { title: m.rules_suggested_added(), description: updated === 0 ? undefined : m.transactions_updated({ count: updated }) });
+  }
+  catch {
+    toast.add({ title: m.rules_suggested_failed(), description: m.common_try_again(), color: 'error' });
+  }
 }
 
 async function saveRule(shouldApply: boolean): Promise<void> {
@@ -114,7 +128,9 @@ async function saveRule(shouldApply: boolean): Promise<void> {
   <QueryBoundary :query="rulesQuery">
     <RulesEmptyState
       v-if="rules.length === 0"
+      :suggest-pending="isAddingSuggested"
       @add="addRule"
+      @suggest="addSuggestedRules"
     />
 
     <div

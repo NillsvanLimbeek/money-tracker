@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { m } from '@/paraglide/messages';
 
-const emit = defineEmits<{ (e: 'add'): void }>();
+defineProps<{ suggestPending?: boolean }>();
+
+const emit = defineEmits<{ (e: 'add' | 'suggest'): void }>();
 </script>
 
 <template>
@@ -28,6 +30,18 @@ const emit = defineEmits<{ (e: 'add'): void }>();
       @click="emit('add')"
     >
       {{ m.rules_empty_add() }}
+    </UButton>
+
+    <UButton
+      block
+      size="xl"
+      variant="soft"
+      icon="i-lucide-sparkles"
+      class="justify-center rounded-2xl py-4"
+      :loading="suggestPending"
+      @click="emit('suggest')"
+    >
+      {{ m.rules_empty_suggested() }}
     </UButton>
   </div>
 </template>

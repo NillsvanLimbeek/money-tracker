@@ -94,6 +94,7 @@ _Last updated: 06-11-2026_
    0. Done — the category filter on `pages/index.vue` is driven by the URL (`?category=food,other`, unknown keys ignored, changes use `router.replace`); the summary's "Uncategorised" row links to `/?category=other`. The month isn't in the URL, so rows imported into past months still need the month picked by hand
    1. Rules UI: done — the list screen, the add and edit forms (with apply on save), the actions / delete drawers and the "Edit existing rule" link on the duplicate error are built
    2. Done — the review screen previews each row's category: `pages/import.vue` loads the rules (`useCategoryRules`) and passes them to `ImportReview`, which calls `importRowToTransaction(row, rules)`; that runs the shared `matchCategory` (list order stands in for `createdAt` in the tie-break) and falls back to `income` / `other`
+   3. Done — suggested rules: the empty rules screen has an "Add suggested rules" button. `POST /api/category-rules/suggested` (`utils/add-suggested-rules/`) inserts the starter list from `backend/src/constants/suggested-rules.ts` (common Dutch merchants), skips any the user already has (same pattern and operator), then recategorises existing non-manual transactions the new rules win, returning `{ created, updated }`. The frontend calls it through `useAddSuggestedRules`
 
 ---
 

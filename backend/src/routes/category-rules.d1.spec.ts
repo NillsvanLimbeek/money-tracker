@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { SUGGESTED_RULES } from '../constants';
 import { categoryRules, transactions } from '../db/schema';
 import { db, jsonInit, requestAs, resetDb, seedTransaction, seedUser } from '../test/d1';
 import { createRule } from '../utils/category-rule-row/category-rule-row.fixture';
@@ -92,6 +93,79 @@ describe('category rule routes', () => {
       const res = await asAlice('/', jsonInit('POST', { ...body, operator: 'regex' }));
 
       expect(res.status).toBe(400);
+    });
+  });
+
+  describe('post /suggested', () => {
+    it('creates the suggested rules for the user and recategorises matching transactions', async () => {
+      await seedTransaction({ id: 't1', userId: 'alice', description: 'Albert Heijn 1', category: 'other' });
+      await seedTransaction({ id: 't2', userId: 'alice', description: 'Unknown shop', category: 'other' });
+      await seedTransaction({ id: 't3', userId: 'bob', description: 'Albert Heijn 2', category: 'other' });
+
+      const res = await asAlice('/suggested', { method: 'POST' });
+      const { created, updated } = await res.json() as { created: number; updated: number };
+
+      expect(res.status).toBe(201);
+      expect(created).toBe(SUGGESTED_RULES.length);
+      expect(updated).toBe(1);
+      expect(await db.select().from(categoryRules).where(eq(categoryRules.userId, 'alice'))).toHaveLength(SUGGESTED_RULES.length);
+      expect(await db.select().from(categoryRules).where(eq(categoryRules.userId, 'bob'))).toHaveLength(0);
+
+      const rows = await db.select().from(transactions).orderBy(transactions.id);
+      expect(rows[0]).toMatchObject({ category: 'food', categorySource: 'rule' });
+      expect(rows[1]).toMatchObject({ category: 'other', categorySource: 'default' });
+      expect(rows[2]).toMatchObject({ category: 'other', categorySource: 'default' });
+    });
+
+    it('skips suggestions the user already has, ignoring case and spacing', async () => {
+      await seedRule({ id: 'mine', pattern: '  ALBERT  Heijn ', category: 'shopping' });
+      await seedTransaction({ id: 't1', userId: 'alice', description: 'Albert Heijn 1', category: 'shopping', categorySource: 'rule' });
+
+      const res = await asAlice('/suggested', { method: 'POST' });
+
+      expect(await res.json()).toEqual({ created: SUGGESTED_RULES.length - 1, updated: 0 });
+      const [row] = await db.select().from(transactions);
+      expect(row).toMatchObject({ category: 'shopping', categorySource: 'rule' });
+    });
+
+    it('adds nothing the second time', async () => {
+      await asAlice('/suggested', { method: 'POST' });
+
+      const res = await asAlice('/suggested', { method: 'POST' });
+
+      expect(await res.json()).toEqual({ created: 0, updated: 0 });
+      expect(await db.select().from(categoryRules)).toHaveLength(SUGGESTED_RULES.length);
+    });
+
+    it('never touches manually categorised transactions', async () => {
+      await seedTransaction({ id: 't1', userId: 'alice', description: 'Albert Heijn 1', category: 'gifts', categorySource: 'manual' });
+
+      const res = await asAlice('/suggested', { method: 'POST' });
+
+      expect(await res.json()).toMatchObject({ updated: 0 });
+      const [row] = await db.select().from(transactions);
+      expect(row).toMatchObject({ category: 'gifts', categorySource: 'manual' });
+    });
+
+    it('leaves transactions an existing, more specific rule wins', async () => {
+      await seedRule({ id: 'mine', pattern: 'albert heijn 1', operator: 'equals', category: 'shopping' });
+      await seedTransaction({ id: 't1', userId: 'alice', description: 'Albert Heijn 1', category: 'shopping', categorySource: 'rule' });
+
+      const res = await asAlice('/suggested', { method: 'POST' });
+
+      expect(await res.json()).toMatchObject({ updated: 0 });
+      const [row] = await db.select().from(transactions);
+      expect(row!.category).toBe('shopping');
+    });
+
+    it('updates more transactions than fit in one statement', async () => {
+      for (let i = 0; i < 200; i++)
+        await seedTransaction({ id: `t${i}`, userId: 'alice', description: 'Albert Heijn', category: 'other' });
+
+      const res = await asAlice('/suggested', { method: 'POST' });
+
+      expect(await res.json()).toMatchObject({ updated: 200 });
+      expect(await db.select().from(transactions).where(eq(transactions.category, 'food'))).toHaveLength(200);
     });
   });
 

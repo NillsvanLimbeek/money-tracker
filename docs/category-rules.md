@@ -88,7 +88,7 @@ All routes behind `requireAuth`, filtered by `userId`, validated with zod.
 
 ## Open questions
 
-- Default rules: seed a starter set per user at sign-up, or a built-in fallback in code?
+- ~~Default rules~~ — decided: an opt-in "Add suggested rules" button on the empty rules screen (`POST /api/category-rules/suggested`), not seeded at sign-up and not a hidden fallback
 - Should a rule be able to match on the bank notes (`Mededelingen`)? That needs `notes` persisted first (Next up #3).
 - Debit-only / credit-only rules, so a shop refund doesn't become Food?
 - Duplicate rules (same pattern + operator): reject or allow?

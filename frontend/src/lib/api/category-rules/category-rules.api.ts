@@ -72,3 +72,14 @@ export async function applyCategoryRule(id: string): Promise<{ updated: number }
 export async function previewCategoryRule(pattern: string, operator: RuleOperator): Promise<RulePreview> {
   return await get('/api/category-rules/preview', { pattern, operator });
 }
+
+/**
+ * Adds the suggested starter rules the user doesn't have yet and applies them to existing transactions.
+ *
+ * @returns How many rules were created and how many transactions changed category.
+ * @example
+ * const { created, updated } = await addSuggestedRules();
+ */
+export async function addSuggestedRules(): Promise<{ created: number; updated: number }> {
+  return await post('/api/category-rules/suggested', undefined);
+}
