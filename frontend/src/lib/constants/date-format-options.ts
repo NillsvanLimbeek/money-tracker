@@ -1,4 +1,4 @@
-import type { DateFormat } from '../composables/use-preferences';
+import type { DateFormat } from '../types';
 
 export const DATE_FORMAT_OPTIONS: { value: DateFormat; label: string }[] = [
   { value: 'dd-MM-yyyy', label: 'DD-MM-YYYY' },

@@ -2,6 +2,7 @@ import type { VueWrapper } from '@vue/test-utils';
 import type { Transaction } from '@/lib/types';
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
+import { usePreferences } from '@/lib/composables/use-preferences';
 import CategoryBadge from '../category-badge/CategoryBadge.vue';
 import CategoryPicker from '../category-picker/CategoryPicker.vue';
 import TransactionRow from './TransactionRow.vue';
@@ -40,6 +41,14 @@ describe('transactionRow', () => {
     expect(text).toContain('Albert Heijn');
     expect(text).toContain('−€43,20');
     expect(text).toContain('Food');
+  });
+
+  it('shows the month above the day when the date format puts the month first', () => {
+    usePreferences().dateFormat.value = 'MM-dd-yyyy';
+    const parts = mountRow().find('.font-mono.uppercase').findAll('p').map(item => item.text());
+    usePreferences().dateFormat.value = 'dd-MM-yyyy';
+
+    expect(parts).toEqual(['Oct', '16']);
   });
 
   it('drops the date and hides the badge until expanded when grouped', async () => {

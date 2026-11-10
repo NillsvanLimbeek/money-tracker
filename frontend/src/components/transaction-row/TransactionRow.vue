@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { computed, ref } from 'vue';
 import CategoryBadge from '@/components/category-badge/CategoryBadge.vue';
 import CategoryPicker from '@/components/category-picker/CategoryPicker.vue';
-import { formatCurrency, formatLocalised, splitNotes } from '@/lib/utils';
+import { formatCurrency, formatLocalised, isMonthFirst, splitNotes } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 interface Props {
@@ -32,6 +32,12 @@ const expanded = ref(false);
 
 const categoryLabel = computed(() =>
   categories.find(category => category.key === transaction.categoryKey)?.label ?? transaction.categoryKey);
+// Day over month, or month over day when the date format preference puts the month first.
+const badgeParts = computed(() => {
+  const day = format(transaction.date, 'dd');
+  const month = formatLocalised(transaction.date, 'MMM');
+  return isMonthFirst() ? [month, day] : [day, month];
+});
 const noteLines = computed(() => (transaction.notes ? splitNotes(transaction.notes) : []));
 const amountClass = computed(() => {
   if (duplicate)
@@ -70,8 +76,8 @@ const amountClass = computed(() => {
           v-else
           class="text-muted flex w-9 shrink-0 flex-col items-start pt-0.5 font-mono text-xs leading-tight uppercase"
         >
-          <p>{{ format(transaction.date, 'dd') }}</p>
-          <p>{{ formatLocalised(transaction.date, 'MMM') }}</p>
+          <p>{{ badgeParts[0] }}</p>
+          <p>{{ badgeParts[1] }}</p>
         </div>
 
         <div class="flex min-w-0 flex-1 flex-col items-start gap-2">

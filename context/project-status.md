@@ -8,7 +8,7 @@ _Last updated: 10-11-2026_
 |---|---|
 | 1. Project setup | Done |
 | 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
-| 3. CSV import pipeline | In progress — schema, migrations, auth middleware, transactions routes, frontend parser and import screen (file picker → review → summary) done, including expandable review rows with bank notes and a results screen, and the transactions page reads real data; category rules backend, the rules screen and the add / edit / delete rule flow (forms and drawers) done, the manual-change rule prompt done, rule-based categorisation shown on the review screen done, transactions page search and category filter done, suggested rules for the empty rules screen done; UI strings moved to Paraglide (English and Dutch) |
+| 3. CSV import pipeline | Done — schema, migrations, auth, transactions routes, ING CSV parser, import flow (file → review → summary), category rules (backend, rules screen, add / edit / delete, create-rule prompt, rule-based categorisation on the review screen, suggested rules), transactions page search and category filter, Paraglide translations (English and Dutch), and Settings language, number format and date format options |
 | 4–7 | Not started |
 
 ---
@@ -86,14 +86,23 @@ _Last updated: 10-11-2026_
 - Everything user-facing is translated: components, pages, category / operator / nav labels, form fields, zod messages, rule validation messages, CSV parse errors and the "Today ·" day label. Constants and zod schemas read the locale once at startup, so changing language needs a page reload (`setLocale` reloads by default)
 - Settings has a "Language & region" section (`pages/settings/index.vue`): an EN / NL `SegmentedControl` (calls `setLocale`, which reloads the page), and "Number format" (`1.234,56` or `1,234.56`) and "Date format" (`DD-MM-YYYY` or `MM-DD-YYYY`) rows that open an `OptionDrawer`. The two format choices live in `usePreferences` (localStorage, shared module-level refs) and are read by `formatCurrency` and `formatDate`; `SettingsRow` got a `pressable` prop for a plain tappable row
 - Month and weekday names follow the language: `dateFnsLocale()` (`lib/utils/date-fns-locale/`) maps the active Paraglide locale to the date-fns one and is passed to `format` for the day headers, month picker, import month groups, period label and the row date badge
-- Not done: the day / month labels in the transaction list ignore the date format preference (only `formatDate` follows it); the `nl` translations are unreviewed
+- The date format preference also orders the day header (`Mon 5 Jan` or `Mon Jan 5`, via `dayLabel`) and the row date badge (day over month, or month over day); `isMonthFirst()` in `format-date.ts` is the switch
+- Not done: the `nl` translations are unreviewed
 
 ---
 
-## Next up
+## Known gaps
+
+- The `nl` translations are unreviewed
+- Changing the language reloads the page, because messages are read once at startup
+- `README.md` is still the Vite template and `frontend/e2e/vue.spec.ts` is the default scaffold
+
+---
+
+## Phase 3 plan (completed)
 
 1. Finish rule-based categorisation (import already applies the user's rules; the placeholder `income` / `other` is only the fallback). Design is in `docs/category-rules.md`; steps:
-   0. Done — the category filter on `pages/index.vue` is driven by the URL (`?category=food,other`, unknown keys ignored, changes use `router.replace`); the summary's "Uncategorised" row links to `/?category=other`. The month isn't in the URL, so rows imported into past months still need the month picked by hand
+   0. Done — the category filter on `pages/index.vue` is driven by the URL (`?category=food,other`, unknown keys ignored, changes use `router.replace`); the summary's "Uncategorised" row links to `/?category=other`
    1. Rules UI: done — the list screen, the add and edit forms (with apply on save), the actions / delete drawers and the "Edit existing rule" link on the duplicate error are built
    2. Done — the review screen previews each row's category: `pages/import.vue` loads the rules (`useCategoryRules`) and passes them to `ImportReview`, which calls `importRowToTransaction(row, rules)`; that runs the shared `matchCategory` (list order stands in for `createdAt` in the tie-break) and falls back to `income` / `other`
    3. Done — suggested rules: the empty rules screen has an "Add suggested rules" button. `POST /api/category-rules/suggested` (`utils/add-suggested-rules/`) inserts the starter list from `backend/src/constants/suggested-rules.ts` (common Dutch merchants), skips any the user already has (same pattern and operator), then recategorises existing non-manual transactions the new rules win, returning `{ created, updated }`. The frontend calls it through `useAddSuggestedRules`

@@ -1,4 +1,4 @@
-import type { NumberFormat } from '@/lib/composables/use-preferences';
+import type { NumberFormat } from '@/lib/types';
 import { usePreferences } from '@/lib/composables/use-preferences';
 
 const NUMBER_LOCALES: Record<NumberFormat, string> = { nl: 'nl-NL', en: 'en-US' };
