@@ -1,5 +1,5 @@
-import type { SignIn } from '../models/sign-in';
-import type { FormFieldConfig } from '@/lib/types';
+import type { SignIn } from '@/features/auth/models/sign-in';
+import type { FormFieldConfig } from '@/features/auth/types';
 import { m } from '@/paraglide/messages';
 
 export const SIGN_IN_FIELDS: FormFieldConfig<SignIn>[] = [

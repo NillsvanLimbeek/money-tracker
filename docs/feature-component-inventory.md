@@ -14,7 +14,7 @@ Features live in `frontend/src/features/<name>/`, with `components/`, `utils/`, 
 | Rules | **Done** |
 | Transactions | **Done** |
 | Settings | **Done** |
-| Auth | To do |
+| Auth | **Done** |
 | Insights, budgets | No feature code, only shared components |
 
 What the import migration changed:
@@ -39,6 +39,11 @@ What the import migration changed:
   - Constants: `date-format-options`, `language-options`, `number-format-options`.
   - Stayed shared: `use-preferences` (used by `format-currency` and `format-date`) and the `DateFormat` and `NumberFormat` types it depends on.
   - The page is `pages/settings/index.vue`.
+- **Auth migration (`features/auth/`):**
+  - Components: `AuthFormField`, `AuthTabs`.
+  - Constants: `sign-in-fields`, `sign-up-fields`. Models: `sign-in`, `sign-up` (zod schemas). Type: `FormFieldConfig`.
+  - Stayed shared: `stores/auth` and `lib/auth-client`, because the router's navigation guard uses the auth store and shared code cannot import from a feature.
+  - The pages are `pages/signin.vue` and `pages/signup.vue`.
 - **Import types stayed shared:** `ImportRow` and `ImportSummary` are back in `lib/types` because the API layer (`transactions.api`, `transactions.queries`, `routes-post`) uses them, and shared code may not import from a feature.
 - **Component auto-import:** `vite.config.ts` passes `components.dirs: ['src/components', 'src/features/*/components']` to the Nuxt UI plugin, so moved components still register without explicit imports. A new feature needs no config change.
 - **Lint rules:** see "Dependency rules" at the bottom.
@@ -78,7 +83,7 @@ The lists below describe where components lived before the migration. Import's c
 - `SettingsSection`
 - Shared with other features: `PageHeader`
 
-### `signin.vue` and `signup.vue`
+### `signin.vue` and `signup.vue` (migrated to `features/auth/`)
 - `AuthFormField`
 - `AuthTabs`
 
@@ -154,7 +159,7 @@ Stays in shared `lib/types` because the API layer uses them: `types/ImportRow`, 
 | `constants/number-format-options` | `settings/index.vue` |
 | `types/DateFormat` | `use-preferences`, `date-format-options` |
 
-### Auth
+### Auth (done, now in `features/auth/`; `stores/auth` and `auth-client` stayed shared because the router uses the store)
 | File | Consumers |
 |---|---|
 | `constants/sign-in-fields`, `constants/sign-up-fields` | `signin.vue`, `signup.vue` |

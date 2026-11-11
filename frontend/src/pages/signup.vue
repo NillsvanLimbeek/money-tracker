@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from '@nuxt/ui';
-import type { SignUp } from '@/lib/models/sign-up';
+import type { SignUp } from '@/features/auth/models/sign-up';
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { SIGN_UP_FIELDS } from '@/lib/constants';
-import { SignUpSchema } from '@/lib/models/sign-up';
+import { SIGN_UP_FIELDS } from '@/features/auth/constants';
+import { SignUpSchema } from '@/features/auth/models/sign-up';
 import { m } from '@/paraglide/messages';
 import { useAuthStore } from '@/stores/auth';
 

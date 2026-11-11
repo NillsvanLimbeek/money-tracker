@@ -2,7 +2,6 @@ export * from './ApiTransaction';
 export * from './Category';
 export * from './CategoryRule';
 export * from './DateFormat';
-export * from './FormField';
 export * from './ImportRow';
 export * from './ImportSummary';
 export * from './NavItem';
