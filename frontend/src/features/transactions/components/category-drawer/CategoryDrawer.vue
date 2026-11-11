@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue';
 import type { Category } from '@/lib/types';
-import { categoryIsSelected } from '@/lib/utils';
+import { categoryIsSelected } from '@/features/transactions/utils';
 import { m } from '@/paraglide/messages';
 
 interface Props {

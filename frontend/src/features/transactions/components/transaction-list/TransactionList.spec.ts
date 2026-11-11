@@ -2,8 +2,8 @@ import type { VueWrapper } from '@vue/test-utils';
 import type { Transaction } from '@/lib/types';
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import CategoryBadge from '../category-badge/CategoryBadge.vue';
-import CategoryPicker from '../category-picker/CategoryPicker.vue';
+import CategoryBadge from '@/components/category-badge/CategoryBadge.vue';
+import CategoryPicker from '@/components/category-picker/CategoryPicker.vue';
 import TransactionList from './TransactionList.vue';
 
 const CATEGORIES = [

@@ -2,11 +2,11 @@
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useMonthTotals } from '@/features/transactions/composables';
+import { categoryIsSelected, filterTransactions } from '@/features/transactions/utils';
 import { useApplyCategoryRule, useCategoryRules, useCreateCategoryRule, useRulePreview } from '@/lib/api/category-rules/category-rules.queries';
 import { useImportedMonths, useTransactions, useUpdateTransactionCategory } from '@/lib/api/transactions/transactions.queries';
-import { useMonthTotals } from '@/lib/composables';
 import { CATEGORIES } from '@/lib/constants';
-import { categoryIsSelected, filterTransactions } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 import { useDateStore } from '@/stores/date';
 

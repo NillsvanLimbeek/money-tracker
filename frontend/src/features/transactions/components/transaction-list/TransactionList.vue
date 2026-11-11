@@ -2,7 +2,8 @@
 import type { Category, Transaction } from '@/lib/types';
 import { computed, ref } from 'vue';
 import TransactionRow from '@/components/transaction-row/TransactionRow.vue';
-import { formatCurrency, groupTransactionsByDay } from '@/lib/utils';
+import { groupTransactionsByDay } from '@/features/transactions/utils';
+import { formatCurrency } from '@/lib/utils';
 
 interface Props {
   transactions: Transaction[];

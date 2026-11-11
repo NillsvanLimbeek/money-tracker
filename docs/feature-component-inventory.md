@@ -4,9 +4,41 @@ A feature is currently a page in `frontend/src/pages/`. This lists which compone
 
 All 42 components are reachable from a page or from `App.vue`; none are orphaned.
 
-## Per feature
+## Migration status
 
-### `index.vue` (transactions)
+Features live in `frontend/src/features/<name>/`, with `components/`, `utils/`, `constants/` and so on inside. The page itself stays in `src/pages/` because the router builds routes from that folder.
+
+| Feature | Status |
+|---|---|
+| Import | **Done** (commit `cbcd31b`) |
+| Rules | To do |
+| Transactions | **Done** |
+| Settings | To do |
+| Auth | To do |
+| Insights, budgets | No feature code, only shared components |
+
+What the import migration changed:
+- **Moved into `features/import/`:**
+  - Components: `ImportDescription`, `ImportFilePicker`, `ImportReview`, `ImportSummary`, `Stepper`, `StatStrip`.
+  - Utils: `parse-ing-csv`, `import-row-to-transaction`, `group-rows-by-month`, `format-period`.
+  - Constants: `banks`.
+  - Each of `utils/` and `constants/` has its own `index.ts` barrel; import code from `@/features/import/utils` and `@/features/import/constants`.
+- **Transactions migration (`features/transactions/`):**
+  - Components: `CategoryDrawer`, `MonthSummary`, `RulePromptDrawer`, `SearchFilterSelection`, `TransactionList`.
+  - Utils: `filter-transactions`, `group-transactions`, `day-label`, `is-selected`.
+  - Composable: `use-month-totals`. Type: `TransactionFilters`.
+  - Each has its own barrel (`utils/`, `composables/`, `types/`).
+  - Stayed shared: `TransactionRow` (with `CategoryBadge`, `CategoryPicker`, `TransactionDescription` and `split-notes`) because import uses it, `Box` and `CurrencyAmount` (generic UI, `MonthSummary` imports them from `components/`), `MonthPicker`/`MonthPickerDrawer`, `QueryBoundary`, `PageHeader`, `stores/date`, and the API queries.
+- **Import types stayed shared:** `ImportRow` and `ImportSummary` are back in `lib/types` because the API layer (`transactions.api`, `transactions.queries`, `routes-post`) uses them, and shared code may not import from a feature.
+- **Component auto-import:** `vite.config.ts` passes `components.dirs: ['src/components', 'src/features/*/components']` to the Nuxt UI plugin, so moved components still register without explicit imports. A new feature needs no config change.
+- **Lint rules:** see "Dependency rules" at the bottom.
+- **Docs:** `context/project-status.md` paths were updated.
+
+## Per feature (before migration)
+
+The lists below describe where components lived before the migration. Import's components are now under `features/import/components/`.
+
+### `index.vue` (transactions, migrated to `features/transactions/`)
 - `CategoryDrawer`
 - `MonthSummary` (uses `Box`, `CurrencyAmount`)
 - `RulePromptDrawer`
@@ -14,7 +46,7 @@ All 42 components are reachable from a page or from `App.vue`; none are orphaned
 - `TransactionList` (uses `TransactionRow`; `TransactionRow` uses `TransactionDescription`, `CategoryPicker`, `CategoryBadge`)
 - Shared with other features: `MonthPicker`, `MonthPickerDrawer`, `QueryBoundary`, `PageHeader`
 
-### `import.vue`
+### `import.vue` (migrated to `features/import/`)
 - `ImportDescription`
 - `ImportFilePicker`
 - `ImportReview` (uses `StatStrip`, `TransactionRow`)
@@ -63,8 +95,8 @@ All 42 components are reachable from a page or from `App.vue`; none are orphaned
 ## Open decisions for the migration
 
 - **Shared:** `PageHeader`, `QueryBoundary`, `MonthPicker`, `MonthPickerDrawer`.
-- **Transaction components:** `TransactionRow` and its children are shared between transactions and import. Keep them in transactions and import from there, or promote them to shared.
-- **Generic UI:** `Box`, `Chip`, `CurrencyAmount`, `AppDrawer`, `StatStrip`, `SegmentedControl` each have a single consumer today. Put them in a shared `ui/` folder, or keep them with their one feature until a second consumer appears.
+- **Transaction components:** `TransactionRow` and its children are used by transactions and import. Features cannot import each other (lint rule), so these must stay in shared `components/` (or move to a shared folder). They cannot move into the transactions feature while import uses them. `ImportReview` keeps using `TransactionRow` from `components/`.
+- **Generic UI:** `Box`, `Chip`, `CurrencyAmount`, `AppDrawer`, `SegmentedControl` each have a single consumer today (`StatStrip` already moved into the import feature). Put them in a shared `ui/` folder, or keep them with their one feature until a second consumer appears.
 - **Settings:** settings and rules are separate pages. They could be separate features or one `settings` feature; they share nothing besides `PageHeader`.
 - **App shell:** `BottomNav` and `DesktopBlocker` belong to no page; put them in shared or a layout folder.
 - **Later:** `lib/api`, `lib/utils` and `lib/types` could follow the same feature split.
@@ -73,7 +105,7 @@ All 42 components are reachable from a page or from `App.vue`; none are orphaned
 
 Based on who actually imports each file today (searched by exported symbol across `.vue` and `.ts`, specs excluded). Name matching is by word, so very generic type names such as `Category` and `Transaction` may over-count slightly.
 
-### Import
+### Import (done, now in `features/import/`)
 | File | Consumers |
 |---|---|
 | `utils/parse-ing-csv` | `ImportReview`, `import.vue`, `constants/banks` |
@@ -93,7 +125,7 @@ Stays in shared `lib/types` because the API layer uses them: `types/ImportRow`, 
 | `constants/rule-operators` | `RuleActions`, `RuleRow`, `rule-fields`, `validate-rule` |
 | `types/RuleField` | `RuleForm`, `rule-fields` |
 
-### Transactions
+### Transactions (done, now in `features/transactions/`)
 | File | Consumers |
 |---|---|
 | `utils/filter-transactions` | `index.vue` |
@@ -152,7 +184,9 @@ Stays in shared `lib/types` because the API layer uses them: `types/ImportRow`, 
 
 ## Dependency rules (enforced by ESLint)
 
-- Code outside `src/features/` and `src/pages/` (so `lib`, `components`, `stores`) cannot import from a feature. Anything the shared layer needs, such as the import types used by the API layer, must live in shared code.
-- A feature cannot import from another feature. Once two features need the same code, move it to `lib` or `components`.
+Configured in `frontend/eslint.config.js` with `no-restricted-imports`:
+
+- Code outside `src/features/` and `src/pages/` (so `lib`, `components`, `stores`) cannot import from a feature, via `@/features/...` or a relative path. Anything the shared layer needs, such as the import types used by the API layer, must live in shared code.
+- A feature cannot import from another feature. Once two features need the same code, move it to `lib` or `components`. The list of features is read from the folders in `src/features/`, so new features are covered automatically (the rule only has an effect once there are two).
 - `src/pages/` may import from features; a page is the entry point that composes its feature.
 - Component auto-import also scans `src/features/*/components` (see `vite.config.ts`), so component names must stay unique across the app.

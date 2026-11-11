@@ -9,4 +9,3 @@ export * from './NavItem';
 export * from './NumberFormat';
 export * from './RuleField';
 export * from './Transaction';
-export * from './TransactionFilters';

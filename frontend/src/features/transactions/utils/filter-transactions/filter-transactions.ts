@@ -1,4 +1,5 @@
-import type { Transaction, TransactionFilters } from '@/lib/types';
+import type { TransactionFilters } from '@/features/transactions/types';
+import type { Transaction } from '@/lib/types';
 import Fuse from 'fuse.js';
 
 /**
