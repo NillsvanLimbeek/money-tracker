@@ -26,14 +26,14 @@ _Last updated: 10-11-2026_
   - `GET /api/transactions/hashes?from&to` — import hashes already stored for the user in an ISO date range, so the review screen can flag duplicates
   - `PATCH /api/transactions/:id` — category override, 404 if not found for the user
 - `packages/*` added to the workspace with a placeholder `packages/shared`
-- Frontend ING CSV parser (`lib/utils/parse-ing-csv.ts`): Windows-1252 decoding, Dutch and English headers, cents, dedup hash with occurrence number, optional notes column (`Mededelingen` / `Notifications`) kept on `ImportRow.notes`
+- Frontend ING CSV parser (`features/import/utils/parse-ing-csv/`): Windows-1252 decoding, Dutch and English headers, cents, dedup hash with occurrence number, optional notes column (`Mededelingen` / `Notifications`) kept on `ImportRow.notes`
 - `splitNotes` (`lib/utils/split-notes.ts`) breaks ING's single `Key: value Key: value` notes string onto separate lines using a list of known English and Dutch keys; text before the first key, or with none, stays one line
 - Import screen (`pages/import.vue`) with a 2-step `Stepper` (file → review; hidden on the summary) and `PageHeader` slots:
   - `ImportFilePicker` — file selection, 10 MB and 5000-row limits
   - `ImportReview` — one `TransactionRow` per row (see below), grouped by month (`groupRowsByMonth`), per-row and per-month select all, duplicates shown as "Already imported" and disabled, Nuxt UI `UCheckbox`, income/expense totals, confirm button
     - Only the checkbox toggles selection; clicking anywhere else on a row expands it (see `TransactionRow`)
     - Found / Selected / Duplicates strip uses the generic `StatStrip` component (`{ label, value, valueClass? }[]`)
-  - `ImportSummary` (`components/import-summary/`) — results screen after confirming: "N transactions imported", source file name and period (`formatPeriod`), In / Out / Skipped strip (`StatStrip`), an "Uncategorised" row linking to the ledger, "View transactions" and "Import another file". In/Out are computed from the rows that were sent; Skipped comes from the import response. The back chevron in the page header returns to file selection
+  - `ImportSummary` (`features/import/components/import-summary/`) — results screen after confirming: "N transactions imported", source file name and period (`formatPeriod`), In / Out / Skipped strip (`StatStrip`), an "Uncategorised" row linking to the ledger, "View transactions" and "Import another file". In/Out are computed from the rows that were sent; Skipped comes from the import response. The back chevron in the page header returns to file selection
 - Column check step dropped: the parser already accepts both ING header variants, so the import flow stays two steps (file → review) and the summary sits outside the stepper. Revisit if more banks are added
 - `TransactionRow` (`components/transaction-row/`) is the single row component for both the transaction list and the import review. It replaced `ImportReviewRow`, and the date, notes and toggle column are inlined rather than separate components:
   - Props: `transaction`, `categories`, `pickerOpen`, plus `selectable` / `selected` / `duplicate` for the import review. `selectable` adds a checkbox and makes the category badge read-only (no picker); `duplicate` dims the row, shows "Already imported" and disables the checkbox

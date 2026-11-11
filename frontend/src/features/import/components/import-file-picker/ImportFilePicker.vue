@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useDropZone, useFileDialog } from '@vueuse/core';
 import { ref } from 'vue';
-import { MAX_FILE_BYTES, SUPPORTED_BANKS } from '@/lib/constants';
+import { MAX_FILE_BYTES, SUPPORTED_BANKS } from '@/features/import/constants';
 import { m } from '@/paraglide/messages';
 
 const emit = defineEmits<{

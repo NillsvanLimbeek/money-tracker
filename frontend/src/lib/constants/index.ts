@@ -1,4 +1,3 @@
-export * from './banks';
 export * from './categories';
 export * from './date-format-options';
 export * from './drawer-ui';

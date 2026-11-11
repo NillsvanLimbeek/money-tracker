@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { ImportRow, ImportSummary } from '@/lib/types';
 import { computed } from 'vue';
-import { formatCurrency, formatPeriod } from '@/lib/utils';
+import { formatPeriod } from '@/features/import/utils';
+import { formatCurrency } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 interface Props {

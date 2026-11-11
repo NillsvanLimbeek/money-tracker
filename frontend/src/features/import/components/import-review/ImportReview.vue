@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { ParseError } from '@/features/import/utils';
 import type { CategoryRule, ImportRow } from '@/lib/types';
-import type { ParseError } from '@/lib/utils';
 import { computed, ref } from 'vue';
+import { groupRowsByMonth, importRowToTransaction } from '@/features/import/utils';
 import { CATEGORIES } from '@/lib/constants';
-import { formatCurrency, groupRowsByMonth, importRowToTransaction } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 interface Props {

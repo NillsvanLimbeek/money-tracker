@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import type { ParseResult } from '@/features/import/utils';
 import type { ImportRow, ImportSummary } from '@/lib/types';
-import type { ParseResult } from '@/lib/utils';
 import { computed, ref, watch } from 'vue';
+import { MAX_FILE_BYTES } from '@/features/import/constants';
+import { decodeIngCsv, parseIngCsv } from '@/features/import/utils';
 import { useCategoryRules } from '@/lib/api/category-rules/category-rules.queries';
 import { getImportedHashes } from '@/lib/api/transactions/transactions.api';
 import { useImportTransactions } from '@/lib/api/transactions/transactions.queries';
-import { MAX_FILE_BYTES } from '@/lib/constants';
-import { decodeIngCsv, parseIngCsv } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 const MAX_IMPORT_ROWS = 5000;

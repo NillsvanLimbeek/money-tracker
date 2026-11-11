@@ -21,6 +21,11 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     ui({
+      // Auto-register components from the shared folder and from every
+      // feature (src/features/<feature>/components).
+      components: {
+        dirs: ['src/components', 'src/features/*/components'],
+      },
       ui: {
         // 'brand' is our custom indigo-violet scale, defined in
         // src/assets/main.css and anchored at shade 500 = #4f45c4.
