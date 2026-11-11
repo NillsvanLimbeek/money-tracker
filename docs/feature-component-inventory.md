@@ -13,7 +13,7 @@ Features live in `frontend/src/features/<name>/`, with `components/`, `utils/`, 
 | Import | **Done** (commit `cbcd31b`) |
 | Rules | **Done** |
 | Transactions | **Done** |
-| Settings | To do |
+| Settings | **Done** |
 | Auth | To do |
 | Insights, budgets | No feature code, only shared components |
 
@@ -34,6 +34,11 @@ What the import migration changed:
   - Utils: `group-rules-by-category`. Constants: `rule-fields`. Types: `RuleDraft`, `RuleFieldConfig` (`types/RuleField.ts`).
   - Stayed shared: `validate-rule`, plus `constants/rule-operators` and `constants/rule-validation` (which `validate-rule` imports, so they cannot depend on a feature), `CategoryBadge`, `constants/drawer-ui`, `constants/categories` and the `category-rules` API.
   - The page is `pages/settings/rules.vue`.
+- **Settings migration (`features/settings/`):**
+  - Components: `OptionDrawer`, `SegmentedControl`, `SettingsRow`, `SettingsSection`.
+  - Constants: `date-format-options`, `language-options`, `number-format-options`.
+  - Stayed shared: `use-preferences` (used by `format-currency` and `format-date`) and the `DateFormat` and `NumberFormat` types it depends on.
+  - The page is `pages/settings/index.vue`.
 - **Import types stayed shared:** `ImportRow` and `ImportSummary` are back in `lib/types` because the API layer (`transactions.api`, `transactions.queries`, `routes-post`) uses them, and shared code may not import from a feature.
 - **Component auto-import:** `vite.config.ts` passes `components.dirs: ['src/components', 'src/features/*/components']` to the Nuxt UI plugin, so moved components still register without explicit imports. A new feature needs no config change.
 - **Lint rules:** see "Dependency rules" at the bottom.
@@ -66,7 +71,7 @@ The lists below describe where components lived before the migration. Import's c
 - `RulesEmptyState`
 - Shared with other features: `CategoryBadge` (from transactions), `QueryBoundary`, `PageHeader`
 
-### `settings/index.vue`
+### `settings/index.vue` (migrated to `features/settings/`)
 - `OptionDrawer`
 - `SegmentedControl`
 - `SettingsRow`
@@ -141,7 +146,7 @@ Stays in shared `lib/types` because the API layer uses them: `types/ImportRow`, 
 | `utils/is-selected` | `CategoryDrawer`, `index.vue` |
 | `utils/split-notes` | `TransactionRow` (moves with `TransactionRow`, wherever that ends up) |
 
-### Settings
+### Settings (done, now in `features/settings/`; the `DateFormat` type stayed shared because `use-preferences` uses it)
 | File | Consumers |
 |---|---|
 | `constants/date-format-options` | `settings/index.vue` |
