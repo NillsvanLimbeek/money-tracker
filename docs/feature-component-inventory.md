@@ -11,7 +11,7 @@ Features live in `frontend/src/features/<name>/`, with `components/`, `utils/`, 
 | Feature | Status |
 |---|---|
 | Import | **Done** (commit `cbcd31b`) |
-| Rules | To do |
+| Rules | **Done** |
 | Transactions | **Done** |
 | Settings | To do |
 | Auth | To do |
@@ -29,6 +29,11 @@ What the import migration changed:
   - Composable: `use-month-totals`. Type: `TransactionFilters`.
   - Each has its own barrel (`utils/`, `composables/`, `types/`).
   - Stayed shared: `TransactionRow` (with `CategoryBadge`, `CategoryPicker`, `TransactionDescription` and `split-notes`) because import uses it, `Box` and `CurrencyAmount` (generic UI, `MonthSummary` imports them from `components/`), `MonthPicker`/`MonthPickerDrawer`, `QueryBoundary`, `PageHeader`, `stores/date`, and the API queries.
+- **Rules migration (`features/rules/`):**
+  - Components: `Chip`, `RuleForm`, `RuleGroup`, `RuleRow`, `RuleActions`, `RuleDeleteDrawer`, `RulesEmptyState`, `AppDrawer`, `CategorySelect`, `RulePreview`. The last three were only used by `RuleForm`.
+  - Utils: `group-rules-by-category`. Constants: `rule-fields`. Types: `RuleDraft`, `RuleFieldConfig` (`types/RuleField.ts`).
+  - Stayed shared: `validate-rule`, plus `constants/rule-operators` and `constants/rule-validation` (which `validate-rule` imports, so they cannot depend on a feature), `CategoryBadge`, `constants/drawer-ui`, `constants/categories` and the `category-rules` API.
+  - The page is `pages/settings/rules.vue`.
 - **Import types stayed shared:** `ImportRow` and `ImportSummary` are back in `lib/types` because the API layer (`transactions.api`, `transactions.queries`, `routes-post`) uses them, and shared code may not import from a feature.
 - **Component auto-import:** `vite.config.ts` passes `components.dirs: ['src/components', 'src/features/*/components']` to the Nuxt UI plugin, so moved components still register without explicit imports. A new feature needs no config change.
 - **Lint rules:** see "Dependency rules" at the bottom.
@@ -54,7 +59,7 @@ The lists below describe where components lived before the migration. Import's c
 - `Stepper`
 - Shared with other features: `PageHeader`, `TransactionRow` (from transactions)
 
-### `settings/rules.vue`
+### `settings/rules.vue` (migrated to `features/rules/`)
 - `Chip`
 - `RuleForm` (uses `AppDrawer`, `CategorySelect`, `RulePreview`)
 - `RuleGroup` (uses `RuleRow`; `RuleRow` uses `RuleActions`, `RuleDeleteDrawer`)
@@ -116,7 +121,7 @@ Based on who actually imports each file today (searched by exported symbol acros
 
 Stays in shared `lib/types` because the API layer uses them: `types/ImportRow`, `types/ImportSummary`.
 
-### Rules
+### Rules (done, now in `features/rules/`; `rule-operators` and `rule-validation` stayed shared because `validate-rule` uses them)
 | File | Consumers |
 |---|---|
 | `utils/group-rules-by-category` | `RuleGroup`, `rules.vue` |

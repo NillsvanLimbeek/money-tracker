@@ -1,4 +1,4 @@
-import type { RuleOperator } from './CategoryRule';
+import type { RuleOperator } from '@/lib/types';
 
 export interface RuleDraft {
   operator: RuleOperator;

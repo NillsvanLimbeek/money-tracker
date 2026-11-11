@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { FormError } from '@nuxt/ui';
-import type { Category, CategoryRule, RuleDraft, RuleOperator, RulePreview } from '@/lib/types';
+import type { RuleDraft } from '@/features/rules/types';
+import type { Category, CategoryRule, RuleOperator, RulePreview } from '@/lib/types';
 import { computed, reactive, useTemplateRef } from 'vue';
-import { RULE_FIELDS } from '@/lib/constants';
+import { RULE_FIELDS } from '@/features/rules/constants';
 import { validateRule } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 

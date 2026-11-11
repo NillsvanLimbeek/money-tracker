@@ -1,6 +1,7 @@
-import type { RuleFieldConfig, RuleOperator } from '@/lib/types';
+import type { RuleFieldConfig } from '@/features/rules/types';
+import type { RuleOperator } from '@/lib/types';
+import { RULE_OPERATORS } from '@/lib/constants';
 import { m } from '@/paraglide/messages';
-import { RULE_OPERATORS } from './rule-operators';
 
 export const RULE_FIELDS: RuleFieldConfig[] = [
   {

@@ -1,6 +1,6 @@
 import type { VueWrapper } from '@vue/test-utils';
+import type { RuleGroup as RuleGroupData } from '@/features/rules/utils';
 import type { CategoryRule } from '@/lib/types';
-import type { RuleGroup as RuleGroupData } from '@/lib/utils';
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import RuleGroup from './RuleGroup.vue';

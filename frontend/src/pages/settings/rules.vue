@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { CategoryRule, RuleOperator } from '@/lib/types';
 import { computed, ref } from 'vue';
+import { groupRulesByCategory } from '@/features/rules/utils';
 import { useAddSuggestedRules, useApplyCategoryRule, useCategoryRules, useCreateCategoryRule, useDeleteCategoryRule, useRulePreview, useUpdateCategoryRule } from '@/lib/api/category-rules/category-rules.queries';
 import { CATEGORIES } from '@/lib/constants';
-import { groupRulesByCategory } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 const rulesQuery = useCategoryRules();

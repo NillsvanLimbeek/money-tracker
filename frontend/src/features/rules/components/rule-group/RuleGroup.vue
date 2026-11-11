@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import type { RuleGroup } from '@/features/rules/utils';
 import type { CategoryRule } from '@/lib/types';
-import type { RuleGroup } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 interface Props {

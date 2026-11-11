@@ -7,5 +7,4 @@ export * from './ImportRow';
 export * from './ImportSummary';
 export * from './NavItem';
 export * from './NumberFormat';
-export * from './RuleField';
 export * from './Transaction';
