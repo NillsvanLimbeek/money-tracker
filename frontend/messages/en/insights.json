@@ -1,0 +1,8 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "insights_net": "Net · {month}",
+  "insights_income": "Income",
+  "insights_expenses": "Expenses",
+  "insights_vs_month": "vs {month}",
+  "insights_kept": "You kept {percent}% of your income."
+}

@@ -15,6 +15,7 @@
       "./messages/{locale}/settings.json",
       "./messages/{locale}/import.json",
       "./messages/{locale}/auth.json",
+      "./messages/{locale}/insights.json",
       "./messages/{locale}/common.json"
     ]
   }

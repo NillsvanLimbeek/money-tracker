@@ -1,0 +1,8 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "insights_net": "Saldo · {month}",
+  "insights_income": "Inkomen",
+  "insights_expenses": "Uitgaven",
+  "insights_vs_month": "t.o.v. {month}",
+  "insights_kept": "Je hield {percent}% van je inkomen over."
+}
