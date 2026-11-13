@@ -4,5 +4,11 @@
   "insights_income": "Income",
   "insights_expenses": "Expenses",
   "insights_vs_month": "vs {month}",
-  "insights_kept": "You kept {percent}% of your income."
+  "insights_kept": "You kept {percent}% of your income.",
+  "insights_spending_title": "Spending by category",
+  "insights_biggest": "Biggest",
+  "insights_biggest_change": "Biggest change",
+  "insights_spending_empty": "No spending this month yet.",
+  "insights_spending_chart_label": "Spending by category",
+  "insights_spent_in": "Spent in {month}"
 }

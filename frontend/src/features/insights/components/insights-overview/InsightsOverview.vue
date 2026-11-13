@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { subMonths } from 'date-fns';
 import { computed } from 'vue';
-import { percentChange } from '@/features/insights/utils';
+import { formatPercent, percentChange } from '@/features/insights/utils';
 import { formatCurrency, formatLocalised } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
@@ -23,10 +23,6 @@ const expenseDelta = computed(() => percentChange(expense, previousExpense));
 const monthLabel = computed(() => formatLocalised(month, 'MMM yyyy').toUpperCase());
 const versus = computed(() => m.insights_vs_month({ month: formatLocalised(subMonths(month, 1), 'MMM') }));
 const keptPercent = computed(() => (income > 0 ? Math.round((net.value / income) * 100) : null));
-
-function formatPercent(value: number): string {
-  return `${value > 0 ? '+' : value < 0 ? '−' : ''}${Math.abs(value)}%`;
-}
 </script>
 
 <template>

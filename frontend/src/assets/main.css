@@ -192,3 +192,18 @@
   /* Link hover, not derivable from --ui-primary via opacity */
   --ui-primary-link-hover: #332aa8;
 }
+
+/*
+ * Spending-by-category chart. One solid color per category for the doughnut
+ * segments, bars and icons; the tinted icon tiles are mixed from it in the
+ * component. These differ from the badge tokens above because the chart
+ * needs saturated fills that still read next to each other.
+ */
+:root {
+  --chart-housing: #2f6db0;
+  --chart-food: #b05a22;
+  --chart-shopping: #946f1f;
+  --chart-transport: #2f7d5a;
+  --chart-entertainment: #b0497f;
+  --chart-other: #6b6b78;
+}

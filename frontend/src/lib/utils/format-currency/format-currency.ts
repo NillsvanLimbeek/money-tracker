@@ -25,3 +25,22 @@ export function formatCurrency(value: number): string {
   const sign = value < 0 ? '−' : '+';
   return `${sign}€${FORMATTERS[numberFormat.value].format(Math.abs(value))}`;
 }
+
+/**
+ * Formats an amount as unsigned euros, for totals where the direction is clear from context. Separators follow the number format preference.
+ *
+ * @param value - The amount in euros. The sign is dropped.
+ * @param fractionDigits - How many decimals to show, `2` by default.
+ * @returns The amount with a euro sign, e.g. `€1.234,50`.
+ * @example
+ * formatEuros(-1234.5); // '€1.234,50'
+ * formatEuros(1909, 0); // '€1.909'
+ */
+export function formatEuros(value: number, fractionDigits = 2): string {
+  const formatter = new Intl.NumberFormat(NUMBER_LOCALES[numberFormat.value], {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  });
+
+  return `€${formatter.format(Math.abs(value))}`;
+}

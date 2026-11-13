@@ -45,5 +45,12 @@ const { income: previousIncome, expense: previousExpense } = useMonthTotals(() =
     :previous-expense
   />
 
+  <SpendingByCategory
+    class="mx-4 mt-3"
+    :month="selectedMonth"
+    :transactions="currentQuery.data.value ?? []"
+    :previous-transactions="previousQuery.data.value ?? []"
+  />
+
   <div class="h-28" />
 </template>

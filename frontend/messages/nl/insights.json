@@ -4,5 +4,11 @@
   "insights_income": "Inkomen",
   "insights_expenses": "Uitgaven",
   "insights_vs_month": "t.o.v. {month}",
-  "insights_kept": "Je hield {percent}% van je inkomen over."
+  "insights_kept": "Je hield {percent}% van je inkomen over.",
+  "insights_spending_title": "Uitgaven per categorie",
+  "insights_biggest": "Grootste",
+  "insights_biggest_change": "Grootste verschil",
+  "insights_spending_empty": "Nog geen uitgaven deze maand.",
+  "insights_spending_chart_label": "Uitgaven per categorie",
+  "insights_spent_in": "Uitgegeven in {month}"
 }

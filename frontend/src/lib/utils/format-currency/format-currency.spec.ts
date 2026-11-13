@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { usePreferences } from '@/lib/composables';
-import { formatCurrency } from './format-currency';
+import { formatCurrency, formatEuros } from './format-currency';
 
 describe('formatCurrency', () => {
   afterEach(() => {
@@ -27,5 +27,27 @@ describe('formatCurrency', () => {
     usePreferences().numberFormat.value = 'en';
 
     expect(formatCurrency(-1234.5)).toBe('−€1,234.50');
+  });
+});
+
+describe('formatEuros', () => {
+  afterEach(() => {
+    usePreferences().numberFormat.value = 'nl';
+  });
+
+  it('drops the sign', () => {
+    expect(formatEuros(-12.5)).toBe('€12,50');
+    expect(formatEuros(12.5)).toBe('€12,50');
+  });
+
+  it('shows two decimals by default and as many as asked for', () => {
+    expect(formatEuros(1909)).toBe('€1.909,00');
+    expect(formatEuros(1909, 0)).toBe('€1.909');
+  });
+
+  it('uses English separators when the number format preference is en', () => {
+    usePreferences().numberFormat.value = 'en';
+
+    expect(formatEuros(1234.5)).toBe('€1,234.50');
   });
 });
