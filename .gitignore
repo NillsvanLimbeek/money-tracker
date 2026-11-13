@@ -62,3 +62,6 @@ backend/wrangler.toml
 frontend/src/paraglide
 frontend/project.inlang/cache
 frontend/project.inlang/.meta.json
+
+*storybook.log
+storybook-static
