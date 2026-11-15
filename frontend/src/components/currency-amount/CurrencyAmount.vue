@@ -21,6 +21,8 @@ interface Props {
     <span
       class="font-bold"
       v-bind="$attrs"
-    >{{ formatCurrency(value) }}</span>
+    >
+      {{ formatCurrency(value) }}
+    </span>
   </div>
 </template>
