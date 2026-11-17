@@ -125,6 +125,7 @@ Page code moved out of `components/` and `lib/` into `frontend/src/features/<nam
 - Storybook 10 (`@storybook/vue3-vite`, `addon-docs`) in `frontend/.storybook/` (`main.ts`, `preview.ts`, `StoryWrapper.vue`). Run with `pnpm storybook` (port 6006), build with `pnpm build-storybook`. The Vue devtools plugin is filtered out of the Storybook Vite config
 - Stories are `*.stories.ts` beside the component, one for each of the 12 components in `src/components/` (`BottomNav`, `Box`, `CategoryBadge`, `CategoryPicker`, `CurrencyAmount`, `DesktopBlocker`, `MonthPicker`, `MonthPickerDrawer`, `PageHeader`, `QueryBoundary`, `TransactionDescription`, `TransactionRow`)
 - The import feature's components have stories too, titled `Import/…` (`ImportDescription`, `Stepper`, `StatStrip`, `ImportFilePicker`, `ImportReview`, `ImportSummary`), each beside its component
+- The auth feature's components have stories titled `Auth/…` (`AuthTabs`, `AuthFormField`)
 - Rules, transactions, settings and insights components have no stories yet
 
 ---
@@ -133,7 +134,7 @@ Page code moved out of `components/` and `lib/` into `frontend/src/features/<nam
 
 - The `nl` translations are unreviewed
 - Changing the language reloads the page, because messages are read once at startup
-- Rules, transactions, settings and insights components have no Storybook stories (import has them)
+- Rules, transactions, settings and insights components have no Storybook stories (import and auth have them)
 - `README.md` is still the Vite template and `frontend/e2e/vue.spec.ts` is the default scaffold
 
 ---
