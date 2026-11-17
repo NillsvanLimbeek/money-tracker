@@ -145,6 +145,7 @@ function toggleGroup(groupRows: ImportRow[]): void {
       >
         {{ m.import_confirm({ count: selectedRows.length }) }}
       </UButton>
+
       <span class="text-muted font-mono text-sm">{{ m.import_totals({ income: formatCurrency(income), expense: formatCurrency(-expense) }) }}</span>
     </div>
   </div>

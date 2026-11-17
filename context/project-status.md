@@ -2,14 +2,15 @@
 
 > What's done and what's next. For goals, stack, architecture and data model see `project-overview.md`.
 
-_Last updated: 10-11-2026_
+_Last updated: 17-11-2026_
 
 | Phase | State |
 |---|---|
 | 1. Project setup | Done |
 | 2. Auth & backend | Done — better-auth, Hono, Drizzle, D1; sign-in/sign-up pages working |
 | 3. CSV import pipeline | Done — schema, migrations, auth, transactions routes, ING CSV parser, import flow (file → review → summary), category rules (backend, rules screen, add / edit / delete, create-rule prompt, rule-based categorisation on the review screen, suggested rules), transactions page search and category filter, Paraglide translations (English and Dutch), and Settings language, number format and date format options |
-| 4–7 | Not started |
+| 4. Dashboard views + charts | In progress — Insights page has the month picker, the net / income / expenses overview with deltas vs the previous month, and the spending by category chart |
+| 5–7 | Not started |
 
 ---
 
@@ -103,10 +104,36 @@ _Last updated: 10-11-2026_
 
 ---
 
+## Feature folders
+
+Page code moved out of `components/` and `lib/` into `frontend/src/features/<name>/` (`components/`, `utils/`, `constants/`, `types/`, `composables/`, each with an `index.ts` barrel). The page files stay in `src/pages/` because the router builds routes from that folder. Done for import, transactions, rules, settings, auth and insights. Component, util and composable names in the notes above (e.g. `ImportReview`, `RuleForm`, `useMonthTotals`) now live in their feature folder. Only generic UI stays in `src/components/` (`Box`, `TransactionRow`, `MonthPicker`, `PageHeader`, …). Full file list and what stayed shared: `docs/feature-component-inventory.md`
+
+---
+
+## Insights page (phase 4, in progress)
+
+`pages/insights.vue` binds to `useDateStore` and loads the selected and previous month with `useTransactions`, totals from `useMonthTotals`. Code is in `features/insights/`:
+- `InsightsOverview` — net for the month with a `DeltaChip` (amount vs previous month), plus income and expenses cards with percentage deltas and a "kept N%" figure. `percentChange` (`utils/percent-change/`) does the delta maths
+- `SpendingByCategory` — donut (`CategoryDonut`, Chart.js via `vue-chartjs`) and one `CategorySpendRow` per category, with each category's share (`formatPercent`) and change vs the previous month. `groupSpendingByCategory` (`utils/`) builds the rows. each row links to the transactions page filtered by that category (`/?category=food`); spending up is red, down is green. `formatEuros` (`lib/utils/format-currency/`) is the new unsigned euro formatter with a `fractionDigits` argument
+- All strings are in `messages/{en,nl}/insights.json`; the units have specs
+- Still to do for phase 4: other dashboard views (e.g. trends over several months) and charts
+
+---
+
+## Storybook
+
+- Storybook 10 (`@storybook/vue3-vite`, `addon-docs`) in `frontend/.storybook/` (`main.ts`, `preview.ts`, `StoryWrapper.vue`). Run with `pnpm storybook` (port 6006), build with `pnpm build-storybook`. The Vue devtools plugin is filtered out of the Storybook Vite config
+- Stories are `*.stories.ts` beside the component, one for each of the 12 components in `src/components/` (`BottomNav`, `Box`, `CategoryBadge`, `CategoryPicker`, `CurrencyAmount`, `DesktopBlocker`, `MonthPicker`, `MonthPickerDrawer`, `PageHeader`, `QueryBoundary`, `TransactionDescription`, `TransactionRow`)
+- The import feature's components have stories too, titled `Import/…` (`ImportDescription`, `Stepper`, `StatStrip`, `ImportFilePicker`, `ImportReview`, `ImportSummary`), each beside its component
+- Rules, transactions, settings and insights components have no stories yet
+
+---
+
 ## Known gaps
 
 - The `nl` translations are unreviewed
 - Changing the language reloads the page, because messages are read once at startup
+- Rules, transactions, settings and insights components have no Storybook stories (import has them)
 - `README.md` is still the Vite template and `frontend/e2e/vue.spec.ts` is the default scaffold
 
 ---
