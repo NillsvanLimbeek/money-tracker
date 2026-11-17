@@ -129,7 +129,8 @@ Page code moved out of `components/` and `lib/` into `frontend/src/features/<nam
 - The insights feature's components have stories titled `Insights/…` (`DeltaChip`, `InsightsOverview`, `CategorySpendRow`, `CategoryDonut`, `SpendingByCategory`)
 - The settings feature's components have stories titled `Settings/…` (`SettingsSection`, `SettingsRow`, `SegmentedControl`, `OptionDrawer`)
 - The rules feature's components have stories titled `Rules/…` (`AppDrawer`, `CategorySelect`, `Chip`, `RuleActions`, `RuleDeleteDrawer`, `RuleForm`, `RuleGroup`, `RulePreview`, `RuleRow`, `RulesEmptyState`); the drawers start open with a button to reopen them
-- Transactions components have no stories yet
+- The transactions feature's components have stories titled `Transactions/…` (`CategoryDrawer`, `MonthSummary`, `RulePromptDrawer`, `SearchFilterSelection`, `TransactionList`)
+- Every component now has a story
 
 ---
 
@@ -137,7 +138,6 @@ Page code moved out of `components/` and `lib/` into `frontend/src/features/<nam
 
 - The `nl` translations are unreviewed
 - Changing the language reloads the page, because messages are read once at startup
-- Transactions components have no Storybook stories (the other features have them)
 - `README.md` is still the Vite template and `frontend/e2e/vue.spec.ts` is the default scaffold
 
 ---
