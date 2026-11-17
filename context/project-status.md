@@ -115,7 +115,7 @@ Page code moved out of `components/` and `lib/` into `frontend/src/features/<nam
 `pages/insights.vue` binds to `useDateStore` and loads the selected and previous month with `useTransactions`, totals from `useMonthTotals`. Code is in `features/insights/`:
 - `InsightsOverview` — net for the month with a `DeltaChip` (amount vs previous month), plus income and expenses cards with percentage deltas and a "kept N%" figure. `percentChange` (`utils/percent-change/`) does the delta maths
 - `SpendingByCategory` — donut (`CategoryDonut`, Chart.js via `vue-chartjs`) and one `CategorySpendRow` per category, with each category's share (`formatPercent`) and change vs the previous month. `groupSpendingByCategory` (`utils/`) builds the rows. each row links to the transactions page filtered by that category (`/?category=food`); spending up is red, down is green. `formatEuros` (`lib/utils/format-currency/`) is the new unsigned euro formatter with a `fractionDigits` argument
-- All strings are in `messages/{en,nl}/insights.json`; the units have specs
+- All strings are in `messages/{en,nl}/insights.json`; the utils and every component have specs. `CategoryDonut`'s spec mocks `vue-chartjs` (no canvas in jsdom), and the specs read icon names with `findComponent({ name: 'Icon' })` because the usual `UIcon` stub doesn't take effect
 - Still to do for phase 4: other dashboard views (e.g. trends over several months) and charts
 
 ---
@@ -126,7 +126,8 @@ Page code moved out of `components/` and `lib/` into `frontend/src/features/<nam
 - Stories are `*.stories.ts` beside the component, one for each of the 12 components in `src/components/` (`BottomNav`, `Box`, `CategoryBadge`, `CategoryPicker`, `CurrencyAmount`, `DesktopBlocker`, `MonthPicker`, `MonthPickerDrawer`, `PageHeader`, `QueryBoundary`, `TransactionDescription`, `TransactionRow`)
 - The import feature's components have stories too, titled `Import/…` (`ImportDescription`, `Stepper`, `StatStrip`, `ImportFilePicker`, `ImportReview`, `ImportSummary`), each beside its component
 - The auth feature's components have stories titled `Auth/…` (`AuthTabs`, `AuthFormField`)
-- Rules, transactions, settings and insights components have no stories yet
+- The insights feature's components have stories titled `Insights/…` (`DeltaChip`, `InsightsOverview`, `CategorySpendRow`, `CategoryDonut`, `SpendingByCategory`)
+- Rules, transactions and settings components have no stories yet
 
 ---
 
@@ -134,7 +135,7 @@ Page code moved out of `components/` and `lib/` into `frontend/src/features/<nam
 
 - The `nl` translations are unreviewed
 - Changing the language reloads the page, because messages are read once at startup
-- Rules, transactions, settings and insights components have no Storybook stories (import and auth have them)
+- Rules, transactions and settings components have no Storybook stories (import, auth and insights have them)
 - `README.md` is still the Vite template and `frontend/e2e/vue.spec.ts` is the default scaffold
 
 ---
