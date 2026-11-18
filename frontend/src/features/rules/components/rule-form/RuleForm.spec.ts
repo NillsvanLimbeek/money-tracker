@@ -15,7 +15,7 @@ const PREVIEW: RulePreview = {
 };
 
 const stubs = {
-  Drawer: { template: '<div><slot /><slot name="header" /><slot name="body" /><slot name="footer" /></div>' },
+  Drawer: { props: ['title'], template: '<div><slot /><h2>{{ title }}</h2><slot name="actions" /><slot name="header" /><slot name="body" /><slot name="footer" /></div>' },
   Icon: { template: '<i />' },
 };
 

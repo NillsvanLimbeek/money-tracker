@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 
+import UButton from '@nuxt/ui/components/Button.vue';
 import PageHeader from './PageHeader.vue';
 
 const meta = {
@@ -15,7 +16,7 @@ export const Default: Story = {};
 
 export const WithActions: Story = {
   render: args => ({
-    components: { PageHeader },
+    components: { PageHeader, UButton },
     setup: () => ({ args }),
     template: `
       <PageHeader v-bind="args">

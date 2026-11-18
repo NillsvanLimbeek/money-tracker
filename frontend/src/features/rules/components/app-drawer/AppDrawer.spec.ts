@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import AppDrawer from './AppDrawer.vue';
 
 const stubs = {
-  Drawer: { template: '<div><slot name="header" /><slot name="body" /><slot name="footer" /></div>' },
+  Drawer: { props: ['title'], template: '<div><h2>{{ title }}</h2><slot name="actions" /><slot name="body" /><slot name="footer" /></div>' },
   Icon: { template: '<i />' },
 };
 

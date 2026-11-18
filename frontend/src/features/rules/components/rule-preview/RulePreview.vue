@@ -20,6 +20,7 @@ defineProps<Props>();
     <ul
       v-if="preview.descriptions.length > 0"
       class="divide-accented flex max-h-56 flex-col divide-y overflow-y-auto"
+      tabindex="0"
     >
       <li
         v-for="group in preview.descriptions"

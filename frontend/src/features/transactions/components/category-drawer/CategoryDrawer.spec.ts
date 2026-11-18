@@ -9,7 +9,7 @@ const CATEGORIES = [
 ];
 
 const stubs = {
-  Drawer: { template: '<div><slot /><slot name="header" /><slot name="body" /><slot name="footer" /></div>' },
+  Drawer: { template: '<div><slot /><slot name="actions" /><slot name="header" /><slot name="body" /><slot name="footer" /></div>' },
   Button: { template: '<button><slot /></button>' },
 };
 

@@ -62,6 +62,8 @@ const options = computed<ChartOptions<'doughnut'>>(() => ({
     :aria-label="m.insights_spending_chart_label()"
   >
     <Doughnut
+      role="presentation"
+      aria-hidden="true"
       :data
       :options
     />

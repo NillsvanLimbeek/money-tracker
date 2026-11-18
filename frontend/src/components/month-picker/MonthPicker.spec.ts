@@ -30,7 +30,7 @@ describe('monthPicker', () => {
   it('asks to open the month sheet from the label', async () => {
     const wrapper = mountPicker();
 
-    await wrapper.find('[aria-label="Choose month"]').trigger('click');
+    await wrapper.find('[aria-label^="Choose month"]').trigger('click');
 
     expect(wrapper.emitted('open')).toHaveLength(1);
   });

@@ -37,7 +37,8 @@ function categoryStyle(key: string): CSSProperties {
 <template>
   <UDrawer
     v-model:open="isFilterOpen"
-    :ui="{ overlay: 'bg-black/50' }"
+    :title="m.filter_title()"
+    :ui="{ overlay: 'bg-black/50', wrapper: 'flex-1', title: 'text-highlighted text-lg font-semibold' }"
   >
     <UButton
       :color="selectedCategories.length > 0 ? 'primary' : 'neutral'"
@@ -49,11 +50,7 @@ function categoryStyle(key: string): CSSProperties {
       {{ m.filter_count({ count: selectedCategories.length }) }}
     </UButton>
 
-    <template #header>
-      <h2 class="text-highlighted flex-1 text-lg font-semibold">
-        {{ m.filter_title() }}
-      </h2>
-
+    <template #actions>
       <UButton
         variant="link"
         color="primary"

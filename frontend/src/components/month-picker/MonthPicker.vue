@@ -34,7 +34,7 @@ function shiftMonth(delta: number): void {
       size="xl"
       block
       class="bg-default text-highlighted flex-1 justify-center rounded-xl p-3 font-semibold"
-      :aria-label="m.month_pick()"
+      :aria-label="`${m.month_pick()}: ${monthLabel}`"
       @click="$emit('open')"
     >
       {{ monthLabel }} <UIcon name="i-lucide-chevron-down" />
