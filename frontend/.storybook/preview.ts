@@ -29,6 +29,14 @@ const preview: Preview = {
   ],
   parameters: {
     layout: 'fullscreen',
+    a11y: {
+      // 'error' fails the story in the Vitest run (`pnpm test:a11y`) on any axe
+      // violation; use 'todo' (report only) or 'off' per story to opt out.
+      test: 'error',
+      options: {
+        runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'],
+      },
+    },
   },
 };
 

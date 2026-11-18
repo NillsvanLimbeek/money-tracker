@@ -1,5 +1,6 @@
 import { readdirSync } from 'node:fs';
 import antfu from '@antfu/eslint-config';
+import vueA11y from 'eslint-plugin-vuejs-accessibility';
 
 const features = readdirSync('src/features', { withFileTypes: true })
   .filter(entry => entry.isDirectory())
@@ -51,5 +52,13 @@ export default antfu({
   rules: {
     'vue/max-attributes-per-line': 'error',
     'ts/explicit-function-return-type': ['error', { allowExpressions: true }],
+  },
+}, ...vueA11y.configs['flat/recommended'], {
+  // TODO(a11y): the row expands on mouse click only. Replace with a real
+  // <button aria-expanded> toggle (the nested checkbox rules out role=button on the row).
+  files: ['src/components/transaction-row/TransactionRow.vue'],
+  rules: {
+    'vuejs-accessibility/click-events-have-key-events': 'off',
+    'vuejs-accessibility/no-static-element-interactions': 'off',
   },
 }, ...featureImportRules);

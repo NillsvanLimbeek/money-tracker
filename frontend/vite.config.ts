@@ -1,3 +1,4 @@
+import process from 'node:process';
 import { fileURLToPath, URL } from 'node:url';
 
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
@@ -19,7 +20,8 @@ export default defineConfig({
     }),
     VueRouter(),
     vue(),
-    vueDevTools(),
+    // The devtools overlay breaks the browser-mode story tests.
+    ...(process.env.VITEST ? [] : [vueDevTools()]),
     ui({
       // Auto-register components from the shared folder and from every
       // feature (src/features/<feature>/components).
