@@ -74,7 +74,14 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
 
-      # Backend (Worker + D1): build the real wrangler.toml from the example.
+      # The frontend is served by the Worker (static assets) on the same
+      # origin as the API, so build it first. An empty API URL makes the app
+      # call relative /api/... paths.
+      - name: Build frontend
+        run: pnpm -C frontend build
+        env:
+          VITE_API_URL: ''
+
       - name: Write backend/wrangler.toml
         working-directory: backend
         run: |
@@ -86,13 +93,5 @@ jobs:
           CORS_ORIGIN: ${{ vars.CORS_ORIGIN }}
       - name: Apply D1 migrations
         run: pnpm -C backend exec wrangler d1 migrations apply money_tracker --remote
-      - name: Deploy Worker
+      - name: Deploy Worker and frontend
         run: pnpm -C backend deploy
-
-      # Frontend (static SPA on Cloudflare Pages).
-      - name: Build frontend
-        run: pnpm -C frontend build
-        env:
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-      - name: Deploy frontend
-        run: pnpm -C backend exec wrangler pages deploy ../frontend/dist --project-name "${{ vars.CF_PAGES_PROJECT }}" --branch main

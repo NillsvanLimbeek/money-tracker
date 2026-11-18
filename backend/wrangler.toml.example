@@ -12,3 +12,11 @@ database_name = "money_tracker"
 database_id = "local"
 migrations_dir = "drizzle"
 migrations_pattern = "drizzle/*/migration.sql"
+
+# Serve the built frontend from the same origin as the API, so the auth
+# cookie is first-party (works on Safari/iOS) and no CORS is needed.
+[assets]
+directory = "../frontend/dist"
+not_found_handling = "single-page-application"
+# API requests hit the Worker; everything else is served as static assets.
+run_worker_first = ["/api/*", "/health"]
