@@ -1,67 +1,101 @@
 # money-tracker
 
-This template should help get you started developing with Vue 3 in Vite.
+A personal finance tracker for importing, categorising and analysing ING bank
+transactions. Built for one user and used in the browser on a phone.
 
-## Recommended IDE Setup
+More background lives in [`context/project-overview.md`](context/project-overview.md),
+and progress in [`context/project-status.md`](context/project-status.md).
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Structure
 
-## Recommended Browser Setup
+pnpm workspace:
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+| Folder | What it is |
+|---|---|
+| `frontend/` | Vue 3 + Vite + TypeScript SPA (Nuxt UI, Pinia, TanStack Query, Paraglide i18n, Storybook) |
+| `backend/` | Cloudflare Worker with Hono, Drizzle and better-auth, on a D1 (SQLite) database |
+| `packages/shared/` | Types and schemas shared by both |
+| `docs/` | Reports and feature notes |
 
-## Type Support for `.vue` Imports in TS
+## Requirements
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- Node `^22.18.0` or `>=24.12.0`
+- [pnpm](https://pnpm.io)
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+## Local development
 
 ```sh
 pnpm install
-```
 
-### Compile and Hot-Reload for Development
+# Backend config (wrangler.toml is gitignored)
+cp backend/wrangler.toml.example backend/wrangler.toml
+echo 'BETTER_AUTH_SECRET=<any-long-random-string>' > backend/.env
 
-```sh
+# Frontend config
+cp frontend/.env.example frontend/.env.local
+
+# Create the local D1 tables
+pnpm -C backend db:migrate:local
+
+# Start frontend (http://localhost:5173) and backend (http://localhost:8787)
 pnpm dev
 ```
 
-### Type-Check, Compile and Minify for Production
+## Scripts
+
+Run from the repo root.
+
+| Command | Does |
+|---|---|
+| `pnpm dev` | Frontend and backend together |
+| `pnpm build` | Type-check and build the frontend |
+| `pnpm lint` / `pnpm lint:fix` | ESLint in every package |
+| `pnpm type-check` | Type-check every package |
+| `pnpm test:unit` | Frontend unit tests (Vitest) |
+| `pnpm -C backend test:unit` | Backend tests (Vitest + Workers pool) |
+| `pnpm test:a11y` | Storybook stories run in a real browser with axe checks |
+| `pnpm test:e2e` | Playwright end-to-end tests (`pnpm -C frontend exec playwright install` first) |
+| `pnpm -C frontend storybook` | Storybook on port 6006 |
+| `pnpm -C backend db:generate` | Generate a Drizzle migration after a schema change |
+
+Some files are generated and gitignored (`frontend/src/paraglide`,
+`auto-imports.d.ts`, `components.d.ts`, `typed-router.d.ts`). `pnpm type-check`
+and `pnpm dev` create them, so run one of those first if your editor reports
+missing modules.
+
+## Deployment
+
+Everything runs on Cloudflare. One Worker serves both the API (`/api/*`) and the
+built frontend as static assets, so the app and API share an origin. That keeps
+the auth cookie first-party, which iOS Safari requires, and avoids CORS.
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) handles CI and deploys:
+
+1. On every pull request and push to `main`, two jobs run: lint, type-check and
+   unit tests, and the Storybook a11y tests.
+2. When both pass on `main`, the deploy job:
+   - builds the frontend,
+   - writes `backend/wrangler.toml` from the example,
+   - applies D1 migrations to the remote database,
+   - runs `wrangler deploy`.
+
+### One-time setup
+
+In the GitHub repo, under Settings → Secrets and variables → Actions:
+
+| Type | Name | Value |
+|---|---|---|
+| Secret | `CLOUDFLARE_API_TOKEN` | Token with Workers Scripts edit and D1 edit permission |
+| Secret | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account id |
+| Secret | `D1_DATABASE_ID` | Id of the `money_tracker` D1 database |
+| Variable | `CORS_ORIGIN` | The deployed URL, e.g. `https://money-tracker.<subdomain>.workers.dev` (no trailing slash) |
+
+The auth secret is set once on the Worker and is not part of CI:
 
 ```sh
-pnpm build
+cd backend
+pnpm exec wrangler secret put BETTER_AUTH_SECRET
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-pnpm test:unit
-```
-
-### Run End-to-End Tests with [Playwright](https://playwright.dev)
-
-```sh
-# Install browsers for the first run
-npx playwright install
-
-# When testing on CI, must build the project first
-pnpm build
-
-# Runs the end-to-end tests
-pnpm test:e2e
-# Runs the tests only on Chromium
-pnpm test:e2e --project=chromium
-# Runs the tests of a specific file
-pnpm test:e2e tests/example.spec.ts
-# Runs the tests in debug mode
-pnpm test:e2e --debug
-```
+To deploy by hand, build the frontend first (`pnpm -C frontend build`), then run
+`pnpm -C backend deploy`.
