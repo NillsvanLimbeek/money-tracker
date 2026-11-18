@@ -156,7 +156,7 @@ describe('transactionRow', () => {
 
       expect(wrapper.text()).toContain('Already imported');
       expect(wrapper.findComponent(CategoryBadge).exists()).toBe(false);
-      expect(wrapper.classes()).toContain('opacity-60');
+      expect(wrapper.classes()).toContain('bg-elevated');
     });
 
     it('disables the checkbox', () => {

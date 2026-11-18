@@ -51,8 +51,9 @@ describe('categorySpendRow', () => {
   });
 
   it('fades the row only when dimmed', () => {
-    expect(mountRow({}, true).find('a').classes()).toContain('opacity-40');
-    expect(mountRow({}, false).find('a').classes()).not.toContain('opacity-40');
-    expect(mountRow().find('a').classes()).not.toContain('opacity-40');
+    expect(mountRow({}, true).find('.opacity-40').exists()).toBe(true);
+    expect(mountRow({}, true).find('.text-highlighted').exists()).toBe(false);
+    expect(mountRow({}, false).find('.opacity-40').exists()).toBe(false);
+    expect(mountRow().find('.opacity-40').exists()).toBe(false);
   });
 });

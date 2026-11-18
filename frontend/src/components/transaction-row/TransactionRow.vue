@@ -49,7 +49,7 @@ const amountClass = computed(() => {
 <template>
   <div
     class="flex w-full cursor-pointer items-stretch text-left"
-    :class="{ 'opacity-60': duplicate }"
+    :class="{ 'bg-elevated': duplicate }"
     @click="expanded = !expanded"
   >
     <div class="min-w-0 flex-1 py-4 pr-3 pl-4">

@@ -119,6 +119,18 @@
 }
 
 /*
+ * WCAG AA text contrast: the stock 500 shades of the status colors are
+ * too light for text on white or on their own soft tint (1.6:1 to 3.8:1),
+ * so the semantic vars use the 700/800 shades, which reach 4.5:1 or better.
+ */
+:root,
+.light {
+  --ui-success: var(--color-green-800);
+  --ui-warning: var(--color-yellow-800);
+  --ui-error: var(--color-red-700);
+}
+
+/*
  * Exact neutral tokens from the design. These override Nuxt UI's
  * default semantic vars (normally derived from the `neutral` Tailwind
  * palette) with the designer's literal values. Written unlayered, so
@@ -137,7 +149,7 @@
   --ui-text-highlighted: #17171a; /* headings, sheet CTA */
   --ui-text: #17171a; /* expense amounts */
   --ui-text-toned: #4a4a55; /* filter bar icon strokes */
-  --ui-text-muted: #75757f; /* labels, dates, meta */
+  --ui-text-muted: #62626c; /* labels, dates, meta */
   --ui-text-dimmed: #9a9aa4; /* search icon stroke */
   --ui-text-inverted: #ffffff;
 

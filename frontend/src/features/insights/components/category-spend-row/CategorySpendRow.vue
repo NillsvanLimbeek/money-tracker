@@ -24,16 +24,20 @@ const changeTone = computed(() => {
 
   return spend.change > 0 ? 'text-error' : 'text-success';
 });
+
+// Dimming with opacity would drop the text below the WCAG contrast minimum,
+// so only the graphics fade and the text switches to the muted color.
+const textTone = computed(() => (dimmed ? 'text-muted' : 'text-highlighted'));
 </script>
 
 <template>
   <RouterLink
     :to="{ path: '/', query: { category: spend.categoryKey } }"
-    class="flex items-center gap-4 transition-opacity"
-    :class="{ 'opacity-40': dimmed }"
+    class="flex items-center gap-4"
   >
     <span
-      class="flex size-12 shrink-0 items-center justify-center rounded-2xl"
+      class="flex size-12 shrink-0 items-center justify-center rounded-2xl transition-opacity"
+      :class="{ 'opacity-40': dimmed }"
       :style="{ backgroundColor: `color-mix(in srgb, ${color} 12%, var(--ui-bg))`, color }"
     >
       <UIcon
@@ -44,12 +48,21 @@ const changeTone = computed(() => {
 
     <div class="min-w-0 flex-1">
       <div class="flex items-baseline justify-between gap-2">
-        <span class="text-highlighted truncate text-base font-medium">{{ label }}</span>
-        <span class="text-highlighted font-mono text-base font-bold">{{ formatEuros(spend.amount) }}</span>
+        <span
+          class="truncate text-base font-medium"
+          :class="textTone"
+        >{{ label }}</span>
+        <span
+          class="font-mono text-base font-bold"
+          :class="textTone"
+        >{{ formatEuros(spend.amount) }}</span>
       </div>
 
       <div class="mt-2 flex items-center gap-3">
-        <div class="bg-elevated h-1.5 flex-1 overflow-hidden rounded-full">
+        <div
+          class="bg-elevated h-1.5 flex-1 overflow-hidden rounded-full transition-opacity"
+          :class="{ 'opacity-40': dimmed }"
+        >
           <div
             class="h-full rounded-full"
             :style="{ width: `${spend.share}%`, minWidth: '6px', backgroundColor: color }"
@@ -58,7 +71,7 @@ const changeTone = computed(() => {
         <span class="text-muted w-10 text-right font-mono text-sm">{{ spend.share }}%</span>
         <span
           class="w-12 text-right font-mono text-sm font-medium"
-          :class="changeTone"
+          :class="dimmed ? 'text-muted' : changeTone"
         >{{ changeLabel }}</span>
       </div>
     </div>
